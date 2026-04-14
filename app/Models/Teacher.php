@@ -86,7 +86,7 @@ class Teacher extends Model implements HasMedia
             ->height(1200)
             ->fit(\Spatie\Image\Enums\Fit::Crop, 900, 1200)
             ->format('webp')
-            ->quality(70)
+            ->quality(65)
             ->performOnCollections('photos')
             ->nonQueued();
 
@@ -108,7 +108,8 @@ class Teacher extends Model implements HasMedia
             ->height(267)
             ->fit(\Spatie\Image\Enums\Fit::Crop, 200, 267)
             ->format('webp')
-            ->quality(75)
+            ->quality(65)
+            ->performOnCollections('photos')
             ->nonQueued();
     }
 

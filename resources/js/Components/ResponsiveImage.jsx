@@ -73,6 +73,7 @@ export default function ResponsiveImage({
             <div className={skeleton && !isLoaded ? 'relative' : ''}>
                 {skeleton && !isLoaded && !imageError && (
                     <div 
+                        aria-label="Loading image placeholder"
                         className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse rounded"
                         style={{ minHeight: height || 200 }}
                     />

@@ -23,10 +23,16 @@ class ProgramStudiSetting extends Model implements HasMedia
         'content' => 'array',
     ];
 
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         $this->addMediaConversion('mobile')
             ->width(375)
+            ->format('webp')
+            ->quality(75)
+            ->nonQueued();
+
+        $this->addMediaConversion('tablet')
+            ->width(768)
             ->format('webp')
             ->quality(75)
             ->nonQueued();
@@ -37,9 +43,21 @@ class ProgramStudiSetting extends Model implements HasMedia
             ->quality(70)
             ->nonQueued();
 
+        $this->addMediaConversion('large')
+            ->width(1920)
+            ->format('webp')
+            ->quality(65)
+            ->nonQueued();
+
         $this->addMediaConversion('webp')
             ->format('webp')
             ->quality(70)
+            ->nonQueued();
+
+        $this->addMediaConversion('thumb')
+            ->width(400)
+            ->format('webp')
+            ->quality(65)
             ->nonQueued();
     }
 
@@ -106,9 +124,10 @@ class ProgramStudiSetting extends Model implements HasMedia
     public static function getContent($sectionKey, $dbContent = null)
     {
         $defaults = self::getDefaults($sectionKey);
-        if (!$dbContent) {
+        if (! $dbContent) {
             return $defaults;
         }
+
         return array_merge($defaults, $dbContent);
     }
 }

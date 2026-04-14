@@ -21,18 +21,41 @@ class SpmbSetting extends Model implements HasMedia
         'content' => 'array',
     ];
 
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
+        $this->addMediaConversion('mobile')
+            ->width(375)
+            ->format('webp')
+            ->quality(75)
+            ->nonQueued();
+
+        $this->addMediaConversion('tablet')
+            ->width(768)
+            ->format('webp')
+            ->quality(75)
+            ->nonQueued();
+
         $this->addMediaConversion('desktop')
             ->width(1280)
             ->format('webp')
             ->quality(70)
             ->nonQueued();
 
-        $this->addMediaConversion('mobile')
-            ->width(375)
+        $this->addMediaConversion('large')
+            ->width(1920)
             ->format('webp')
-            ->quality(75)
+            ->quality(65)
+            ->nonQueued();
+
+        $this->addMediaConversion('webp')
+            ->format('webp')
+            ->quality(70)
+            ->nonQueued();
+
+        $this->addMediaConversion('thumb')
+            ->width(400)
+            ->format('webp')
+            ->quality(65)
             ->nonQueued();
     }
 
@@ -41,14 +64,14 @@ class SpmbSetting extends Model implements HasMedia
     {
         return [
             'pengaturan_umum' => [
-                'title', 
-                'description_html', 
-                'is_registration_open', 
-                'registration_year', 
+                'title',
+                'description_html',
+                'is_registration_open',
+                'registration_year',
                 'announcement_text',
                 'banner_image_url',
                 'whatsapp_number',
-                'video_guide_url'
+                'video_guide_url',
             ],
             'jalur_pendaftaran' => ['items'], // List of paths (zonasi, prestasi, etc)
             'jadwal_penting' => ['items'], // items will be array of objects with title, date, description
@@ -81,8 +104,8 @@ class SpmbSetting extends Model implements HasMedia
                             'Kartu Keluarga (minimal 1 tahun)',
                             'Akta Kelahiran / Surat Keterangan Lahir',
                             'Ijazah / Surat Keterangan Lulus',
-                            'Titik koordinat tempat tinggal'
-                        ]
+                            'Titik koordinat tempat tinggal',
+                        ],
                     ],
                     [
                         'label' => 'Prestasi',
@@ -92,8 +115,8 @@ class SpmbSetting extends Model implements HasMedia
                             'Nilai Rapor semester 1-5',
                             'Sertifikat/Piagam Kejuaraan (min. tingkat Kota/Kab)',
                             'Surat Tanggung Jawab Mutlak (SPTJM)',
-                            'Akta Kelahiran & KK'
-                        ]
+                            'Akta Kelahiran & KK',
+                        ],
                     ],
                     [
                         'label' => 'Afirmasi',
@@ -103,8 +126,8 @@ class SpmbSetting extends Model implements HasMedia
                             'Kartu KIP / PKH / KKS / Terdaftar DTKS',
                             'Surat Keterangan Tidak Mampu (jika ada)',
                             'Akta Kelahiran & KK',
-                            'Surat Pernyataan Orang Tua'
-                        ]
+                            'Surat Pernyataan Orang Tua',
+                        ],
                     ],
                     [
                         'label' => 'Perpindahan',
@@ -114,9 +137,9 @@ class SpmbSetting extends Model implements HasMedia
                             'Surat Keputusan Pindah Tugas Orang Tua',
                             'Surat Keterangan Domisili',
                             'Akta Kelahiran & KK',
-                            'Ijazah / Surat Keterangan Lulus'
-                        ]
-                    ]
+                            'Ijazah / Surat Keterangan Lulus',
+                        ],
+                    ],
                 ],
             ],
             'jadwal_penting' => [

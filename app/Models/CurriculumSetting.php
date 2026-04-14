@@ -17,10 +17,16 @@ class CurriculumSetting extends Model implements HasMedia
         'content' => 'array',
     ];
 
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         $this->addMediaConversion('mobile')
             ->width(375)
+            ->format('webp')
+            ->quality(75)
+            ->nonQueued();
+
+        $this->addMediaConversion('tablet')
+            ->width(768)
             ->format('webp')
             ->quality(75)
             ->nonQueued();
@@ -31,9 +37,21 @@ class CurriculumSetting extends Model implements HasMedia
             ->quality(70)
             ->nonQueued();
 
+        $this->addMediaConversion('large')
+            ->width(1920)
+            ->format('webp')
+            ->quality(65)
+            ->nonQueued();
+
         $this->addMediaConversion('webp')
             ->format('webp')
             ->quality(70)
+            ->nonQueued();
+
+        $this->addMediaConversion('thumb')
+            ->width(400)
+            ->format('webp')
+            ->quality(65)
             ->nonQueued();
     }
 
@@ -78,7 +96,7 @@ class CurriculumSetting extends Model implements HasMedia
     {
         $default = self::getDefaults($key);
 
-        if (!$dbContent) {
+        if (! $dbContent) {
             return $default;
         }
 

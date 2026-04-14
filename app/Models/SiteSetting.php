@@ -22,7 +22,7 @@ class SiteSetting extends Model implements HasMedia
     /**
      * Register media conversions
      */
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         // Responsive variants for hero/banner images
         $this->addMediaConversion('mobile')
@@ -46,7 +46,7 @@ class SiteSetting extends Model implements HasMedia
         $this->addMediaConversion('large')
             ->width(1920)
             ->format('webp')
-            ->quality(70)
+            ->quality(65)
             ->nonQueued();
 
         $this->addMediaConversion('webp')
@@ -192,7 +192,7 @@ class SiteSetting extends Model implements HasMedia
     {
         $default = self::getDefaults($key);
 
-        if (!$dbContent) {
+        if (! $dbContent) {
             return $default;
         }
 
@@ -209,18 +209,20 @@ class SiteSetting extends Model implements HasMedia
      */
     public static function get(string $key): mixed
     {
-        if (!in_array($key, self::getSectionFields()['general'])) {
+        if (! in_array($key, self::getSectionFields()['general'])) {
             return null;
         }
 
         $setting = self::where('section_key', 'general')->first();
-        
-        if (!$setting) {
+
+        if (! $setting) {
             $defaults = self::defaults();
+
             return $defaults['general'][$key] ?? null;
         }
 
         $content = $setting->content ?? [];
+
         return $content[$key] ?? null;
     }
 
@@ -238,7 +240,7 @@ class SiteSetting extends Model implements HasMedia
             $dbRow = $settings->get($key);
             $dbContent = ($dbRow) ? $dbRow->content : null;
             $siteSettings[$key] = self::getContent($key, $dbContent);
-            
+
             // Override image field for all hero sections with central hero image
             if (str_starts_with($key, 'hero_') && isset($siteSettings[$key])) {
                 $siteSettings[$key]['image'] = $centralHeroImage;

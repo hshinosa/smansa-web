@@ -34,6 +34,7 @@ class Extracurricular extends Model implements HasMedia
      * Available type constants
      */
     public const TYPE_ORGANISASI = 'organisasi';
+
     public const TYPE_EKSTRAKURIKULER = 'ekstrakurikuler';
 
     /**
@@ -63,6 +64,7 @@ class Extracurricular extends Model implements HasMedia
     public function getImageUrlAttribute(): ?string
     {
         $media = $this->getFirstMedia('images');
+
         return $media ? $media->getUrl() : null;
     }
 
@@ -72,6 +74,7 @@ class Extracurricular extends Model implements HasMedia
     public function getBgImageUrlAttribute(): ?string
     {
         $media = $this->getFirstMedia('bg_images');
+
         return $media ? $media->getUrl() : null;
     }
 
@@ -81,13 +84,14 @@ class Extracurricular extends Model implements HasMedia
     public function getProfileImageUrlAttribute(): ?string
     {
         $media = $this->getFirstMedia('profile_images');
+
         return $media ? $media->getUrl() : null;
     }
 
     /**
      * Register media conversions for extracurricular images
      */
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         // Thumbnail for admin panel
         $this
@@ -95,7 +99,7 @@ class Extracurricular extends Model implements HasMedia
             ->width(400)
             ->height(300)
             ->format('webp')
-            ->quality(75)
+            ->quality(65)
             ->performOnCollections('images', 'bg_images', 'profile_images')
             ->nonQueued();
 
@@ -125,7 +129,24 @@ class Extracurricular extends Model implements HasMedia
             ->width(1920)
             ->height(1080)
             ->format('webp')
-            ->quality(75)
+            ->quality(70)
+            ->performOnCollections('images', 'bg_images', 'profile_images')
+            ->nonQueued();
+
+        // Large version
+        $this
+            ->addMediaConversion('large')
+            ->width(2560)
+            ->format('webp')
+            ->quality(65)
+            ->performOnCollections('images', 'bg_images', 'profile_images')
+            ->nonQueued();
+
+        // WebP version (original as WebP)
+        $this
+            ->addMediaConversion('webp')
+            ->format('webp')
+            ->quality(70)
             ->performOnCollections('images', 'bg_images', 'profile_images')
             ->nonQueued();
     }
@@ -138,11 +159,11 @@ class Extracurricular extends Model implements HasMedia
         $this
             ->addMediaCollection('images')
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
-        
+
         $this
             ->addMediaCollection('bg_images')
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
-        
+
         $this
             ->addMediaCollection('profile_images')
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);

@@ -14,7 +14,7 @@ class SchoolProfileSetting extends Model implements HasMedia
     protected $fillable = ['section_key', 'content'];
 
     // Removed casts to avoid conflict with accessor/mutator
-    
+
     /**
      * Get the content attribute and ensure it's always an array
      */
@@ -24,7 +24,7 @@ class SchoolProfileSetting extends Model implements HasMedia
         if (is_array($value)) {
             return $value;
         }
-        
+
         // Decode JSON string to array
         if (is_string($value)) {
             // Remove wrapping quotes if exists
@@ -32,19 +32,19 @@ class SchoolProfileSetting extends Model implements HasMedia
             if (substr($value, 0, 1) === '"' && substr($value, -1) === '"') {
                 $value = substr($value, 1, -1);
             }
-            
+
             // Unescape the JSON string
             $value = stripcslashes($value);
-            
+
             $decoded = json_decode($value, true);
             if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
                 return $decoded;
             }
         }
-        
+
         return [];
     }
-    
+
     /**
      * Set the content attribute - encode array to JSON
      */
@@ -56,7 +56,7 @@ class SchoolProfileSetting extends Model implements HasMedia
     /**
      * Register media conversions
      */
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         // Responsive variants for all images
         $this->addMediaConversion('mobile')
@@ -80,7 +80,7 @@ class SchoolProfileSetting extends Model implements HasMedia
         $this->addMediaConversion('large')
             ->width(1920)
             ->format('webp')
-            ->quality(70)
+            ->quality(65)
             ->nonQueued();
 
         $this->addMediaConversion('webp')
@@ -170,16 +170,17 @@ class SchoolProfileSetting extends Model implements HasMedia
         ];
 
         $default = $defaults[$key] ?? [];
-        
+
         if ($dbContent && is_array($dbContent)) {
             // For history section, ensure timeline from DB takes precedence
             if ($key === 'history' && isset($dbContent['timeline']) && is_array($dbContent['timeline'])) {
                 $merged = array_merge($default, $dbContent);
                 // Explicitly set timeline from DB to avoid overwrite
                 $merged['timeline'] = $dbContent['timeline'];
+
                 return $merged;
             }
-            
+
             // For other sections with array fields, merge carefully
             return array_merge($default, $dbContent);
         }
