@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TkaAverageRequest;
 use App\Models\TkaAverage;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\DB;
-
-use App\Http\Requests\TkaAverageRequest;
 
 class TkaAverageController extends Controller
 {
@@ -22,7 +20,7 @@ class TkaAverageController extends Controller
             ->get();
 
         return Inertia::render('Admin/TkaAverages/Index', [
-            'groups' => $groups
+            'groups' => $groups,
         ]);
     }
 
@@ -36,7 +34,7 @@ class TkaAverageController extends Controller
         return Inertia::render('Admin/TkaAverages/Show', [
             'academic_year' => $academic_year,
             'exam_type' => $exam_type,
-            'subjects' => $subjects
+            'subjects' => $subjects,
         ]);
     }
 
@@ -74,19 +72,26 @@ class TkaAverageController extends Controller
     public function destroy($id)
     {
         TkaAverage::findOrFail($id)->delete();
+
         return back()->with('success', 'Data dihapus.');
     }
-    
+
     // Bulk delete for a group
     public function destroyGroup(Request $request)
     {
-        $year = $request->input('academic_year');
-        $type = $request->input('exam_type');
-        
+        // Validate input to prevent SQL injection and invalid data
+        $validated = $request->validate([
+            'academic_year' => 'required|string|max:20',
+            'exam_type' => 'required|string|in:UTBK,Ujian Sekolah,Try Out',
+        ]);
+
+        $year = $validated['academic_year'];
+        $type = $validated['exam_type'];
+
         TkaAverage::where('academic_year', $year)
             ->where('exam_type', $type)
             ->delete();
-            
+
         return redirect()->route('admin.tka-averages.index')->with('success', 'Data grup ujian berhasil dihapus.');
     }
 }

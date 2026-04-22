@@ -16,6 +16,7 @@ use App\Models\ProgramStudiSetting;
 use App\Models\PtnAdmission;
 use App\Models\RagDocument;
 use App\Models\SchoolProfileSetting;
+use App\Models\Seragam;
 use App\Models\SiteSetting;
 use App\Models\SpmbSetting;
 use App\Models\Teacher;
@@ -525,7 +526,7 @@ class RagService
                 }
 
                 if (! empty($programNames)) {
-                    $ragProgramDocs = \App\Models\RagDocument::where('file_type', 'database')
+                    $ragProgramDocs = RagDocument::where('file_type', 'database')
                         ->where('category', 'Program Studi')
                         ->where('is_active', true)
                         ->where(function ($q) use ($programNames) {
@@ -787,7 +788,7 @@ class RagService
             }
 
             // 17. Search Seragam (School Uniforms)
-            $seragams = \App\Models\Seragam::where('is_active', true)
+            $seragams = Seragam::where('is_active', true)
                 ->where(function ($q) use ($queryLower) {
                     $q->where('name', 'like', "%{$queryLower}%")
                         ->orWhere('description', 'like', "%{$queryLower}%")
@@ -851,76 +852,80 @@ class RagService
     public function processDocument(RagDocument $document): bool
     {
         try {
-            // 1. Delete existing chunks from DB
-            $document->chunks()->delete();
+            // Wrap in transaction to ensure all-or-nothing processing
+            return DB::transaction(function () use ($document) {
+                // 1. Delete existing chunks from DB
+                $document->chunks()->delete();
 
-            // 2. Split content into chunks
-            $chunks = $this->splitTextIntoChunks($document->content);
+                // 2. Split content into chunks
+                $chunks = $this->splitTextIntoChunks($document->content);
 
-            // 3. Generate embeddings and store in PostgreSQL
-            foreach ($chunks as $index => $chunkText) {
-                $embeddingResult = $this->embeddingService->createEmbedding($chunkText, 'passage');
+                // 3. Generate embeddings and store in PostgreSQL
+                foreach ($chunks as $index => $chunkText) {
+                    $embeddingResult = $this->embeddingService->createEmbedding($chunkText, 'passage');
 
-                if (! $embeddingResult['success']) {
-                    Log::error('Failed to generate embedding', [
-                        'document_id' => $document->id,
-                        'chunk_index' => $index,
-                    ]);
-
-                    continue;
-                }
-
-                $embedding = $embeddingResult['embedding'];
-                $tokenCount = $this->estimateTokenCount($chunkText);
-
-                try {
-                    if ($this->pgvectorAvailable) {
-                        // Store with pgvector
-                        $embeddingStr = '['.implode(',', $embedding).']';
-                        DB::statement(
-                            'INSERT INTO rag_document_chunks (document_id, content, chunk_index, token_count, embedding, created_at, updated_at)
-                             VALUES (?, ?, ?, ?, ?::vector, NOW(), NOW())',
-                            [$document->id, $chunkText, $index, $tokenCount, $embeddingStr]
-                        );
-                    } else {
-                        // Store as JSON text (fallback)
-                        DB::table('rag_document_chunks')->insert([
+                    if (! $embeddingResult['success']) {
+                        Log::error('Failed to generate embedding', [
                             'document_id' => $document->id,
-                            'content' => $chunkText,
                             'chunk_index' => $index,
-                            'token_count' => $tokenCount,
-                            'embedding' => json_encode($embedding),
-                            'created_at' => now(),
-                            'updated_at' => now(),
                         ]);
+
+                        // Throw exception to rollback transaction
+                        throw new \Exception("Failed to generate embedding for chunk {$index}");
                     }
 
-                    Log::info('Chunk stored successfully', [
-                        'document_id' => $document->id,
-                        'chunk_index' => $index,
-                        'token_count' => $tokenCount,
-                        'mode' => $this->pgvectorAvailable ? 'pgvector' : 'fallback',
-                    ]);
-                } catch (\Exception $e) {
-                    Log::error('Failed to store chunk', [
-                        'document_id' => $document->id,
-                        'chunk_index' => $index,
-                        'error' => $e->getMessage(),
-                    ]);
-                    throw $e;
+                    $embedding = $embeddingResult['embedding'];
+                    $tokenCount = $this->estimateTokenCount($chunkText);
+
+                    try {
+                        if ($this->pgvectorAvailable) {
+                            // Store with pgvector
+                            $embeddingStr = '['.implode(',', $embedding).']';
+                            DB::statement(
+                                'INSERT INTO rag_document_chunks (document_id, content, chunk_index, token_count, embedding, created_at, updated_at)
+                             VALUES (?, ?, ?, ?, ?::vector, NOW(), NOW())',
+                                [$document->id, $chunkText, $index, $tokenCount, $embeddingStr]
+                            );
+                        } else {
+                            // Store as JSON text (fallback)
+                            DB::table('rag_document_chunks')->insert([
+                                'document_id' => $document->id,
+                                'content' => $chunkText,
+                                'chunk_index' => $index,
+                                'token_count' => $tokenCount,
+                                'embedding' => json_encode($embedding),
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
+                        }
+
+                        Log::info('Chunk stored successfully', [
+                            'document_id' => $document->id,
+                            'chunk_index' => $index,
+                            'token_count' => $tokenCount,
+                            'mode' => $this->pgvectorAvailable ? 'pgvector' : 'fallback',
+                        ]);
+                    } catch (\Exception $e) {
+                        Log::error('Failed to store chunk', [
+                            'document_id' => $document->id,
+                            'chunk_index' => $index,
+                            'error' => $e->getMessage(),
+                        ]);
+                        throw $e;
+                    }
                 }
-            }
 
-            // 4. Mark document as processed
-            $document->update(['is_processed' => true]);
+                // 4. Mark document as processed
+                $document->update(['is_processed' => true]);
 
-            Log::info('Document processing completed', [
-                'document_id' => $document->id,
-                'chunks_count' => count($chunks),
-                'mode' => $this->pgvectorAvailable ? 'pgvector' : 'fallback',
-            ]);
+                Log::info('Document processing completed', [
+                    'document_id' => $document->id,
+                    'chunks_count' => count($chunks),
+                    'mode' => $this->pgvectorAvailable ? 'pgvector' : 'fallback',
+                ]);
 
-            return true;
+                return true;
+            }); // End transaction
         } catch (\Exception $e) {
             Log::error('Document processing failed', [
                 'document_id' => $document->id,
@@ -980,7 +985,7 @@ class RagService
             try {
                 if ($config['table'] === 'posts') {
                     // Search with strict title matching
-                    $post = \App\Models\Post::where('status', 'published')
+                    $post = Post::where('status', 'published')
                         ->where(function ($q) use ($config) {
                             // Title MUST contain one of the required keywords
                             foreach ($config['title_must_contain'] as $keyword) {
@@ -1009,7 +1014,7 @@ class RagService
                         ];
                     }
                 } elseif ($config['table'] === 'programs') {
-                    $program = \App\Models\Program::where('is_featured', true)
+                    $program = Program::where('is_featured', true)
                         ->where(function ($q) use ($config) {
                             foreach ($config['title_must_contain'] as $keyword) {
                                 $q->orWhere('title', 'like', "%{$keyword}%")

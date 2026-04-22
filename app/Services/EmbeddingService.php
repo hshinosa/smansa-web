@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AiSetting;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -13,9 +14,13 @@ use Illuminate\Support\Facades\Log;
 class EmbeddingService
 {
     protected string $provider;
+
     protected string $baseUrl;
+
     protected string $model;
+
     protected int $dimensions;
+
     protected array $candidateBaseUrls = [];
 
     public function __construct()
@@ -64,6 +69,7 @@ class EmbeddingService
 
         try {
             $root = Http::timeout(2)->get($baseUrl);
+
             return $root->successful();
         } catch (\Exception $e) {
             return false;
@@ -85,7 +91,7 @@ class EmbeddingService
             ];
         }
 
-        if (!$this->isAvailable()) {
+        if (! $this->isAvailable()) {
             return [
                 'success' => false,
                 'error' => 'Embedding service unavailable',
@@ -129,15 +135,21 @@ class EmbeddingService
     protected function requestOpenAiCompatible(string $text): array
     {
         try {
-            $response = Http::timeout(30)->post("{$this->baseUrl}/v1/embeddings", [
-                'input' => $text,
-                'model' => $this->model,
-            ]);
+            // Add retry logic for transient failures
+            $response = Http::timeout(30)
+                ->retry(3, 1000, function ($exception) {
+                    // Only retry on connection errors, not on 4xx errors
+                    return $exception instanceof ConnectionException;
+                })
+                ->post("{$this->baseUrl}/v1/embeddings", [
+                    'input' => $text,
+                    'model' => $this->model,
+                ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return [
                     'success' => false,
-                    'error' => 'OpenAI-compatible endpoint failed: HTTP ' . $response->status(),
+                    'error' => 'OpenAI-compatible endpoint failed: HTTP '.$response->status(),
                     'embedding' => [],
                 ];
             }
@@ -145,7 +157,7 @@ class EmbeddingService
             $json = $response->json();
             $embedding = $json['data'][0]['embedding'] ?? null;
 
-            if (!is_array($embedding) || empty($embedding)) {
+            if (! is_array($embedding) || empty($embedding)) {
                 return [
                     'success' => false,
                     'error' => 'OpenAI-compatible endpoint returned invalid embedding format',
@@ -164,7 +176,7 @@ class EmbeddingService
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'error' => 'OpenAI-compatible endpoint exception: ' . $e->getMessage(),
+                'error' => 'OpenAI-compatible endpoint exception: '.$e->getMessage(),
                 'embedding' => [],
             ];
         }
@@ -173,15 +185,21 @@ class EmbeddingService
     protected function requestTeiNative(string $text): array
     {
         try {
-            $response = Http::timeout(30)->post("{$this->baseUrl}/embed", [
-                'inputs' => $text,
-                'truncate' => true,
-            ]);
+            // Add retry logic for transient failures
+            $response = Http::timeout(30)
+                ->retry(3, 1000, function ($exception) {
+                    // Only retry on connection errors
+                    return $exception instanceof ConnectionException;
+                })
+                ->post("{$this->baseUrl}/embed", [
+                    'inputs' => $text,
+                    'truncate' => true,
+                ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return [
                     'success' => false,
-                    'error' => 'TEI native endpoint failed: HTTP ' . $response->status(),
+                    'error' => 'TEI native endpoint failed: HTTP '.$response->status(),
                     'embedding' => [],
                 ];
             }
@@ -190,13 +208,13 @@ class EmbeddingService
 
             // TEI may return either [float...] or [[float...]] depending on endpoint/version
             $embedding = [];
-            if (is_array($json) && !empty($json) && is_numeric($json[0] ?? null)) {
+            if (is_array($json) && ! empty($json) && is_numeric($json[0] ?? null)) {
                 $embedding = $json;
             } elseif (is_array($json) && isset($json[0]) && is_array($json[0])) {
                 $embedding = $json[0];
             }
 
-            if (!is_array($embedding) || empty($embedding)) {
+            if (! is_array($embedding) || empty($embedding)) {
                 return [
                     'success' => false,
                     'error' => 'TEI native endpoint returned invalid embedding format',
@@ -215,7 +233,7 @@ class EmbeddingService
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'error' => 'TEI native endpoint exception: ' . $e->getMessage(),
+                'error' => 'TEI native endpoint exception: '.$e->getMessage(),
                 'embedding' => [],
             ];
         }
