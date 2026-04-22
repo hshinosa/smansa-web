@@ -1,8 +1,16 @@
 <?php
 
+use App\Http\Middleware\CookieSecurity;
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\InputSanitization;
+use App\Http\Middleware\LogRequest;
+use App\Http\Middleware\PerformanceOptimization;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,13 +21,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
-            \App\Http\Middleware\InputSanitization::class,
-            \App\Http\Middleware\HandleInertiaRequests::class,
-            \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
-            \App\Http\Middleware\SecurityHeaders::class,
-            \App\Http\Middleware\CookieSecurity::class,
-            \App\Http\Middleware\PerformanceOptimization::class,
-            \App\Http\Middleware\LogRequest::class,
+            InputSanitization::class,
+            HandleInertiaRequests::class,
+            AddLinkHeadersForPreloadedAssets::class,
+            SecurityHeaders::class,
+            CookieSecurity::class,
+            PerformanceOptimization::class,
+            LogRequest::class,
         ]);
 
         // Exclude API routes and health check from CSRF protection
@@ -31,8 +39,37 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
 
         // Trust all proxies (Cloudflare, Nginx, etc.)
-        $middleware->trustProxies(at: '*', headers: \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR | \Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO);
+        $middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_PROTO);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Prevent information disclosure in production
+        $exceptions->render(function (Throwable $e, $request) {
+            // Let custom exceptions handle their own rendering
+            if (method_exists($e, 'render')) {
+                return $e->render($request);
+            }
+
+            // For production: hide sensitive error details
+            if (! config('app.debug')) {
+                $statusCode = method_exists($e, 'getStatusCode')
+                    ? $e->getStatusCode()
+                    : 500;
+
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => [
+                            'code' => 'SERVER_ERROR',
+                            'message' => 'Terjadi kesalahan pada server. Silakan coba lagi.',
+                        ],
+                    ], $statusCode);
+                }
+
+                // For Inertia requests
+                return redirect()->back()->with('error', 'Terjadi kesalahan. Silakan coba lagi.');
+            }
+
+            // In development: let Laravel show detailed errors
+            return null;
+        });
     })->create();
