@@ -3,16 +3,18 @@
 namespace App\Jobs;
 
 use App\Models\Post;
-use App\Services\RagService;
 use App\Services\ContentCreationService;
 use App\Services\GroqService;
+use App\Services\RagService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class ProcessInstagramPost implements ShouldQueue
@@ -20,18 +22,24 @@ class ProcessInstagramPost implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 3;
+
     public $timeout = 180; // Increased to 3 minutes for AI processing
+
     public $backoff = [30, 60, 120];
-    
+
     /**
      * The maximum number of unhandled exceptions to allow before failing.
      */
     public $maxExceptions = 3;
 
     protected int $scrapedPostId;
+
     protected string $title;
+
     protected string $category;
+
     protected int $authorId;
+
     protected bool $useAI;
 
     /**
@@ -67,11 +75,12 @@ class ProcessInstagramPost implements ShouldQueue
             'timestamp' => now()->toIso8601String(),
         ]);
 
-        // Implement Redis-based atomic lock to prevent race conditions (extended timeout for AI processing)
-        $lock = \Illuminate\Support\Facades\Cache::lock('process_instagram_post_' . $this->scrapedPostId, 200);
+        // Implement Redis-based atomic lock to prevent race conditions (lock timeout < job timeout)
+        $lock = Cache::lock('process_instagram_post_'.$this->scrapedPostId, 150);
 
-        if (!$lock->get()) {
+        if (! $lock->get()) {
             Log::warning('[InstagramJob] Job already being processed by another worker - releasing early', ['scraped_id' => $this->scrapedPostId]);
+
             return;
         }
 
@@ -89,22 +98,23 @@ class ProcessInstagramPost implements ShouldQueue
             // Get the scraped post (no lockForUpdate - we're using Cache lock instead)
             $scrapedPost = DB::table('sc_raw_news_feeds')->where('id', $this->scrapedPostId)->first();
 
-            if (!$scrapedPost) {
+            if (! $scrapedPost) {
                 Log::warning('[InstagramJob] Scraped post not found in DB', ['id' => $this->scrapedPostId]);
+
                 return;
             }
 
             if ($scrapedPost->is_processed) {
                 Log::info('[InstagramJob] Post already marked as processed in DB', [
                     'id' => $this->scrapedPostId,
-                    'processed_at' => $scrapedPost->processed_at
+                    'processed_at' => $scrapedPost->processed_at,
                 ]);
-                
+
                 // Safety: make sure status is null if it's already processed
                 DB::table('sc_raw_news_feeds')
                     ->where('id', $this->scrapedPostId)
                     ->update(['processing_status' => null]);
-                    
+
                 return;
             }
 
@@ -115,14 +125,14 @@ class ProcessInstagramPost implements ShouldQueue
             }
 
             $fixedImagePaths = [];
-            if (!empty($imagePaths) && is_array($imagePaths)) {
+            if (! empty($imagePaths) && is_array($imagePaths)) {
                 foreach ($imagePaths as $path) {
                     $cleanPath = ltrim($path, '/\\');
                     // Remove "downloads/" prefix if present
                     $cleanPath = preg_replace('#^downloads/#', '', $cleanPath);
                     // Add instagram-scraper/downloads prefix
-                    if (!str_starts_with($cleanPath, 'instagram-scraper/')) {
-                        $cleanPath = 'instagram-scraper/downloads/' . $cleanPath;
+                    if (! str_starts_with($cleanPath, 'instagram-scraper/')) {
+                        $cleanPath = 'instagram-scraper/downloads/'.$cleanPath;
                     }
                     $fixedImagePaths[] = $cleanPath;
                 }
@@ -138,35 +148,35 @@ class ProcessInstagramPost implements ShouldQueue
                 try {
                     // Build image context for AI generation
                     $imageCount = count($fixedImagePaths);
-                    
+
                     // Try AI Vision for ALL images analysis
                     $imageDescriptions = [];
-                    if (!empty($fixedImagePaths)) {
+                    if (! empty($fixedImagePaths)) {
                         Log::info('[InstagramJob] Analyzing all images', ['total_images' => $imageCount]);
-                        
+
                         foreach ($fixedImagePaths as $index => $imagePath) {
                             $fullPath = base_path($imagePath);
                             if (file_exists($fullPath)) {
-                                Log::info("[InstagramJob] Analyzing image " . ($index + 1) . "/{$imageCount}", ['path' => $imagePath]);
+                                Log::info('[InstagramJob] Analyzing image '.($index + 1)."/{$imageCount}", ['path' => $imagePath]);
                                 $visionResult = $groqService->analyzeImage($fullPath);
                                 if ($visionResult['success']) {
-                                    $imageDescriptions[] = "Gambar " . ($index + 1) . ": " . $visionResult['message'];
+                                    $imageDescriptions[] = 'Gambar '.($index + 1).': '.$visionResult['message'];
                                 } else {
-                                    Log::warning("[InstagramJob] Vision failed for image " . ($index + 1), ['error' => $visionResult['error'] ?? 'unknown']);
+                                    Log::warning('[InstagramJob] Vision failed for image '.($index + 1), ['error' => $visionResult['error'] ?? 'unknown']);
                                 }
                             }
                         }
                     }
 
                     // Combine all descriptions or use heuristic fallback
-                    if (!empty($imageDescriptions)) {
-                        $imageDescription = "Deskripsi visual dari {$imageCount} gambar:\n" . implode("\n", $imageDescriptions);
+                    if (! empty($imageDescriptions)) {
+                        $imageDescription = "Deskripsi visual dari {$imageCount} gambar:\n".implode("\n", $imageDescriptions);
                         Log::info('[InstagramJob] Combined vision analysis successful', ['total_analyzed' => count($imageDescriptions)]);
                     } else {
                         $imageDescription = $this->generateImageDescription($fixedImagePaths, $caption);
                         Log::info('[InstagramJob] Using heuristic image description');
                     }
-                    
+
                     // Get likes/engagement if available
                     $engagement = null;
                     if (isset($scrapedPost->likes_count)) {
@@ -174,14 +184,14 @@ class ProcessInstagramPost implements ShouldQueue
                     } elseif (isset($scrapedPost->engagement)) {
                         $engagement = $scrapedPost->engagement;
                     }
-                    
+
                     // Extract hashtags from caption
                     $hashtags = [];
                     preg_match_all('/#(\w+)/u', $caption, $matches);
-                    if (!empty($matches[1])) {
+                    if (! empty($matches[1])) {
                         $hashtags = array_slice($matches[1], 0, 10); // Limit to 10 hashtags
                     }
-                    
+
                     // Use ContentCreationService for AI-generated content
                     $aiResult = $contentCreationService->generateNewsArticle($caption, [
                         'date' => $scrapedPost->scraped_at ?? null,
@@ -190,17 +200,17 @@ class ProcessInstagramPost implements ShouldQueue
                         'engagement' => $engagement,
                         'hashtags' => $hashtags,
                     ]);
-                    
-                    if ($aiResult['success'] && !empty($aiResult['article'])) {
+
+                    if ($aiResult['success'] && ! empty($aiResult['article'])) {
                         $article = $aiResult['article'];
-                        
+
                         // Use AI-generated title if available
-                        if (!empty($article['title'])) {
+                        if (! empty($article['title'])) {
                             $title = Str::limit($article['title'], 200);
                         }
-                        
+
                         // Use AI-generated category if available
-                        if (!empty($article['category'])) {
+                        if (! empty($article['category'])) {
                             $categoryMap = [
                                 'Berita Sekolah' => 'Berita',
                                 'Berita' => 'Berita',
@@ -211,10 +221,10 @@ class ProcessInstagramPost implements ShouldQueue
                             ];
                             $category = $categoryMap[$article['category']] ?? $this->category;
                         }
-                        
+
                         // Content is already formatted with proper capitalization by ContentCreationService
                         $content = $article['content'];
-                        
+
                         Log::info('[InstagramJob] AI processing completed via ContentCreationService', [
                             'original_title' => $this->title,
                             'ai_title' => $title,
@@ -248,12 +258,12 @@ class ProcessInstagramPost implements ShouldQueue
             // Create unique slug
             $slug = Str::slug($title);
             if (empty($slug)) {
-                $slug = 'instagram-post-' . $this->scrapedPostId;
+                $slug = 'instagram-post-'.$this->scrapedPostId;
             }
-            
+
             $existingSlug = Post::where('slug', $slug)->exists();
             if ($existingSlug) {
-                $slug = $slug . '-' . time();
+                $slug = $slug.'-'.time();
             }
 
             // Create draft post
@@ -276,39 +286,39 @@ class ProcessInstagramPost implements ShouldQueue
             ]);
 
             // Handle ALL images attachment
-            if (!empty($fixedImagePaths)) {
+            if (! empty($fixedImagePaths)) {
                 Log::info('[InstagramJob] Attaching all images to post', [
                     'total_images' => count($fixedImagePaths),
                     'post_id' => $post->id,
                 ]);
-                
+
                 $attachedCount = 0;
                 foreach ($fixedImagePaths as $index => $imagePath) {
                     $fullPath = base_path($imagePath);
-                    
+
                     if (file_exists($fullPath)) {
                         try {
                             $post->addMedia($fullPath)
                                 ->preservingOriginal()
                                 ->toMediaCollection('featured'); // Spatie supports multiple in one collection
-                            
+
                             $attachedCount++;
-                            Log::info("[InstagramJob] Image " . ($index + 1) . " attached successfully", [
+                            Log::info('[InstagramJob] Image '.($index + 1).' attached successfully', [
                                 'post_id' => $post->id,
                                 'image' => $imagePath,
                             ]);
                         } catch (\Exception $e) {
-                            Log::warning("[InstagramJob] Failed to attach image " . ($index + 1), [
+                            Log::warning('[InstagramJob] Failed to attach image '.($index + 1), [
                                 'post_id' => $post->id,
                                 'image' => $imagePath,
                                 'error' => $e->getMessage(),
                             ]);
                         }
                     } else {
-                        Log::warning("[InstagramJob] Image file not found", ['path' => $fullPath]);
+                        Log::warning('[InstagramJob] Image file not found', ['path' => $fullPath]);
                     }
                 }
-                
+
                 Log::info('[InstagramJob] Image attachment completed', [
                     'post_id' => $post->id,
                     'attached' => $attachedCount,
@@ -325,7 +335,7 @@ class ProcessInstagramPost implements ShouldQueue
             ];
 
             // Only add processed_at if the column exists to avoid errors
-            if (\Illuminate\Support\Facades\Schema::hasColumn('sc_raw_news_feeds', 'processed_at')) {
+            if (Schema::hasColumn('sc_raw_news_feeds', 'processed_at')) {
                 $updateData['processed_at'] = now();
             }
 
@@ -351,7 +361,7 @@ class ProcessInstagramPost implements ShouldQueue
                 ->where('id', $this->scrapedPostId)
                 ->update([
                     'processing_status' => null,
-                    'error_message' => 'Processing error: ' . Str::limit($e->getMessage(), 200),
+                    'error_message' => 'Processing error: '.Str::limit($e->getMessage(), 200),
                     'updated_at' => now(),
                 ]);
 
@@ -363,94 +373,90 @@ class ProcessInstagramPost implements ShouldQueue
 
     /**
      * Format content with proper capitalization (fallback when AI is not used or fails)
-     * 
-     * @param string $caption
-     * @return string
      */
     protected function formatContentWithCapitalization(string $caption): string
     {
         // Escape HTML entities
         $text = htmlspecialchars($caption, ENT_QUOTES, 'UTF-8');
-        
+
         // Apply capitalization
         $text = $this->capitalizeSentences($text);
-        
+
         // Split by double newlines for paragraphs
         $paragraphs = preg_split('/\n\s*\n/', $text);
         $html = '';
-        
+
         foreach ($paragraphs as $p) {
             $p = trim($p);
-            if (empty($p)) continue;
-            
+            if (empty($p)) {
+                continue;
+            }
+
             // Convert single newlines to <br>
             $p = nl2br($p);
-            
+
             // Linkify URLs
             $p = preg_replace(
-                '/(https?:\/\/[^\s]+)/', 
-                '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">$1</a>', 
+                '/(https?:\/\/[^\s]+)/',
+                '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">$1</a>',
                 $p
             );
-            
+
             // Linkify Mentions (@username)
             $p = preg_replace(
-                '/@(\w+)/', 
-                '<a href="https://instagram.com/$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">@$1</a>', 
+                '/@(\w+)/',
+                '<a href="https://instagram.com/$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">@$1</a>',
                 $p
             );
-            
+
             $html .= "<p class=\"mb-4 text-gray-700 leading-relaxed\">{$p}</p>";
         }
-        
+
         return $html;
     }
 
     /**
      * Capitalize first letter of each sentence
-     * 
-     * @param string $text
-     * @return string
      */
     protected function capitalizeSentences(string $text): string
     {
         // First, capitalize the very first character of the text
         if (strlen($text) > 0) {
-            $text = mb_strtoupper(mb_substr($text, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($text, 1, null, 'UTF-8');
+            $text = mb_strtoupper(mb_substr($text, 0, 1, 'UTF-8'), 'UTF-8').mb_substr($text, 1, null, 'UTF-8');
         }
-        
+
         // Capitalize after sentence-ending punctuation followed by space/newline
         $text = preg_replace_callback(
             '/([.!?])\s+([a-záàâäãåæçéèêëíìîïñóòôöõøúùûüýÿ])/ui',
             function ($matches) {
-                return $matches[1] . ' ' . mb_strtoupper($matches[2], 'UTF-8');
+                return $matches[1].' '.mb_strtoupper($matches[2], 'UTF-8');
             },
             $text
         );
-        
+
         // Capitalize after newlines
         $text = preg_replace_callback(
             '/(\n\s*)([a-záàâäãåæçéèêëíìîïñóòôöõøúùûüýÿ])/ui',
             function ($matches) {
-                return $matches[1] . mb_strtoupper($matches[2], 'UTF-8');
+                return $matches[1].mb_strtoupper($matches[2], 'UTF-8');
             },
             $text
         );
-        
+
         // Capitalize after numbered list items (1. 2. 3. etc.)
         $text = preg_replace_callback(
             '/(\d+\.\s*)([a-záàâäãåæçéèêëíìîïñóòôöõøúùûüýÿ])/ui',
             function ($matches) {
-                return $matches[1] . mb_strtoupper($matches[2], 'UTF-8');
+                return $matches[1].mb_strtoupper($matches[2], 'UTF-8');
             },
             $text
         );
-        
+
         // Capitalize after bullet points (- or *)
         $text = preg_replace_callback(
             '/([\-\*]\s+)([a-záàâäãåæçéèêëíìîïñóòôöõøúùûüýÿ])/ui',
             function ($matches) {
-                return $matches[1] . mb_strtoupper($matches[2], 'UTF-8');
+                return $matches[1].mb_strtoupper($matches[2], 'UTF-8');
             },
             $text
         );
@@ -461,10 +467,6 @@ class ProcessInstagramPost implements ShouldQueue
     /**
      * Generate a contextual description of images based on paths and caption
      * This helps the AI understand what the images likely contain
-     * 
-     * @param array $imagePaths
-     * @param string $caption
-     * @return string
      */
     protected function generateImageDescription(array $imagePaths, string $caption): string
     {
@@ -477,7 +479,7 @@ class ProcessInstagramPost implements ShouldQueue
 
         // Analyze caption for context clues about what the images might show
         $captionLower = strtolower($caption);
-        
+
         // Keywords for different types of activities
         $activityKeywords = [
             'upacara' => 'upacara bendera',
@@ -524,9 +526,9 @@ class ProcessInstagramPost implements ShouldQueue
             }
         }
 
-        if (!empty($detectedActivities)) {
+        if (! empty($detectedActivities)) {
             $uniqueActivities = array_unique($detectedActivities);
-            $description = 'Gambar kemungkinan menampilkan ' . implode(', ', array_slice($uniqueActivities, 0, 3));
+            $description = 'Gambar kemungkinan menampilkan '.implode(', ', array_slice($uniqueActivities, 0, 3));
         } else {
             $description = 'Dokumentasi foto kegiatan sekolah';
         }
@@ -551,7 +553,7 @@ class ProcessInstagramPost implements ShouldQueue
 
         // Always release the lock on failure to prevent deadlock
         try {
-            $lock = \Illuminate\Support\Facades\Cache::lock('process_instagram_post_' . $this->scrapedPostId);
+            $lock = Cache::lock('process_instagram_post_'.$this->scrapedPostId);
             $lock->forceRelease();
         } catch (\Exception $e) {
             Log::warning('[InstagramJob] Could not release lock on failure', ['error' => $e->getMessage()]);
@@ -562,7 +564,7 @@ class ProcessInstagramPost implements ShouldQueue
             ->where('id', $this->scrapedPostId)
             ->update([
                 'processing_status' => null,
-                'error_message' => 'Job failed permanently: ' . Str::limit($exception->getMessage(), 200),
+                'error_message' => 'Job failed permanently: '.Str::limit($exception->getMessage(), 200),
                 'updated_at' => now(),
             ]);
     }

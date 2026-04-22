@@ -16,10 +16,13 @@ class RunInstagramScraperJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $timeout = 600; // 10 minutes
+
     public $tries = 1;
 
     protected string $username;
+
     protected int $maxPosts;
+
     protected int $logId;
 
     /**
@@ -30,7 +33,7 @@ class RunInstagramScraperJob implements ShouldQueue
         $this->username = $username;
         $this->maxPosts = $maxPosts;
         $this->logId = $logId;
-        
+
         $this->onQueue('instagram');
     }
 
@@ -41,7 +44,7 @@ class RunInstagramScraperJob implements ShouldQueue
     {
         Log::info('[ScraperJob] Starting background scraping', [
             'username' => $this->username,
-            'log_id' => $this->logId
+            'log_id' => $this->logId,
         ]);
 
         try {
@@ -76,7 +79,7 @@ class RunInstagramScraperJob implements ShouldQueue
                 ]);
             } else {
                 $output = Artisan::output();
-                
+
                 DB::table('sc_scraper_logs')
                     ->where('id', $this->logId)
                     ->update([
@@ -88,13 +91,14 @@ class RunInstagramScraperJob implements ShouldQueue
 
                 Log::error('[ScraperJob] Background scraping failed', [
                     'username' => $this->username,
-                    'output' => $output
+                    'output' => $output,
                 ]);
             }
         } catch (\Exception $e) {
             Log::error('[ScraperJob] Exception during scraping', [
                 'username' => $this->username,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             DB::table('sc_scraper_logs')
@@ -105,6 +109,9 @@ class RunInstagramScraperJob implements ShouldQueue
                     'completed_at' => now(),
                     'updated_at' => now(),
                 ]);
+
+            // Re-throw to trigger retry mechanism
+            throw $e;
         }
     }
 }

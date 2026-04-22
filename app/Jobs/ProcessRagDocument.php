@@ -15,6 +15,12 @@ class ProcessRagDocument implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 3;
+
+    public $timeout = 120;
+
+    public $backoff = [30, 60, 120];
+
     protected RagDocument $document;
 
     /**
@@ -31,10 +37,10 @@ class ProcessRagDocument implements ShouldQueue
     public function handle(RagService $ragService): void
     {
         Log::info('Processing RAG document via queue', ['document_id' => $this->document->id]);
-        
+
         try {
             $success = $ragService->processDocument($this->document);
-            
+
             if ($success) {
                 Log::info('RAG document processed successfully', ['document_id' => $this->document->id]);
             } else {
@@ -43,7 +49,7 @@ class ProcessRagDocument implements ShouldQueue
         } catch (\Exception $e) {
             Log::error('Exception during RAG document processing job', [
                 'document_id' => $this->document->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
             throw $e;
         }
