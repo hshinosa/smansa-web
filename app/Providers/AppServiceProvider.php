@@ -21,6 +21,7 @@ use App\Models\Teacher;
 use App\Observers\CacheInvalidationObserver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
@@ -64,7 +65,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Enable method spoofing for legacy HTML forms and some XHR clients
-        \Illuminate\Http\Request::enableHttpMethodParameterOverride();
+        Request::enableHttpMethodParameterOverride();
 
         $isDevHost = false;
 
@@ -75,12 +76,17 @@ class AppServiceProvider extends ServiceProvider
         }
 
         if ($this->app->environment('production') && ! $isDevHost) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
-            \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
+            URL::forceScheme('https');
+            URL::forceRootUrl(config('app.url'));
         }
 
         Vite::prefetch(concurrency: 3);
         Schema::defaultStringLength(191);
+
+        Event::listen(
+            MediaHasBeenAdded::class,
+            CompressOriginalImage::class
+        );
 
         // Register CacheInvalidationObserver for automatic cache clearing
         $cacheObserver = CacheInvalidationObserver::class;
