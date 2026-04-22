@@ -2,27 +2,27 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\SchoolProfileSetting;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 
 class UpdateStrukturOrganisasiSeeder extends Seeder
 {
     public function run()
     {
-        $fotoGuruPath = base_path('foto-guru');
+        $fotoGuruPath = base_path('data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU');
 
         // 1. HERO STRUKTUR ORGANISASI
         $hero = SchoolProfileSetting::updateOrCreate(
             ['section_key' => 'hero_organization'],
             ['content' => json_encode([
                 'title' => 'Struktur Organisasi SMAN 1 Baleendah',
-                'image_url' => '/images/hero-bg-sman1baleendah.jpeg'
+                'image_url' => '/images/hero-bg-sman1baleendah.jpeg',
             ])]
         );
-        
+
         // Migrate Hero Image
-        $heroBgPath = $fotoGuruPath . DIRECTORY_SEPARATOR . 'SMANSA.jpeg';
+        $heroBgPath = $fotoGuruPath.DIRECTORY_SEPARATOR.'SMANSA.jpeg';
         if (File::exists($heroBgPath)) {
             $hero->clearMediaCollection('hero_organization_bg');
             $hero->addMedia($heroBgPath)
@@ -36,7 +36,7 @@ class UpdateStrukturOrganisasiSeeder extends Seeder
             ['content' => json_encode([
                 'title' => 'Bagan Struktur Organisasi',
                 'description' => 'Struktur organisasi SMA Negeri 1 Baleendah Tahun Pelajaran 2025/2026',
-                'image_url' => '/images/hero-bg-sman1baleendah.jpeg'
+                'image_url' => '/images/hero-bg-sman1baleendah.jpeg',
             ])]
         );
 

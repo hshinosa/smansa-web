@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Teacher;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 
 class PopulateTeachersSeeder extends Seeder
@@ -18,24 +18,24 @@ class PopulateTeachersSeeder extends Seeder
         $teachersData = [
             // Pimpinan & Manajemen
             [
-                'name' => 'Drs. H. Dede Amar, M.M.Pd.', 
-                'position' => 'Kepala Sekolah', 
-                'department' => 'Manajemen', 
-                'type' => 'guru'
+                'name' => 'Drs. H. Dede Amar, M.M.Pd.',
+                'position' => 'Kepala Sekolah',
+                'department' => 'Manajemen',
+                'type' => 'guru',
             ],
             [
-                'name' => 'Dra. Hj. Elis Nurhayati', 
-                'position' => 'Wakil Kepala Sekolah Bidang Kurikulum', 
-                'department' => 'Manajemen', 
-                'type' => 'guru'
+                'name' => 'Dra. Hj. Elis Nurhayati',
+                'position' => 'Wakil Kepala Sekolah Bidang Kurikulum',
+                'department' => 'Manajemen',
+                'type' => 'guru',
             ],
             [
-                'name' => 'Asep Saepudin, S.Pd.', 
-                'position' => 'Wakil Kepala Sekolah Bidang Kesiswaan', 
-                'department' => 'Manajemen', 
-                'type' => 'guru'
+                'name' => 'Asep Saepudin, S.Pd.',
+                'position' => 'Wakil Kepala Sekolah Bidang Kesiswaan',
+                'department' => 'Manajemen',
+                'type' => 'guru',
             ],
-            
+
             // MIPA
             ['name' => 'Budi Santoso, S.Pd.', 'position' => 'Guru Matematika', 'department' => 'Matematika', 'type' => 'guru'],
             ['name' => 'Siti Aminah, S.Si.', 'position' => 'Guru Fisika', 'department' => 'Fisika', 'type' => 'guru'],
@@ -80,15 +80,15 @@ class PopulateTeachersSeeder extends Seeder
 
         $counter = 0;
 
-        $smansaPath = base_path('foto-guru/SMANSA.jpeg');
+        $smansaPath = base_path('data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU/SMANSA.jpeg');
 
         foreach ($teachersData as $data) {
             $teacher = Teacher::create([
                 'name' => $data['name'],
-                'type' => $data['type'], 
+                'type' => $data['type'],
                 'position' => $data['position'],
                 'department' => $data['department'],
-                'nip' => '19' . rand(70, 99) . rand(10, 12) . rand(10, 30) . '200' . rand(1, 9),
+                'nip' => '19'.rand(70, 99).rand(10, 12).rand(10, 30).'200'.rand(1, 9),
                 'is_active' => true,
                 'sort_order' => $counter++,
             ]);

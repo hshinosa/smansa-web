@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\ProgramStudiSetting;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 
 class PopulateProgramStudiSeeder extends Seeder
@@ -26,7 +26,7 @@ class PopulateProgramStudiSeeder extends Seeder
             $setting = ProgramStudiSetting::updateOrCreate(
                 [
                     'program_name' => $programName,
-                    'section_key' => $sectionKey
+                    'section_key' => $sectionKey,
                 ],
                 ['content' => $content]
             );
@@ -34,7 +34,7 @@ class PopulateProgramStudiSeeder extends Seeder
             // Handle Media Attachments
             $this->attachMedia($setting, $sectionKey, $content);
         }
-        
+
         $this->command->info("Program Studi {$programName} populated.");
     }
 
@@ -42,10 +42,10 @@ class PopulateProgramStudiSeeder extends Seeder
     {
         $imagePath = null;
         $collection = null;
-        $smansaPath = base_path('foto-guru/SMANSA.jpeg');
+        $smansaPath = base_path('data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU/SMANSA.jpeg');
 
         if ($sectionKey === 'hero') {
-            $imagePath = public_path('images/anak-sma-programstudi.png');
+            $imagePath = base_path('data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU/SMANSA.jpeg');
             $collection = 'hero_background_image';
 
             // Also attach thumbnail_card (Student photo)
@@ -99,7 +99,7 @@ class PopulateProgramStudiSeeder extends Seeder
                             ['title' => 'Fisika', 'desc' => 'Mekanika, Termodinamika, dan Fisika Modern'],
                             ['title' => 'Kimia', 'desc' => 'Kimia Organik, Stoikiometri, dan Larutan'],
                             ['title' => 'Biologi', 'desc' => 'Genetika, Ekologi, dan Anatomi Fisiologi'],
-                        ]
+                        ],
                     ],
                     'facilities' => [
                         'title' => 'Fasilitas Riset',
@@ -110,8 +110,8 @@ class PopulateProgramStudiSeeder extends Seeder
                             ['title' => 'Laboratorium Komputer & CBT'],
                             ['title' => 'Green House & Apotek Hidup'],
                             ['title' => 'Teleskop Astronomi'],
-                            ['title' => 'Perpustakaan Digital Sains']
-                        ]
+                            ['title' => 'Perpustakaan Digital Sains'],
+                        ],
                     ],
                     'career_paths' => [
                         'title' => 'Prospek Masa Depan',
@@ -120,9 +120,9 @@ class PopulateProgramStudiSeeder extends Seeder
                             ['title' => 'Kedokteran & Kesehatan', 'desc' => 'Dokter, Apoteker, Ahli Gizi'],
                             ['title' => 'Teknik & Rekayasa', 'desc' => 'Teknik Sipil, Industri, Elektro, Informatika'],
                             ['title' => 'Sains Murni', 'desc' => 'Peneliti, Ahli Biologi, Kimiawan'],
-                            ['title' => 'Teknologi Informasi', 'desc' => 'Data Scientist, Software Engineer']
-                        ]
-                    ]
+                            ['title' => 'Teknologi Informasi', 'desc' => 'Data Scientist, Software Engineer'],
+                        ],
+                    ],
                 ];
 
             case 'ips':
@@ -139,7 +139,7 @@ class PopulateProgramStudiSeeder extends Seeder
                             ['title' => 'Sosiologi', 'desc' => 'Interaksi Sosial, Konflik, dan Perubahan Masyarakat'],
                             ['title' => 'Geografi', 'desc' => 'Pemetaan, Lingkungan Hidup, dan Kependudukan'],
                             ['title' => 'Sejarah Peminatan', 'desc' => 'Sejarah Dunia dan Pergerakan Nasional'],
-                        ]
+                        ],
                     ],
                     'facilities' => [
                         'title' => 'Fasilitas Penunjang',
@@ -150,8 +150,8 @@ class PopulateProgramStudiSeeder extends Seeder
                             ['title' => 'Laboratorium IPS & Peta'],
                             ['title' => 'Corner Bursa Efek Mini'],
                             ['title' => 'Studio Podcast Sosial'],
-                            ['title' => 'Ruang Diskusi & Debat']
-                        ]
+                            ['title' => 'Ruang Diskusi & Debat'],
+                        ],
                     ],
                     'career_paths' => [
                         'title' => 'Prospek Karir',
@@ -160,9 +160,9 @@ class PopulateProgramStudiSeeder extends Seeder
                             ['title' => 'Ekonomi & Bisnis', 'desc' => 'Akuntan, Manajer, Entrepreneur'],
                             ['title' => 'Hukum & Politik', 'desc' => 'Pengacara, Diplomat, Politisi'],
                             ['title' => 'Media & Komunikasi', 'desc' => 'Jurnalis, Public Relations'],
-                            ['title' => 'Psikologi & Sosial', 'desc' => 'Psikolog, Peneliti Sosial']
-                        ]
-                    ]
+                            ['title' => 'Psikologi & Sosial', 'desc' => 'Psikolog, Peneliti Sosial'],
+                        ],
+                    ],
                 ];
 
             case 'bahasa':
@@ -179,7 +179,7 @@ class PopulateProgramStudiSeeder extends Seeder
                             ['title' => 'Bahasa & Sastra Indonesia', 'desc' => 'Kajian Prosa, Puisi, dan Jurnalistik'],
                             ['title' => 'Bahasa Asing Pilihan', 'desc' => 'Bahasa Jepang / Jerman / Perancis'],
                             ['title' => 'Antropologi', 'desc' => 'Kajian Budaya dan Etnografi'],
-                        ]
+                        ],
                     ],
                     'facilities' => [
                         'title' => 'Laboratorium Bahasa',
@@ -190,8 +190,8 @@ class PopulateProgramStudiSeeder extends Seeder
                             ['title' => 'Pojok Literasi & Budaya'],
                             ['title' => 'Panggung Teater Mini'],
                             ['title' => 'Studio Rekaman Bahasa'],
-                            ['title' => 'Koleksi Sastra Perpustakaan']
-                        ]
+                            ['title' => 'Koleksi Sastra Perpustakaan'],
+                        ],
                     ],
                     'career_paths' => [
                         'title' => 'Peluang Global',
@@ -200,9 +200,9 @@ class PopulateProgramStudiSeeder extends Seeder
                             ['title' => 'Komunikasi & Media', 'desc' => 'Penerjemah, Content Writer, Editor'],
                             ['title' => 'Pariwisata & Hospitaliti', 'desc' => 'Tour Guide, Staff Hotel Internasional'],
                             ['title' => 'Hubungan Internasional', 'desc' => 'Diplomat, Staff NGO'],
-                            ['title' => 'Seni & Kreatif', 'desc' => 'Penulis Skenario, Kurator Seni']
-                        ]
-                    ]
+                            ['title' => 'Seni & Kreatif', 'desc' => 'Penulis Skenario, Kurator Seni'],
+                        ],
+                    ],
                 ];
 
             default:

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Alumni;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 
 class PopulateAlumniSeeder extends Seeder
@@ -21,7 +21,7 @@ class PopulateAlumniSeeder extends Seeder
                 'video_url' => 'https://www.youtube.com/watch?v=jtqI3aP82wk',
                 'video_source' => 'youtube',
                 'content_type' => 'video',
-                'is_featured' => true
+                'is_featured' => true,
             ],
             [
                 'name' => 'Sarah Wijaya',
@@ -30,9 +30,9 @@ class PopulateAlumniSeeder extends Seeder
                 'video_url' => 'https://www.youtube.com/watch?v=jtqI3aP82wk',
                 'video_source' => 'youtube',
                 'content_type' => 'video',
-                'is_featured' => true
+                'is_featured' => true,
             ],
-            
+
             // NON-FEATURED - dengan gambar anak-sma.png
             [
                 'name' => 'Budi Santoso',
@@ -40,7 +40,7 @@ class PopulateAlumniSeeder extends Seeder
                 'testimonial' => 'Fasilitas dan kurikulum yang berkualitas mempersiapkan saya untuk bersaing di kancah internasional. Sekarang bekerja sebagai Engineer di Perusahaan Teknologi Global.',
                 'image_name' => 'anak-sma.png',
                 'content_type' => 'text',
-                'is_featured' => false
+                'is_featured' => false,
             ],
             [
                 'name' => 'Putri Ayu',
@@ -48,7 +48,7 @@ class PopulateAlumniSeeder extends Seeder
                 'testimonial' => 'Disiplin dan kerja keras yang diajarkan di sekolah menjadi pondasi sukses saya dalam pendidikan kedokteran. Saat ini praktik sebagai Dokter Spesialis Anak.',
                 'image_name' => 'anak-sma.png',
                 'content_type' => 'text',
-                'is_featured' => false
+                'is_featured' => false,
             ],
             [
                 'name' => 'Rizky Pratama',
@@ -56,7 +56,7 @@ class PopulateAlumniSeeder extends Seeder
                 'testimonial' => 'Organisasi kesiswaan di SMAN 1 Baleendah melatih kepemimpinan saya sejak dini. Kini menjabat sebagai Manajer di BUMN dengan latar belakang S2 Manajemen Bisnis.',
                 'image_name' => 'anak-sma.png',
                 'content_type' => 'text',
-                'is_featured' => false
+                'is_featured' => false,
             ],
             [
                 'name' => 'Ani Lestari',
@@ -64,16 +64,18 @@ class PopulateAlumniSeeder extends Seeder
                 'testimonial' => 'Ekstrakurikuler jurnalistik sekolah membuka jalan karir saya di dunia media. Sekarang bekerja sebagai Jurnalis di TV Nasional.',
                 'image_name' => 'anak-sma.png',
                 'content_type' => 'text',
-                'is_featured' => false
-            ]
+                'is_featured' => false,
+            ],
         ];
 
-        $studentPhotoPath = public_path('images/anak-sma.png');
-        $secondaryPhotoPath = public_path('images/anak-sma-programstudi.png');
+        $photoFolder = base_path('data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU');
+        $photoFiles = File::glob($photoFolder.'/*.jpg');
+        $studentPhotoPath = $photoFiles[0] ?? base_path('data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU/SMANSA.jpeg');
+        $secondaryPhotoPath = $photoFiles[1] ?? $studentPhotoPath;
 
         foreach ($alumniData as $data) {
             unset($data['image_name']);
-            
+
             $data['is_published'] = true;
             $data['sort_order'] = 0;
 

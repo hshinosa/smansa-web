@@ -2,17 +2,17 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Program;
 use App\Models\SiteSetting;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 
 class PopulateProgramsTableSeeder extends Seeder
 {
     public function run()
     {
-        $fotoGuruPath = base_path('foto-guru');
-        $smansaPath = $fotoGuruPath . DIRECTORY_SEPARATOR . 'SMANSA.jpeg';
+        $fotoGuruPath = base_path('data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU');
+        $smansaPath = $fotoGuruPath.DIRECTORY_SEPARATOR.'SMANSA.jpeg';
 
         // 1. Update Hero Section Title
         $hero = SiteSetting::updateOrCreate(
@@ -20,7 +20,7 @@ class PopulateProgramsTableSeeder extends Seeder
             ['content' => [
                 'title' => 'Program Sekolah',
                 'subtitle' => 'Membangun karakter dan kompetensi siswa melalui berbagai inisiatif positif.',
-                'image' => '/images/hero-bg-sman1baleendah.jpeg'
+                'image' => '/images/hero-bg-sman1baleendah.jpeg',
             ]]
         );
 
@@ -38,16 +38,16 @@ class PopulateProgramsTableSeeder extends Seeder
                 'icon_name' => 'Microscope',
                 'link' => '/akademik/program-studi/mipa',
                 'category' => 'Program Studi',
-                'sort_order' => 1
+                'sort_order' => 1,
             ],
             [
                 'title' => 'IPS',
                 'description' => 'Program Ilmu Pengetahuan Sosial yang mempelajari dinamika masyarakat, ekonomi, dan sejarah.',
-                'image_name' => 'anak-sma-programstudi.png', 
+                'image_name' => 'anak-sma-programstudi.png',
                 'icon_name' => 'Globe',
                 'link' => '/akademik/program-studi/ips',
                 'category' => 'Program Studi',
-                'sort_order' => 2
+                'sort_order' => 2,
             ],
             [
                 'title' => 'Bahasa',
@@ -56,7 +56,7 @@ class PopulateProgramsTableSeeder extends Seeder
                 'icon_name' => 'BookOpen',
                 'link' => '/akademik/program-studi/bahasa',
                 'category' => 'Program Studi',
-                'sort_order' => 3
+                'sort_order' => 3,
             ],
             // 3. Program Sekolah (Non-Prodi) - NEW
             [
@@ -66,7 +66,7 @@ class PopulateProgramsTableSeeder extends Seeder
                 'icon_name' => 'Leaf',
                 'link' => '#',
                 'category' => 'Program Unggulan',
-                'sort_order' => 4
+                'sort_order' => 4,
             ],
             [
                 'title' => 'Sekolah Ramah Anak',
@@ -75,7 +75,7 @@ class PopulateProgramsTableSeeder extends Seeder
                 'icon_name' => 'Heart',
                 'link' => '#',
                 'category' => 'Program Unggulan',
-                'sort_order' => 5
+                'sort_order' => 5,
             ],
             [
                 'title' => 'Literasi Digital',
@@ -84,8 +84,8 @@ class PopulateProgramsTableSeeder extends Seeder
                 'icon_name' => 'Cpu',
                 'link' => '#',
                 'category' => 'Program Unggulan',
-                'sort_order' => 6
-            ]
+                'sort_order' => 6,
+            ],
         ];
 
         foreach ($programs as $data) {
@@ -97,7 +97,7 @@ class PopulateProgramsTableSeeder extends Seeder
                     'link' => $data['link'],
                     'category' => $data['category'],
                     'is_featured' => true,
-                    'sort_order' => $data['sort_order']
+                    'sort_order' => $data['sort_order'],
                 ]
             );
 

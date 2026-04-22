@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\AcademicCalendarContent;
 use App\Models\CurriculumSetting;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 
 class PopulateAcademicAndCurriculumSeeder extends Seeder
@@ -17,8 +17,8 @@ class PopulateAcademicAndCurriculumSeeder extends Seeder
 
     private function seedAcademicCalendar()
     {
-        $fotoGuruPath = base_path('foto-guru');
-        $smansaPath = $fotoGuruPath . DIRECTORY_SEPARATOR . 'SMANSA.jpeg';
+        $fotoGuruPath = base_path('data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU');
+        $smansaPath = $fotoGuruPath.DIRECTORY_SEPARATOR.'SMANSA.jpeg';
 
         AcademicCalendarContent::truncate();
 
@@ -44,7 +44,7 @@ class PopulateAcademicAndCurriculumSeeder extends Seeder
         if (File::exists($smansaPath)) {
             $cal1->clearMediaCollection('calendar_images');
             $cal1->addMedia($smansaPath)->preservingOriginal()->toMediaCollection('calendar_images');
-            
+
             $cal2->clearMediaCollection('calendar_images');
             $cal2->addMedia($smansaPath)->preservingOriginal()->toMediaCollection('calendar_images');
         }
@@ -55,8 +55,8 @@ class PopulateAcademicAndCurriculumSeeder extends Seeder
     private function seedCurriculum()
     {
         $smansaPath = base_path('smansa-dokumen');
-        $infographicDeepLearning = $smansaPath . DIRECTORY_SEPARATOR . 'Kurikulum.jpeg';
-        $infographicEducation2045 = $smansaPath . DIRECTORY_SEPARATOR . 'Kurikulum.png';
+        $infographicDeepLearning = $smansaPath.DIRECTORY_SEPARATOR.'Kurikulum.jpeg';
+        $infographicEducation2045 = $smansaPath.DIRECTORY_SEPARATOR.'Kurikulum.png';
 
         $sections = CurriculumSetting::getSectionFields();
         $mediaCollections = CurriculumSetting::getMediaCollections();
@@ -81,7 +81,7 @@ class PopulateAcademicAndCurriculumSeeder extends Seeder
                 $setting->addMedia($path)->preservingOriginal()->toMediaCollection($collection);
             }
         }
-        
+
         $this->command->info('Curriculum Settings populated.');
     }
 }
