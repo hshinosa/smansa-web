@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { logger } from '@/Utils/logger';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import InputLabel from '@/Components/InputLabel';
 import { getImageUrl } from '@/Utils/imageUtils';
@@ -10,7 +11,7 @@ export default function ImageUploadCard({ id, label, onChange, previewUrl, error
 
     useEffect(() => {
         const processedUrl = previewUrl ? getImageUrl(previewUrl) : null;
-        console.log(`🖼️ ImageUploadCard [${id}]: Processing previewUrl`, {
+        logger.log(`🖼️ ImageUploadCard [${id}]: Processing previewUrl`, {
             original: previewUrl,
             processed: processedUrl,
             label: label

@@ -1,0 +1,179 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "Lewati ke konten utama" [ref=e4] [cursor=pointer]:
+      - /url: "#main-content"
+    - navigation "Navigasi utama" [ref=e5]:
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - link "Logo SMAN 1 Baleendah" [ref=e9] [cursor=pointer]:
+            - /url: /
+            - img "Logo SMAN 1 Baleendah" [ref=e10]
+          - generic [ref=e11]:
+            - link "SMAN 1 Baleendah" [ref=e12] [cursor=pointer]:
+              - /url: /
+            - paragraph [ref=e13]: Unggul dalam Prestasi, Berkarakter Mulia
+        - button "Toggle navigasi utama" [ref=e15] [cursor=pointer]:
+          - generic [ref=e16]: Open main menu
+          - img [ref=e17]
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - button "Profil"
+            - generic:
+              - button "Akademik"
+          - link "Berita Pengumuman":
+            - /url: /berita-pengumuman
+          - link "Alumni":
+            - /url: /alumni
+          - link "Kontak":
+            - /url: /kontak
+          - generic:
+            - link "Info PPDB":
+              - /url: /informasi-spmb
+    - generic [ref=e18]:
+      - img "Background" [ref=e20]
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - heading "Selamat Datang di SMA Negeri 1 Baleendah" [level=1] [ref=e26]:
+            - text: Selamat Datang di
+            - text: SMA Negeri 1 Baleendah
+          - paragraph [ref=e27]: Sekolah penggerak prestasi dan inovasi masa depan. Kami berkomitmen mencetak lulusan yang cerdas, berakhlak mulia, dan siap bersaing di era global.
+          - generic [ref=e28]:
+            - link "Jelajahi Profil" [ref=e29] [cursor=pointer]:
+              - /url: /profil-sekolah
+            - link "Info PPDB" [ref=e30] [cursor=pointer]:
+              - /url: /informasi-spmb
+        - generic [ref=e31]:
+          - img "Siswa Berprestasi SMAN 1 Baleendah" [ref=e32]
+          - generic [ref=e33]:
+            - img [ref=e35]
+            - generic [ref=e41]:
+              - paragraph [ref=e42]: Akreditasi
+              - paragraph [ref=e43]: A
+          - generic [ref=e44]:
+            - img [ref=e46]
+            - generic [ref=e52]:
+              - paragraph [ref=e53]: Lulusan
+              - paragraph [ref=e54]: 15k+
+          - generic [ref=e55]:
+            - img [ref=e57]
+            - generic [ref=e63]:
+              - paragraph [ref=e64]: Siswa Aktif
+              - paragraph [ref=e65]: 1.2k+
+    - generic [ref=e68]:
+      - img "Tentang Kami" [ref=e71]
+      - generic [ref=e73]:
+        - heading "Tentang Kami" [level=2] [ref=e74]
+        - generic [ref=e75]:
+          - paragraph [ref=e76]: SMAN 1 Baleendah berdiri sejak tahun 1975 dan telah menjadi salah satu sekolah rujukan di Jawa Barat. Dengan visi menjadi sekolah unggul dalam prestasi dan berwawasan lingkungan, kami terus berinovasi dalam pembelajaran berbasis teknologi dan penguatan karakter.
+          - paragraph [ref=e77]: Kami percaya bahwa setiap siswa memiliki potensi unik yang perlu dikembangkan melalui bimbingan yang tepat dan fasilitas yang memadai.
+        - link "Selengkapnya tentang kami" [ref=e78] [cursor=pointer]:
+          - /url: /profil/sejarah
+          - text: Selengkapnya tentang kami
+          - img [ref=e79]
+    - generic [ref=e82]:
+      - heading "Sambutan Kepala Sekolah" [level=2] [ref=e84]
+      - generic [ref=e85]:
+        - img "Drs. H. Ahmad Suryadi, M.Pd." [ref=e88]
+        - generic [ref=e89]:
+          - heading "Drs. H. Ahmad Suryadi, M.Pd." [level=3] [ref=e90]
+          - paragraph [ref=e91]: Kepala SMA Negeri 1 Baleendah
+      - generic [ref=e93]:
+        - img [ref=e95]
+        - generic [ref=e97]:
+          - paragraph [ref=e98]: Assalamu'alaikum Warahmatullahi Wabarakatuh...
+          - paragraph [ref=e99]: Saya mewakili seluruh warga SMA Negeri 1 Baleendah menyampaikan terima kasih atas kunjungan Anda ke website resmi kami...
+          - paragraph [ref=e100]: Hormat kami,
+    - generic [ref=e103]:
+      - heading "Program Akademik" [level=2] [ref=e104]
+      - paragraph [ref=e105]: Berbagai program inovatif yang dirancang untuk mengembangkan potensi siswa secara holistik.
+    - generic [ref=e108]:
+      - generic [ref=e109]:
+        - generic [ref=e110]:
+          - heading "Berita Smansa" [level=2] [ref=e111]
+          - paragraph [ref=e112]: Informasi terbaru seputar kegiatan sekolah, prestasi siswa, dan pengumuman akademik.
+        - link "Lihat Semua Berita" [ref=e113] [cursor=pointer]:
+          - /url: /berita-pengumuman
+          - text: Lihat Semua Berita
+          - img [ref=e114]
+      - paragraph [ref=e118]: Belum ada berita terbaru.
+    - generic [ref=e119]:
+      - generic [ref=e121]:
+        - heading "Galeri Sekolah" [level=2] [ref=e122]
+        - paragraph [ref=e123]: Momen-momen seru dan kegiatan inspiratif siswa-siswi SMAN 1 Baleendah.
+      - generic [ref=e124]: Belum ada galeri foto.
+      - link "Lihat Galeri Lengkap" [ref=e126] [cursor=pointer]:
+        - /url: /galeri
+        - text: Lihat Galeri Lengkap
+        - img [ref=e127]
+    - generic [ref=e132]:
+      - heading "Siap Menjadi Bagian dari Keluarga Besar SMAN 1 Baleendah?" [level=2] [ref=e133]
+      - paragraph [ref=e134]: Dapatkan informasi lengkap mengenai pendaftaran peserta didik baru, jadwal, dan persyaratan yang dibutuhkan.
+      - generic [ref=e135]:
+        - link "Daftar Sekarang" [ref=e136] [cursor=pointer]:
+          - /url: /informasi-spmb
+        - link "Hubungi Kami" [ref=e137] [cursor=pointer]:
+          - /url: /kontak
+    - contentinfo [ref=e138]:
+      - generic [ref=e139]:
+        - generic [ref=e140]:
+          - generic [ref=e141]:
+            - generic [ref=e142]:
+              - img "Logo SMAN 1 Baleendah" [ref=e143]
+              - heading "SMAN 1 Baleendah" [level=3] [ref=e145]
+            - paragraph [ref=e146]: SMA Negeri 1 Baleendah adalah sekolah penggerak prestasi dan inovasi masa depan yang berkomitmen mencetak lulusan cerdas dan berakhlak mulia.
+            - generic [ref=e147]:
+              - link "Instagram" [ref=e148] [cursor=pointer]:
+                - /url: https://www.instagram.com/sman1baleendah
+                - img [ref=e149]
+              - link "Facebook" [ref=e152] [cursor=pointer]:
+                - /url: https://www.facebook.com/SMAN1Baleendah
+                - img [ref=e153]
+              - link "LinkedIn" [ref=e155] [cursor=pointer]:
+                - /url: https://www.linkedin.com/school/sman-1-baleendah/
+                - img [ref=e156]
+              - link "X" [ref=e160] [cursor=pointer]:
+                - /url: https://twitter.com/sman1baleendah
+                - img [ref=e161]
+              - link "YouTube" [ref=e163] [cursor=pointer]:
+                - /url: https://www.youtube.com/@sman1baleendah
+                - img [ref=e164]
+          - generic [ref=e167]:
+            - heading "Tautan Cepat" [level=4] [ref=e168]
+            - list [ref=e169]:
+              - listitem [ref=e170]:
+                - link "Profil Sekolah" [ref=e171] [cursor=pointer]:
+                  - /url: /profil/sejarah
+              - listitem [ref=e172]:
+                - link "Info PPDB" [ref=e173] [cursor=pointer]:
+                  - /url: /informasi-spmb
+              - listitem [ref=e174]:
+                - link "Program Studi" [ref=e175] [cursor=pointer]:
+                  - /url: /akademik/program-studi/mipa
+              - listitem [ref=e176]:
+                - link "Berita & Pengumuman" [ref=e177] [cursor=pointer]:
+                  - /url: /berita-pengumuman
+              - listitem [ref=e178]:
+                - link "Kontak Kami" [ref=e179] [cursor=pointer]:
+                  - /url: /kontak
+          - generic [ref=e180]:
+            - heading "Hubungi Kami" [level=4] [ref=e181]
+            - generic [ref=e182]:
+              - generic [ref=e183]:
+                - img [ref=e184]
+                - paragraph [ref=e187]: Jl. R.A.A. Wiranatakoesoemah No.30, Baleendah, Kec. Baleendah, Kabupaten Bandung, Jawa Barat 40375
+              - generic [ref=e188]:
+                - img [ref=e189]
+                - link "(022) 5940262" [ref=e191] [cursor=pointer]:
+                  - /url: tel:(022) 5940262
+              - generic [ref=e192]:
+                - img [ref=e193]
+                - link "info@sman1baleendah.sch.id" [ref=e196] [cursor=pointer]:
+                  - /url: mailto:info@sman1baleendah.sch.id
+          - generic [ref=e197]:
+            - heading "Lokasi Sekolah" [level=4] [ref=e198]
+            - iframe [ref=e200]
+        - paragraph [ref=e202]: © 2025 SMAN 1 Baleendah. All rights reserved.
+  - button [ref=e204] [cursor=pointer]:
+    - img [ref=e205]

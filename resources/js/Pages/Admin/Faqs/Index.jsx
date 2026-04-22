@@ -1,4 +1,5 @@
 // FILE: resources/js/Pages/Admin/Faqs/Index.jsx
+import { logger } from '@/Utils/logger';
 // Fully responsive FAQs management page with accent color theme
 
 import React, { useState, useEffect } from 'react';
@@ -133,7 +134,7 @@ export default function Index({ faqs }) {
                 // Rollback on error
                 setOrderedFaqs(backupItems);
                 toast.error('Gagal menyimpan urutan FAQ');
-                console.error('Reorder error:', error);
+                logger.error('Reorder error:', error);
             });
     };
 

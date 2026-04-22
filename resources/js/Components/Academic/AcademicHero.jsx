@@ -1,4 +1,3 @@
-import React from 'react';
 import { Head, usePage } from '@inertiajs/react';
 import { TYPOGRAPHY } from '@/Utils/typography';
 

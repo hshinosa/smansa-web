@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '@/Utils/logger';
 import { Head, useForm } from '@inertiajs/react';
 import { Save, Globe, Share2, Layout, Image as ImageIcon } from 'lucide-react';
 import ContentManagementPage from '@/Components/Admin/ContentManagementPage';
@@ -65,7 +66,7 @@ export default function Index({ auth, sections, activeSection: initialActiveSect
                 toast.success('Pengaturan berhasil disimpan!');
             },
             onError: (errors) => {
-                console.error('Save errors:', errors);
+                logger.error('Save errors:', errors);
                 toast.error('Gagal menyimpan pengaturan.');
             }
         });

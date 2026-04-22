@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '@/Utils/logger';
 import { Head, router, useForm } from '@inertiajs/react';
 import { Plus, Edit2, Trash2, Search, EyeOff, CheckCircle, CalendarDays } from 'lucide-react';
 import Modal from '@/Components/Modal';
@@ -99,7 +100,7 @@ export default function AcademicCalendarContentPage({ contents, filters }) {
                     closeModal();
                 },
                 onError: (errors) => {
-                    console.error('Update errors:', errors);
+                    logger.error('Update errors:', errors);
                 }
             });
         } else {
@@ -109,7 +110,7 @@ export default function AcademicCalendarContentPage({ contents, filters }) {
                     closeModal();
                 },
                 onError: (errors) => {
-                    console.error('Store errors:', errors);
+                    logger.error('Store errors:', errors);
                 }
             });
         }

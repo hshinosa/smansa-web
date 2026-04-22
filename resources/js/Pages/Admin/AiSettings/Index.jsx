@@ -72,7 +72,7 @@ export default function Index({ settings, apifyToken, embeddingHealth, queueHeal
                 setAvailableModels(response.data.models || []);
             }
         } catch (error) {
-            console.error('Failed to fetch models:', error);
+            logger.error('Failed to fetch models:', error);
         } finally {
             setLoadingModels(false);
         }

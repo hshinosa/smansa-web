@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { perfLogger } from './logger';
 
 export function usePerformanceMonitoring() {
     useEffect(() => {
@@ -10,23 +11,27 @@ export function usePerformanceMonitoring() {
             const lcpObserver = new PerformanceObserver((list) => {
                 const entries = list.getEntries();
                 const lastEntry = entries[entries.length - 1];
-                console.log('LCP:', lastEntry.startTime);
+                perfLogger.logWebVital('LCP', lastEntry.startTime);
             });
             
             try {
                 lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
-            } catch (e) {}
+            } catch (_e) {
+                // Observer not supported
+            }
 
             const fidObserver = new PerformanceObserver((list) => {
                 for (const entry of list.getEntries()) {
                     const delay = entry.processingStart - entry.startTime;
-                    console.log('FID:', delay);
+                    perfLogger.logWebVital('FID', delay);
                 }
             });
             
             try {
                 fidObserver.observe({ entryTypes: ['first-input'] });
-            } catch (e) {}
+            } catch (_e) {
+                // Observer not supported
+            }
 
             let clsValue = 0;
             const clsObserver = new PerformanceObserver((list) => {
@@ -35,18 +40,20 @@ export function usePerformanceMonitoring() {
                         clsValue += entry.value;
                     }
                 }
-                console.log('CLS:', clsValue);
+                perfLogger.logWebVital('CLS', clsValue);
             });
             
             try {
                 clsObserver.observe({ entryTypes: ['layout-shift'] });
-            } catch (e) {}
+            } catch (_e) {
+                // Observer not supported
+            }
 
             window.addEventListener('load', () => {
                 const navEntry = performance.getEntriesByType('navigation')[0];
                 if (navEntry) {
-                    console.log('TTFB:', navEntry.responseStart);
-                    console.log('FCP:', navEntry.domContentLoadedEventEnd);
+                    perfLogger.logWebVital('TTFB', navEntry.responseStart);
+                    perfLogger.logWebVital('FCP', navEntry.domContentLoadedEventEnd);
                 }
             });
 
@@ -71,22 +78,9 @@ export function preloadCriticalImage(src) {
 }
 
 export function markPerformance(name) {
-    if (typeof performance !== 'undefined' && performance.mark) {
-        performance.mark(name);
-        console.log(`[Performance] ${name}`);
-    }
+    perfLogger.mark(name);
 }
 
 export function measurePerformance(name, startMark, endMark) {
-    if (typeof performance !== 'undefined' && performance.measure) {
-        try {
-            performance.measure(name, startMark, endMark);
-            const entries = performance.getEntriesByName(name);
-            if (entries.length > 0) {
-                console.log(`[Performance] ${name}: ${entries[0].duration}ms`);
-            }
-        } catch (e) {
-            console.warn(`[Performance] Failed to measure ${name}:`, e);
-        }
-    }
+    return perfLogger.measure(name, startMark, endMark);
 }

@@ -1,11 +1,13 @@
 // FILE: resources/js/Pages/Admin/DashboardPage.jsx
 // Fully responsive admin dashboard for desktop, tablet, and mobile
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Head, usePage, Link } from '@inertiajs/react';
+import { logger } from '@/Utils/logger';
 import AdminLayout from '@/Layouts/AdminLayout';
 import axios from 'axios';
 import Modal from '@/Components/Modal';
+import toast from 'react-hot-toast';
 import { Search, X, CalendarDays, ChevronLeft, ChevronRight, ExternalLink, AlertCircle, Info, Clock, Mail, Eye, FileText, Users, LayoutGrid } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
@@ -248,7 +250,7 @@ export default function DashboardPage() {
                 setDashboardActivityLogs(response.data.data.slice(0, 5));
             }
         } catch (error) { 
-            console.error("Activity logs error:", error);
+            logger.error("Activity logs error:", error);
             toast.error('Gagal memuat log aktivitas. Coba refresh halaman.');
             // Set empty data on error
             if (forModal) {

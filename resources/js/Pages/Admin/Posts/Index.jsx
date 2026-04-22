@@ -1,4 +1,5 @@
 // FILE: resources/js/Pages/Admin\Posts/Index.jsx
+import { logger } from '@/Utils/logger';
 // Fully responsive posts management page with accent color theme
 
 import React, { useState } from 'react';
@@ -93,7 +94,7 @@ export default function Index({ posts }) {
         e.preventDefault();
         
         // DEBUG: Log what's being sent
-        console.log('[PostSubmit] Form data before submit:', {
+        logger.log('[PostSubmit] Form data before submit:', {
             title: data.title,
             titleLength: data.title?.length,
             content: data.content?.substring(0, 100),
@@ -126,7 +127,7 @@ export default function Index({ posts }) {
         const hasFileInImages = data.images && data.images.some(img => img instanceof File);
         const needsFormData = data.featured_image instanceof File || hasFileInImages;
         
-        console.log('[PostSubmit] needsFormData:', needsFormData, 'hasFileInImages:', hasFileInImages);
+        logger.log('[PostSubmit] needsFormData:', needsFormData, 'hasFileInImages:', hasFileInImages);
         
         if (editMode) {
             // BUG FIX: When using FormData with files, we need to use router.post with _method spoofing
@@ -146,8 +147,8 @@ export default function Index({ posts }) {
                     });
                 }
                 
-                console.log('[PostSubmit] Using router.post with _method PUT for edit with files');
-                console.log('[PostSubmit] existingImages:', existingImages.length, 'newImages:', newImages.length);
+                logger.log('[PostSubmit] Using router.post with _method PUT for edit with files');
+                logger.log('[PostSubmit] existingImages:', existingImages.length, 'newImages:', newImages.length);
                 
                 router.post(route('admin.posts.update', currentId), {
                     _method: 'PUT',

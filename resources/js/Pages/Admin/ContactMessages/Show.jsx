@@ -1,4 +1,3 @@
-import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Mail, Trash2, ArrowLeft, User, Calendar, Tag, MessageSquare } from 'lucide-react';

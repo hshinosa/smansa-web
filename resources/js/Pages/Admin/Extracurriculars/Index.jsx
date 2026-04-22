@@ -1,4 +1,5 @@
 // FILE: resources/js/Pages/Admin/Extracurriculars/Index.jsx
+import { logger } from '@/Utils/logger';
 // Fully responsive management page for Organisasi & Ekstrakurikuler
 
 import React, { useState, useMemo } from 'react';
@@ -77,7 +78,7 @@ export default function Index({ extracurriculars }) {
 
     const openModal = (item = null) => {
         if (item) {
-            console.log('📝 Opening edit modal for:', {
+            logger.log('📝 Opening edit modal for:', {
                 id: item.id,
                 name: item.name,
                 image_url: item.image_url,
@@ -105,7 +106,7 @@ export default function Index({ extracurriculars }) {
                 is_active: !!item.is_active
             });
             
-            console.log('✅ Form data set:', {
+            logger.log('✅ Form data set:', {
                 image_url: item.image_url || '',
                 bg_image_url: item.bg_image_url || '',
                 profile_image_url: item.profile_image_url || ''
@@ -154,7 +155,7 @@ export default function Index({ extracurriculars }) {
                 // The server redirect logic should now send ?tab=... which initializes the state correctly
             },
             onError: (errors) => {
-                console.error('Submission errors:', errors);
+                logger.error('Submission errors:', errors);
                 toast.error('Gagal menyimpan data. Periksa input Anda.');
             }
         };

@@ -1,7 +1,6 @@
 // FILE: resources/js/Components/Admin/ContentManagementPage.jsx
 // Redesigned for accessibility (ages 20-50) with larger touch targets and clearer UI
 
-import React from 'react';
 import { Head } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import ContentEditorSidebar from '@/Components/Admin/ContentEditorSidebar';

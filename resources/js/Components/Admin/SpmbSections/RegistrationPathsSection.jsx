@@ -1,4 +1,3 @@
-import React from 'react';
 import { Users, X, Plus, Trash2 } from 'lucide-react';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';

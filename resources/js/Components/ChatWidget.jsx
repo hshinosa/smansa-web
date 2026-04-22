@@ -3,16 +3,11 @@ import { MessageCircle, X, Send, Bot, Trash2 } from 'lucide-react';
 import { router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import DOMPurify from 'dompurify';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
+import LazyMarkdown from '@/Components/LazyMarkdown';
+import { logger } from '@/Utils/logger';
 
-// Debug logging helper
-const DEBUG_CHAT = import.meta.env.DEV;
 const logChat = (message, data = {}) => {
-    if (DEBUG_CHAT) {
-        console.log(`[ChatWidget] ${message}`, data);
-    }
+    logger.debug('ChatWidget', message, data);
 };
 
 const sanitizeHtml = (html) => {
@@ -30,7 +25,6 @@ export default function ChatWidget() {
     let siteSettings = null;
     let siteName = 'SMAN 1 Baleendah';
     
-    // Safely try to get page context (may not be available)
     try {
         const page = usePage();
         if (page && page.props) {
@@ -38,8 +32,7 @@ export default function ChatWidget() {
             siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
         }
     } catch (error) {
-        // usePage() called outside Inertia context - use defaults
-        console.warn('ChatWidget: usePage() not available, using default site name');
+        logger.warn('ChatWidget: usePage() not available, using default site name');
     }
     
     // Get initial WhatsApp number from site settings (state for dynamic updates from API)
@@ -122,7 +115,7 @@ export default function ChatWidget() {
                 
                 // Validate session ID format from backend perspective
                 if (!/^session_\d+_[a-z0-9]+_\d+$/.test(sid)) {
-                    console.warn('Invalid session ID format, regenerating...');
+                    logger.warn('Invalid session ID format, regenerating...');
                     localStorage.removeItem('chat_session_id');
                     initializeSession();
                     return;
@@ -134,7 +127,7 @@ export default function ChatWidget() {
                 // Release lock
                 localStorage.removeItem(lockKey);
             } catch (error) {
-                console.error('Session initialization error:', error);
+                logger.error('Session initialization error:', error);
                 localStorage.removeItem(lockKey);
             }
         };
@@ -185,7 +178,7 @@ export default function ChatWidget() {
             }
             setHistoryLoaded(true);
         } catch (error) {
-            console.error('Failed to load chat history:', error);
+            logger.error('Failed to load chat history:', error);
             setHistoryLoaded(true); // Mark as loaded even on error to prevent retry
         } finally {
             setIsLoadingHistory(false);
@@ -267,10 +260,10 @@ export default function ChatWidget() {
         });
         
         return new Promise(async (resolve, reject) => {
+            // Create a temporary message ID for streaming (declare outside try for catch block access)
+            const botMessageId = 'bot_' + Date.now();
+            
             try {
-                // Create a temporary message for streaming (this will replace typing indicator)
-                const botMessageId = 'bot_' + Date.now();
-                
                 // Turn off typing indicator immediately when streaming starts
                 setIsTyping(false);
                 
@@ -385,7 +378,7 @@ export default function ChatWidget() {
                     elapsedMs,
                     stack: error.stack?.substring(0, 300)
                 });
-                console.error('Chat streaming error:', error);
+                logger.error('Chat streaming error:', error);
                 setIsTyping(false);
                 
                 // Determine error type and provide user-friendly message
@@ -554,7 +547,7 @@ Silakan klik tombol di bawah ini untuk langsung chat:`,
             
             // Typing indicator is already turned off inside sendMessageToAPIStream
         } catch (error) {
-            console.error('Send message error:', error);
+            logger.error('Send message error:', error);
             setIsTyping(false);
             addMessage('Maaf, saya sedang mengalami masalah koneksi. Silakan coba beberapa saat lagi.', 'bot', false);
         }
@@ -580,7 +573,7 @@ Silakan klik tombol di bawah ini untuk langsung chat:`,
                 }
             })
             .catch(error => {
-                console.error('Send message error:', error);
+                logger.error('Send message error:', error);
                 setIsTyping(false);
                 addMessage('Maaf, saya sedang mengalami masalah koneksi. Silakan coba beberapa saat lagi.', 'bot', false);
             });
@@ -709,9 +702,7 @@ Silakan klik tombol di bawah ini untuk langsung chat:`,
                                                         <span className="text-[10px] text-gray-400 ml-1 font-medium italic">AI sedang mengetik...</span>
                                                     </div>
                                                 ) : (
-                                                    <ReactMarkdown 
-                                                        remarkPlugins={[remarkGfm]}
-                                                        rehypePlugins={[rehypeRaw]}
+                                                    <LazyMarkdown 
                                                         components={{
                                                             h1: ({node, ...props}) => <h1 className="text-lg font-bold mb-2 text-gray-900" {...props} />,
                                                             h2: ({node, ...props}) => <h2 className="text-base font-bold mb-2 text-gray-900" {...props} />,
@@ -733,7 +724,7 @@ Silakan klik tombol di bawah ini untuk langsung chat:`,
                                                         }}
                                                     >
                                                         {sanitizeHtml(msg.text)}
-                                                    </ReactMarkdown>
+                                                    </LazyMarkdown>
                                                 )
                                             ) : (
                                                 msg.text

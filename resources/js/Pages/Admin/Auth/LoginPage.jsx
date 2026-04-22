@@ -1,5 +1,4 @@
 // FILE: resources/js/Pages/Admin/Auth/LoginPage.jsx
-import React from 'react';
 import { Head, useForm, Link, usePage } from '@inertiajs/react';
 import InputLabel from '@/Components/InputLabel'; // Asumsi Anda punya komponen ini dari Breeze
 import TextInput from '@/Components/TextInput';   // Asumsi Anda punya komponen ini dari Breeze

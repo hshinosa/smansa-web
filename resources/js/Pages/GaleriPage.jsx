@@ -1,5 +1,6 @@
-import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import React, { useState, useMemo } from 'react';
+import { logger } from '@/Utils/logger';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Search, ChevronLeft, ChevronRight, X, Play, Image as ImageIcon } from 'lucide-react';
 
 // Import Components
@@ -7,8 +8,9 @@ import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import ResponsiveImage from '@/Components/ResponsiveImage';
 import { normalizeUrl } from '@/Utils/imageUtils';
+import { getNavigationData } from '@/Utils/navigationData';
 
-// Import utilities
+// Import typography constants
 import { TYPOGRAPHY } from '@/Utils/typography';
 import { useNavigation, useHeroSettings } from '@/Hooks';
 import { useSearchFilter, usePagination, useLightbox } from '@/Hooks';
@@ -47,7 +49,7 @@ const GalleryThumbnail = ({ item }) => {
 
     const handleError = (e) => {
         if (!hasError) {
-            console.warn("Image load failed for:", item.title, "Source:", imgSrc);
+            logger.warn("Image load failed for:", item.title, "Source:", imgSrc);
             
             // For YouTube thumbnails, try hqdefault as fallback
             if (imgSrc && imgSrc.includes('maxresdefault.jpg')) {

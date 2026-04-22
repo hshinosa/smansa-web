@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
+     * Disable automatic transaction wrapping for this migration
+     * This allows pgvector extension creation to fail gracefully without aborting the entire migration
+     */
+    public $withinTransaction = false;
+
+    /**
      * Create AI and RAG (Retrieval-Augmented Generation) tables
      * Using PostgreSQL pgvector for embedding storage instead of Qdrant
      */
@@ -71,36 +77,37 @@ return new class extends Migration
 
         // Add pgvector support for PostgreSQL (if available)
         if (DB::connection()->getDriverName() === 'pgsql') {
+            $vectorEnabled = false;
+
             try {
-                // Check if pgvector is available
-                $result = DB::select("SELECT * FROM pg_available_extensions WHERE name = 'vector'");
-                
-                if (!empty($result)) {
-                    // Enable pgvector extension
-                    DB::statement('CREATE EXTENSION IF NOT EXISTS vector');
-                    
+                // Try to enable pgvector extension in a separate transaction
+                DB::unprepared('CREATE EXTENSION IF NOT EXISTS vector');
+                $vectorEnabled = true;
+                echo "✓ pgvector extension enabled\n";
+            } catch (\Exception $e) {
+                // Extension creation failed (likely needs superuser) - use fallback
+                echo "⚠ Could not enable pgvector extension: " . $e->getMessage() . "\n";
+                echo "  RAG will work with limited functionality using TEXT storage\n";
+            }
+
+            if ($vectorEnabled) {
+                try {
                     // Add vector column (768 dimensions for Ollama nomic-embed-text:v1.5)
-                    // Adjust dimensions if using different model (1536 for OpenAI text-embedding-3-small)
                     DB::statement('ALTER TABLE rag_document_chunks ADD COLUMN embedding vector(768)');
-                    
+
                     // Create HNSW index for fast approximate nearest neighbor search
-                    // Using cosine distance which is standard for embeddings
                     DB::statement('CREATE INDEX rag_document_chunks_embedding_idx ON rag_document_chunks USING hnsw (embedding vector_cosine_ops)');
-                    
-                    echo "✓ pgvector extension installed and configured\n";
-                } else {
-                    echo "⚠ pgvector extension not available - RAG will work with limited functionality\n";
-                    echo "  To install: Follow instructions at https://github.com/pgvector/pgvector\n";
-                    
-                    // Add regular text column as fallback (will store JSON string)
+
+                    echo "✓ pgvector configured with HNSW index\n";
+                } catch (\Exception $e) {
+                    echo "⚠ Could not configure pgvector: " . $e->getMessage() . "\n";
+                    // Fall back to TEXT column
                     DB::statement('ALTER TABLE rag_document_chunks ADD COLUMN embedding TEXT');
                 }
-            } catch (\Exception $e) {
-                echo "⚠ Could not setup pgvector: " . $e->getMessage() . "\n";
-                echo "  RAG will work with limited functionality\n";
-                
-                // Add regular text column as fallback
+            } else {
+                // Add regular text column as fallback (will store JSON string)
                 DB::statement('ALTER TABLE rag_document_chunks ADD COLUMN embedding TEXT');
+                echo "✓ Using TEXT column for embeddings (fallback mode)\n";
             }
         }
 

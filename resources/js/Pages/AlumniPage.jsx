@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '@/Utils/logger';
 import { 
     GraduationCap, 
     Quote, 
@@ -54,7 +55,7 @@ const FeaturedCard = ({ alumni }) => {
     const isVideo = alumni.content_type === 'video';
 
     const handleVideoError = (e) => {
-        console.error('Video load error:', e, 'URL:', videoUrl);
+        logger.error('Video load error:', e, 'URL:', videoUrl);
         setVideoError(true);
     };
 

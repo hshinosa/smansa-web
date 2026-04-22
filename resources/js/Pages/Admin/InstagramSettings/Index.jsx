@@ -1,4 +1,5 @@
 // FILE: resources/js/Pages/Admin/InstagramSettings/Index.jsx
+import { logger } from '@/Utils/logger';
 // Instagram Apify API Key Management UI
 
 import React, { useState } from 'react';
@@ -47,7 +48,7 @@ export default function Index({ apifyToken, statistics, logs, pendingPosts = { d
                 toast.success('API key berhasil disimpan');
             },
             onError: (errors) => {
-                console.error('Save errors:', errors);
+                logger.error('Save errors:', errors);
                 toast.error('Gagal menyimpan API key');
             }
         });
@@ -256,7 +257,7 @@ export default function Index({ apifyToken, statistics, logs, pendingPosts = { d
                 
                 if (attempts > maxAttempts) {
                     clearInterval(interval);
-                    console.warn('Polling timeout: Background process taking too long or stuck.');
+                    logger.warn('Polling timeout: Background process taking too long or stuck.');
                     return;
                 }
 

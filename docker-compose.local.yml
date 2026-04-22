@@ -1,0 +1,61 @@
+name: sman1baleendah
+
+services:
+  app:
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_URL=http://localhost
+      - ASSET_URL=http://localhost
+      - CDN_URL=http://localhost
+      - SESSION_DOMAIN=
+      - SESSION_SECURE_COOKIE=false
+      - SESSION_DRIVER=redis
+      - CACHE_STORE=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-BuUyzCCiCIC3MhAkXzpyRtrEnFtHBeSK}
+      - SANCTUM_STATEFUL_DOMAINS=localhost
+    volumes:
+      - ./public/build:/var/www/public/build:ro
+
+  queue:
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_URL=http://localhost
+      - ASSET_URL=http://localhost
+      - CDN_URL=http://localhost
+      - SESSION_DOMAIN=
+      - SESSION_SECURE_COOKIE=false
+      - SESSION_DRIVER=redis
+      - CACHE_STORE=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-BuUyzCCiCIC3MhAkXzpyRtrEnFtHBeSK}
+      - SANCTUM_STATEFUL_DOMAINS=localhost
+
+  scheduler:
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_URL=http://localhost
+      - ASSET_URL=http://localhost
+      - CDN_URL=http://localhost
+      - SESSION_DOMAIN=
+      - SESSION_SECURE_COOKIE=false
+      - SESSION_DRIVER=redis
+      - CACHE_STORE=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-BuUyzCCiCIC3MhAkXzpyRtrEnFtHBeSK}
+      - SANCTUM_STATEFUL_DOMAINS=localhost
+
+  nginx:
+    ports:
+      - "80:80"
+    volumes:
+      - ./public:/var/www/public:ro
+      - app_storage:/var/www/storage:ro
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/sites/:/etc/nginx/sites-available

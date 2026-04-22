@@ -1,4 +1,3 @@
-import React from 'react';
 import { Edit2, Trash2, Plus, User, MapPin, GraduationCap } from 'lucide-react';
 import PrimaryButton from '@/Components/PrimaryButton';
 
@@ -137,10 +136,10 @@ export default function TeachersListSection({ teachers, title, onEdit, onDelete,
                                 </td>
                             </tr>
                         ))}
-                        {filteredTeachers.length === 0 && (
+                        {teachers.length === 0 && (
                             <tr>
                                 <td colSpan="4" className="px-6 py-10 text-center text-gray-500">
-                                    Belum ada data {type} yang ditambahkan.
+                                    Belum ada data yang ditambahkan.
                                 </td>
                             </tr>
                         )}

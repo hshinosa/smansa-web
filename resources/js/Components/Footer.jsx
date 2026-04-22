@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { MapPin, Phone, Mail, Link2, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 import { getNavigationData } from '@/Utils/navigationData';

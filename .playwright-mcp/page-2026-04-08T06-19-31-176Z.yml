@@ -1,0 +1,898 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "Lewati ke konten utama" [ref=e4] [cursor=pointer]:
+      - /url: "#main-content"
+    - navigation "Navigasi utama" [ref=e5]:
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - link "Logo SMAN 1 Baleendah" [ref=e9] [cursor=pointer]:
+            - /url: /
+            - img "Logo SMAN 1 Baleendah" [ref=e10]
+          - generic [ref=e11]:
+            - link "SMAN 1 Baleendah" [ref=e12] [cursor=pointer]:
+              - /url: /
+            - paragraph [ref=e13]: Unggul dalam Prestasi, Berkarakter Mulia
+        - button "Toggle navigasi utama" [ref=e15] [cursor=pointer]:
+          - generic [ref=e16]: Open main menu
+          - img [ref=e17]
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - button "Profil"
+            - generic:
+              - button "Akademik"
+          - link "Berita Pengumuman":
+            - /url: /berita-pengumuman
+          - link "Alumni":
+            - /url: /alumni
+          - link "Kontak":
+            - /url: /kontak
+          - generic:
+            - link "Info PPDB":
+              - /url: /informasi-spmb
+    - main [ref=e18]:
+      - generic [ref=e19]:
+        - img "Background Guru & Staff" [ref=e21]
+        - generic [ref=e23]:
+          - heading "Guru & Staff" [level=1] [ref=e24]
+          - paragraph [ref=e25]: Tenaga pendidik dan kependidikan yang berdedikasi untuk kemajuan pendidikan.
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - textbox "Cari nama guru, mata pelajaran, atau jabatan..." [ref=e29]
+          - img [ref=e30]
+        - generic [ref=e33]:
+          - generic [ref=e34]:
+            - button "Pimpinan & Manajemen" [ref=e35] [cursor=pointer]
+            - button "Matematika" [ref=e36] [cursor=pointer]
+            - button "Fisika" [ref=e37] [cursor=pointer]
+            - button "Kimia" [ref=e38] [cursor=pointer]
+            - button "Biologi" [ref=e39] [cursor=pointer]
+            - button "Ekonomi" [ref=e40] [cursor=pointer]
+            - button "Geografi" [ref=e41] [cursor=pointer]
+            - button "Sejarah" [ref=e42] [cursor=pointer]
+            - button "Sosiologi" [ref=e43] [cursor=pointer]
+            - button "Bahasa Indonesia" [ref=e44] [cursor=pointer]
+            - button "Bahasa Inggris" [ref=e45] [cursor=pointer]
+            - button "Bahasa Sunda" [ref=e46] [cursor=pointer]
+            - button "Bahasa Jepang" [ref=e47] [cursor=pointer]
+            - button "Pendidikan Agama Islam" [ref=e48] [cursor=pointer]
+            - button "Pendidikan Pancasila" [ref=e49] [cursor=pointer]
+            - button "Bimbingan Konseling" [ref=e50] [cursor=pointer]
+            - button "Penjasorkes" [ref=e51] [cursor=pointer]
+            - button "PKWU" [ref=e52] [cursor=pointer]
+            - button "Seni Budaya" [ref=e53] [cursor=pointer]
+            - button "Staff, TU & Perpustakaan" [ref=e54] [cursor=pointer]
+          - generic [ref=e56]:
+            - heading "Pimpinan & Manajemen" [level=2] [ref=e58]
+            - generic [ref=e59]:
+              - generic [ref=e60] [cursor=pointer]:
+                - img "Risalatulhaq, S.Pd" [ref=e62]
+                - generic [ref=e64]:
+                  - heading "Risalatulhaq, S.Pd" [level=3] [ref=e65]
+                  - paragraph [ref=e66]: Guru Mata Pelajaran
+                  - generic [ref=e67]:
+                    - generic [ref=e68]:
+                      - img [ref=e69]
+                      - generic [ref=e72]: Kurikulum
+                    - generic [ref=e73]:
+                      - img [ref=e74]
+                      - generic [ref=e77]: "NIP: NIP-00001"
+              - generic [ref=e78] [cursor=pointer]:
+                - img "Guru Bahasa Indonesia 1" [ref=e80]
+                - generic [ref=e82]:
+                  - heading "Guru Bahasa Indonesia 1" [level=3] [ref=e83]
+                  - paragraph [ref=e84]: Guru Mata Pelajaran
+                  - generic [ref=e85]:
+                    - generic [ref=e86]:
+                      - img [ref=e87]
+                      - generic [ref=e90]: Kurikulum
+                    - generic [ref=e91]:
+                      - img [ref=e92]
+                      - generic [ref=e95]: "NIP: NIP-00002"
+              - generic [ref=e96] [cursor=pointer]:
+                - img "Guru Sosiologi 1" [ref=e98]
+                - generic [ref=e100]:
+                  - heading "Guru Sosiologi 1" [level=3] [ref=e101]
+                  - paragraph [ref=e102]: Guru Mata Pelajaran
+                  - generic [ref=e103]:
+                    - generic [ref=e104]:
+                      - img [ref=e105]
+                      - generic [ref=e108]: Kurikulum
+                    - generic [ref=e109]:
+                      - img [ref=e110]
+                      - generic [ref=e113]: "NIP: NIP-00003"
+              - generic [ref=e114] [cursor=pointer]:
+                - img "Guru IPS 2" [ref=e116]
+                - generic [ref=e118]:
+                  - heading "Guru IPS 2" [level=3] [ref=e119]
+                  - paragraph [ref=e120]: Guru Mata Pelajaran
+                  - generic [ref=e121]:
+                    - generic [ref=e122]:
+                      - img [ref=e123]
+                      - generic [ref=e126]: Kurikulum
+                    - generic [ref=e127]:
+                      - img [ref=e128]
+                      - generic [ref=e131]: "NIP: NIP-00004"
+              - generic [ref=e132] [cursor=pointer]:
+                - img "Guru Bahasa Inggris 1" [ref=e134]
+                - generic [ref=e136]:
+                  - heading "Guru Bahasa Inggris 1" [level=3] [ref=e137]
+                  - paragraph [ref=e138]: Guru Mata Pelajaran
+                  - generic [ref=e139]:
+                    - generic [ref=e140]:
+                      - img [ref=e141]
+                      - generic [ref=e144]: Kurikulum
+                    - generic [ref=e145]:
+                      - img [ref=e146]
+                      - generic [ref=e149]: "NIP: NIP-00005"
+              - generic [ref=e150] [cursor=pointer]:
+                - img "Guru BK 2" [ref=e152]
+                - generic [ref=e154]:
+                  - heading "Guru BK 2" [level=3] [ref=e155]
+                  - paragraph [ref=e156]: Guru Mata Pelajaran
+                  - generic [ref=e157]:
+                    - generic [ref=e158]:
+                      - img [ref=e159]
+                      - generic [ref=e162]: Kurikulum
+                    - generic [ref=e163]:
+                      - img [ref=e164]
+                      - generic [ref=e167]: "NIP: NIP-00006"
+              - generic [ref=e168] [cursor=pointer]:
+                - img "Guru PKN 1" [ref=e170]
+                - generic [ref=e172]:
+                  - heading "Guru PKN 1" [level=3] [ref=e173]
+                  - paragraph [ref=e174]: Guru Mata Pelajaran
+                  - generic [ref=e175]:
+                    - generic [ref=e176]:
+                      - img [ref=e177]
+                      - generic [ref=e180]: Kurikulum
+                    - generic [ref=e181]:
+                      - img [ref=e182]
+                      - generic [ref=e185]: "NIP: NIP-00007"
+              - generic [ref=e186] [cursor=pointer]:
+                - img "Erwan Risnawan, S.Pd" [ref=e188]
+                - generic [ref=e190]:
+                  - heading "Erwan Risnawan, S.Pd" [level=3] [ref=e191]
+                  - paragraph [ref=e192]: Guru Mata Pelajaran
+                  - generic [ref=e193]:
+                    - generic [ref=e194]:
+                      - img [ref=e195]
+                      - generic [ref=e198]: Kurikulum
+                    - generic [ref=e199]:
+                      - img [ref=e200]
+                      - generic [ref=e203]: "NIP: NIP-00008"
+              - generic [ref=e204] [cursor=pointer]:
+                - img "Tety Kurniawati, S.Pd" [ref=e206]
+                - generic [ref=e208]:
+                  - heading "Tety Kurniawati, S.Pd" [level=3] [ref=e209]
+                  - paragraph [ref=e210]: Guru Mata Pelajaran
+                  - generic [ref=e211]:
+                    - generic [ref=e212]:
+                      - img [ref=e213]
+                      - generic [ref=e216]: Kurikulum
+                    - generic [ref=e217]:
+                      - img [ref=e218]
+                      - generic [ref=e221]: "NIP: NIP-00009"
+              - generic [ref=e222] [cursor=pointer]:
+                - img "Drs. Bambang Sutrisno" [ref=e224]
+                - generic [ref=e226]:
+                  - heading "Drs. Bambang Sutrisno" [level=3] [ref=e227]
+                  - paragraph [ref=e228]: Guru Mata Pelajaran
+                  - generic [ref=e229]:
+                    - generic [ref=e230]:
+                      - img [ref=e231]
+                      - generic [ref=e234]: Kurikulum
+                    - generic [ref=e235]:
+                      - img [ref=e236]
+                      - generic [ref=e239]: "NIP: NIP-00010"
+              - generic [ref=e240] [cursor=pointer]:
+                - img "Turhayani, S.Pd" [ref=e242]
+                - generic [ref=e244]:
+                  - heading "Turhayani, S.Pd" [level=3] [ref=e245]
+                  - paragraph [ref=e246]: Guru Mata Pelajaran
+                  - generic [ref=e247]:
+                    - generic [ref=e248]:
+                      - img [ref=e249]
+                      - generic [ref=e252]: Kurikulum
+                    - generic [ref=e253]:
+                      - img [ref=e254]
+                      - generic [ref=e257]: "NIP: NIP-00011"
+              - generic [ref=e258] [cursor=pointer]:
+                - img "Guru Bahasa Inggris 2" [ref=e260]
+                - generic [ref=e262]:
+                  - heading "Guru Bahasa Inggris 2" [level=3] [ref=e263]
+                  - paragraph [ref=e264]: Guru Mata Pelajaran
+                  - generic [ref=e265]:
+                    - generic [ref=e266]:
+                      - img [ref=e267]
+                      - generic [ref=e270]: Kurikulum
+                    - generic [ref=e271]:
+                      - img [ref=e272]
+                      - generic [ref=e275]: "NIP: NIP-00012"
+              - generic [ref=e276] [cursor=pointer]:
+                - img "Raden Bayu Aji Wicaksono, S.Pd" [ref=e278]
+                - generic [ref=e280]:
+                  - heading "Raden Bayu Aji Wicaksono, S.Pd" [level=3] [ref=e281]
+                  - paragraph [ref=e282]: Guru Mata Pelajaran
+                  - generic [ref=e283]:
+                    - generic [ref=e284]:
+                      - img [ref=e285]
+                      - generic [ref=e288]: Kurikulum
+                    - generic [ref=e289]:
+                      - img [ref=e290]
+                      - generic [ref=e293]: "NIP: NIP-00013"
+              - generic [ref=e294] [cursor=pointer]:
+                - img "Kusrawan, S.Pd" [ref=e296]
+                - generic [ref=e298]:
+                  - heading "Kusrawan, S.Pd" [level=3] [ref=e299]
+                  - paragraph [ref=e300]: Guru Mata Pelajaran
+                  - generic [ref=e301]:
+                    - generic [ref=e302]:
+                      - img [ref=e303]
+                      - generic [ref=e306]: Kurikulum
+                    - generic [ref=e307]:
+                      - img [ref=e308]
+                      - generic [ref=e311]: "NIP: NIP-00014"
+              - generic [ref=e312] [cursor=pointer]:
+                - img "Guru Agama Islam 1" [ref=e314]
+                - generic [ref=e316]:
+                  - heading "Guru Agama Islam 1" [level=3] [ref=e317]
+                  - paragraph [ref=e318]: Guru Mata Pelajaran
+                  - generic [ref=e319]:
+                    - generic [ref=e320]:
+                      - img [ref=e321]
+                      - generic [ref=e324]: Kurikulum
+                    - generic [ref=e325]:
+                      - img [ref=e326]
+                      - generic [ref=e329]: "NIP: NIP-00015"
+              - generic [ref=e330] [cursor=pointer]:
+                - img "Guru Seni Budaya 2" [ref=e332]
+                - generic [ref=e334]:
+                  - heading "Guru Seni Budaya 2" [level=3] [ref=e335]
+                  - paragraph [ref=e336]: Guru Mata Pelajaran
+                  - generic [ref=e337]:
+                    - generic [ref=e338]:
+                      - img [ref=e339]
+                      - generic [ref=e342]: Kurikulum
+                    - generic [ref=e343]:
+                      - img [ref=e344]
+                      - generic [ref=e347]: "NIP: NIP-00016"
+              - generic [ref=e348] [cursor=pointer]:
+                - img "Guru PKN 2" [ref=e350]
+                - generic [ref=e352]:
+                  - heading "Guru PKN 2" [level=3] [ref=e353]
+                  - paragraph [ref=e354]: Guru Mata Pelajaran
+                  - generic [ref=e355]:
+                    - generic [ref=e356]:
+                      - img [ref=e357]
+                      - generic [ref=e360]: Kurikulum
+                    - generic [ref=e361]:
+                      - img [ref=e362]
+                      - generic [ref=e365]: "NIP: NIP-00017"
+              - generic [ref=e366] [cursor=pointer]:
+                - img "Guru Prakarya 2" [ref=e368]
+                - generic [ref=e370]:
+                  - heading "Guru Prakarya 2" [level=3] [ref=e371]
+                  - paragraph [ref=e372]: Guru Mata Pelajaran
+                  - generic [ref=e373]:
+                    - generic [ref=e374]:
+                      - img [ref=e375]
+                      - generic [ref=e378]: Kurikulum
+                    - generic [ref=e379]:
+                      - img [ref=e380]
+                      - generic [ref=e383]: "NIP: NIP-00018"
+              - generic [ref=e384] [cursor=pointer]:
+                - img "Ahmad Rizki, S.Pd" [ref=e386]
+                - generic [ref=e388]:
+                  - heading "Ahmad Rizki, S.Pd" [level=3] [ref=e389]
+                  - paragraph [ref=e390]: Guru Mata Pelajaran
+                  - generic [ref=e391]:
+                    - generic [ref=e392]:
+                      - img [ref=e393]
+                      - generic [ref=e396]: Kurikulum
+                    - generic [ref=e397]:
+                      - img [ref=e398]
+                      - generic [ref=e401]: "NIP: NIP-00019"
+              - generic [ref=e402] [cursor=pointer]:
+                - img "Dadang Sofyan, M.Pd" [ref=e404]
+                - generic [ref=e406]:
+                  - heading "Dadang Sofyan, M.Pd" [level=3] [ref=e407]
+                  - paragraph [ref=e408]: Guru Mata Pelajaran
+                  - generic [ref=e409]:
+                    - generic [ref=e410]:
+                      - img [ref=e411]
+                      - generic [ref=e414]: Kurikulum
+                    - generic [ref=e415]:
+                      - img [ref=e416]
+                      - generic [ref=e419]: "NIP: NIP-00020"
+              - generic [ref=e420] [cursor=pointer]:
+                - img "Oki Ilman Nafian, S.Pd" [ref=e422]
+                - generic [ref=e424]:
+                  - heading "Oki Ilman Nafian, S.Pd" [level=3] [ref=e425]
+                  - paragraph [ref=e426]: Guru Mata Pelajaran
+                  - generic [ref=e427]:
+                    - generic [ref=e428]:
+                      - img [ref=e429]
+                      - generic [ref=e432]: Kurikulum
+                    - generic [ref=e433]:
+                      - img [ref=e434]
+                      - generic [ref=e437]: "NIP: NIP-00021"
+              - generic [ref=e438] [cursor=pointer]:
+                - img "Guru Seni Budaya 1" [ref=e440]
+                - generic [ref=e442]:
+                  - heading "Guru Seni Budaya 1" [level=3] [ref=e443]
+                  - paragraph [ref=e444]: Guru Mata Pelajaran
+                  - generic [ref=e445]:
+                    - generic [ref=e446]:
+                      - img [ref=e447]
+                      - generic [ref=e450]: Kurikulum
+                    - generic [ref=e451]:
+                      - img [ref=e452]
+                      - generic [ref=e455]: "NIP: NIP-00022"
+              - generic [ref=e456] [cursor=pointer]:
+                - img "Guru Prakarya 1" [ref=e458]
+                - generic [ref=e460]:
+                  - heading "Guru Prakarya 1" [level=3] [ref=e461]
+                  - paragraph [ref=e462]: Guru Mata Pelajaran
+                  - generic [ref=e463]:
+                    - generic [ref=e464]:
+                      - img [ref=e465]
+                      - generic [ref=e468]: Kurikulum
+                    - generic [ref=e469]:
+                      - img [ref=e470]
+                      - generic [ref=e473]: "NIP: NIP-00023"
+              - generic [ref=e474] [cursor=pointer]:
+                - img "Guru IPA 1" [ref=e476]
+                - generic [ref=e478]:
+                  - heading "Guru IPA 1" [level=3] [ref=e479]
+                  - paragraph [ref=e480]: Guru Mata Pelajaran
+                  - generic [ref=e481]:
+                    - generic [ref=e482]:
+                      - img [ref=e483]
+                      - generic [ref=e486]: Kurikulum
+                    - generic [ref=e487]:
+                      - img [ref=e488]
+                      - generic [ref=e491]: "NIP: NIP-00024"
+              - generic [ref=e492] [cursor=pointer]:
+                - img "Guru IPS 1" [ref=e494]
+                - generic [ref=e496]:
+                  - heading "Guru IPS 1" [level=3] [ref=e497]
+                  - paragraph [ref=e498]: Guru Mata Pelajaran
+                  - generic [ref=e499]:
+                    - generic [ref=e500]:
+                      - img [ref=e501]
+                      - generic [ref=e504]: Kurikulum
+                    - generic [ref=e505]:
+                      - img [ref=e506]
+                      - generic [ref=e509]: "NIP: NIP-00025"
+              - generic [ref=e510] [cursor=pointer]:
+                - img "Sri Susantini, S.Pd" [ref=e512]
+                - generic [ref=e514]:
+                  - heading "Sri Susantini, S.Pd" [level=3] [ref=e515]
+                  - paragraph [ref=e516]: Guru Mata Pelajaran
+                  - generic [ref=e517]:
+                    - generic [ref=e518]:
+                      - img [ref=e519]
+                      - generic [ref=e522]: Kurikulum
+                    - generic [ref=e523]:
+                      - img [ref=e524]
+                      - generic [ref=e527]: "NIP: NIP-00026"
+              - generic [ref=e528] [cursor=pointer]:
+                - img "Dra. Sri Wahyuni" [ref=e530]
+                - generic [ref=e532]:
+                  - heading "Dra. Sri Wahyuni" [level=3] [ref=e533]
+                  - paragraph [ref=e534]: Guru Mata Pelajaran
+                  - generic [ref=e535]:
+                    - generic [ref=e536]:
+                      - img [ref=e537]
+                      - generic [ref=e540]: Kurikulum
+                    - generic [ref=e541]:
+                      - img [ref=e542]
+                      - generic [ref=e545]: "NIP: NIP-00027"
+              - generic [ref=e546] [cursor=pointer]:
+                - img "Guru IPA 2" [ref=e548]
+                - generic [ref=e550]:
+                  - heading "Guru IPA 2" [level=3] [ref=e551]
+                  - paragraph [ref=e552]: Guru Mata Pelajaran
+                  - generic [ref=e553]:
+                    - generic [ref=e554]:
+                      - img [ref=e555]
+                      - generic [ref=e558]: Kurikulum
+                    - generic [ref=e559]:
+                      - img [ref=e560]
+                      - generic [ref=e563]: "NIP: NIP-00028"
+              - generic [ref=e564] [cursor=pointer]:
+                - img "Guru BK 1" [ref=e566]
+                - generic [ref=e568]:
+                  - heading "Guru BK 1" [level=3] [ref=e569]
+                  - paragraph [ref=e570]: Guru Mata Pelajaran
+                  - generic [ref=e571]:
+                    - generic [ref=e572]:
+                      - img [ref=e573]
+                      - generic [ref=e576]: Kurikulum
+                    - generic [ref=e577]:
+                      - img [ref=e578]
+                      - generic [ref=e581]: "NIP: NIP-00029"
+              - generic [ref=e582] [cursor=pointer]:
+                - img "Dra. Mona Haldrina Hikmat" [ref=e584]
+                - generic [ref=e586]:
+                  - heading "Dra. Mona Haldrina Hikmat" [level=3] [ref=e587]
+                  - paragraph [ref=e588]: Guru Mata Pelajaran
+                  - generic [ref=e589]:
+                    - generic [ref=e590]:
+                      - img [ref=e591]
+                      - generic [ref=e594]: Kurikulum
+                    - generic [ref=e595]:
+                      - img [ref=e596]
+                      - generic [ref=e599]: "NIP: NIP-00030"
+              - generic [ref=e600] [cursor=pointer]:
+                - img "Galih Djayadibrata, S.I.Kom" [ref=e602]
+                - generic [ref=e604]:
+                  - heading "Galih Djayadibrata, S.I.Kom" [level=3] [ref=e605]
+                  - paragraph [ref=e606]: Guru Mata Pelajaran
+                  - generic [ref=e607]:
+                    - generic [ref=e608]:
+                      - img [ref=e609]
+                      - generic [ref=e612]: Kurikulum
+                    - generic [ref=e613]:
+                      - img [ref=e614]
+                      - generic [ref=e617]: "NIP: NIP-00031"
+              - generic [ref=e618] [cursor=pointer]:
+                - img "Guru Sejarah 1" [ref=e620]
+                - generic [ref=e622]:
+                  - heading "Guru Sejarah 1" [level=3] [ref=e623]
+                  - paragraph [ref=e624]: Guru Mata Pelajaran
+                  - generic [ref=e625]:
+                    - generic [ref=e626]:
+                      - img [ref=e627]
+                      - generic [ref=e630]: Kurikulum
+                    - generic [ref=e631]:
+                      - img [ref=e632]
+                      - generic [ref=e635]: "NIP: NIP-00032"
+              - generic [ref=e636] [cursor=pointer]:
+                - img "H. Dudi Rohdiana, S.Pd., M.M" [ref=e638]
+                - generic [ref=e640]:
+                  - heading "H. Dudi Rohdiana, S.Pd., M.M" [level=3] [ref=e641]
+                  - paragraph [ref=e642]: Guru Mata Pelajaran
+                  - generic [ref=e643]:
+                    - generic [ref=e644]:
+                      - img [ref=e645]
+                      - generic [ref=e648]: Kurikulum
+                    - generic [ref=e649]:
+                      - img [ref=e650]
+                      - generic [ref=e653]: "NIP: NIP-00033"
+              - generic [ref=e654] [cursor=pointer]:
+                - img "Siti Aminah, S.Pd" [ref=e656]
+                - generic [ref=e658]:
+                  - heading "Siti Aminah, S.Pd" [level=3] [ref=e659]
+                  - paragraph [ref=e660]: Guru Mata Pelajaran
+                  - generic [ref=e661]:
+                    - generic [ref=e662]:
+                      - img [ref=e663]
+                      - generic [ref=e666]: Kurikulum
+                    - generic [ref=e667]:
+                      - img [ref=e668]
+                      - generic [ref=e671]: "NIP: NIP-00034"
+              - generic [ref=e672] [cursor=pointer]:
+                - img "Guru PJOK 2" [ref=e674]
+                - generic [ref=e676]:
+                  - heading "Guru PJOK 2" [level=3] [ref=e677]
+                  - paragraph [ref=e678]: Guru Mata Pelajaran
+                  - generic [ref=e679]:
+                    - generic [ref=e680]:
+                      - img [ref=e681]
+                      - generic [ref=e684]: Kurikulum
+                    - generic [ref=e685]:
+                      - img [ref=e686]
+                      - generic [ref=e689]: "NIP: NIP-00035"
+              - generic [ref=e690] [cursor=pointer]:
+                - img "Dra. Rina Ristiawati" [ref=e692]
+                - generic [ref=e694]:
+                  - heading "Dra. Rina Ristiawati" [level=3] [ref=e695]
+                  - paragraph [ref=e696]: Guru Mata Pelajaran
+                  - generic [ref=e697]:
+                    - generic [ref=e698]:
+                      - img [ref=e699]
+                      - generic [ref=e702]: Kurikulum
+                    - generic [ref=e703]:
+                      - img [ref=e704]
+                      - generic [ref=e707]: "NIP: NIP-00036"
+              - generic [ref=e708] [cursor=pointer]:
+                - img "Yayuk Soneka, S.Pd" [ref=e710]
+                - generic [ref=e712]:
+                  - heading "Yayuk Soneka, S.Pd" [level=3] [ref=e713]
+                  - paragraph [ref=e714]: Guru Mata Pelajaran
+                  - generic [ref=e715]:
+                    - generic [ref=e716]:
+                      - img [ref=e717]
+                      - generic [ref=e720]: Kurikulum
+                    - generic [ref=e721]:
+                      - img [ref=e722]
+                      - generic [ref=e725]: "NIP: NIP-00037"
+              - generic [ref=e726] [cursor=pointer]:
+                - img "Hj. Siti Nurjanah, S.Pd" [ref=e728]
+                - generic [ref=e730]:
+                  - heading "Hj. Siti Nurjanah, S.Pd" [level=3] [ref=e731]
+                  - paragraph [ref=e732]: Guru Mata Pelajaran
+                  - generic [ref=e733]:
+                    - generic [ref=e734]:
+                      - img [ref=e735]
+                      - generic [ref=e738]: Kurikulum
+                    - generic [ref=e739]:
+                      - img [ref=e740]
+                      - generic [ref=e743]: "NIP: NIP-00038"
+              - generic [ref=e744] [cursor=pointer]:
+                - img "Drs. H. Ahmad Fauzi" [ref=e746]
+                - generic [ref=e748]:
+                  - heading "Drs. H. Ahmad Fauzi" [level=3] [ref=e749]
+                  - paragraph [ref=e750]: Guru Mata Pelajaran
+                  - generic [ref=e751]:
+                    - generic [ref=e752]:
+                      - img [ref=e753]
+                      - generic [ref=e756]: Kurikulum
+                    - generic [ref=e757]:
+                      - img [ref=e758]
+                      - generic [ref=e761]: "NIP: NIP-00039"
+              - generic [ref=e762] [cursor=pointer]:
+                - img "Guru Agama Islam 2" [ref=e764]
+                - generic [ref=e766]:
+                  - heading "Guru Agama Islam 2" [level=3] [ref=e767]
+                  - paragraph [ref=e768]: Guru Mata Pelajaran
+                  - generic [ref=e769]:
+                    - generic [ref=e770]:
+                      - img [ref=e771]
+                      - generic [ref=e774]: Kurikulum
+                    - generic [ref=e775]:
+                      - img [ref=e776]
+                      - generic [ref=e779]: "NIP: NIP-00040"
+              - generic [ref=e780] [cursor=pointer]:
+                - img "Guru Ekonomi 2" [ref=e782]
+                - generic [ref=e784]:
+                  - heading "Guru Ekonomi 2" [level=3] [ref=e785]
+                  - paragraph [ref=e786]: Guru Mata Pelajaran
+                  - generic [ref=e787]:
+                    - generic [ref=e788]:
+                      - img [ref=e789]
+                      - generic [ref=e792]: Kurikulum
+                    - generic [ref=e793]:
+                      - img [ref=e794]
+                      - generic [ref=e797]: "NIP: NIP-00041"
+              - generic [ref=e798] [cursor=pointer]:
+                - img "Dra. Hj. Rina Herawati" [ref=e800]
+                - generic [ref=e802]:
+                  - heading "Dra. Hj. Rina Herawati" [level=3] [ref=e803]
+                  - paragraph [ref=e804]: Guru Mata Pelajaran
+                  - generic [ref=e805]:
+                    - generic [ref=e806]:
+                      - img [ref=e807]
+                      - generic [ref=e810]: Kurikulum
+                    - generic [ref=e811]:
+                      - img [ref=e812]
+                      - generic [ref=e815]: "NIP: NIP-00042"
+              - generic [ref=e816] [cursor=pointer]:
+                - img "Pancasariwarni, M.Pd" [ref=e818]
+                - generic [ref=e820]:
+                  - heading "Pancasariwarni, M.Pd" [level=3] [ref=e821]
+                  - paragraph [ref=e822]: Guru Mata Pelajaran
+                  - generic [ref=e823]:
+                    - generic [ref=e824]:
+                      - img [ref=e825]
+                      - generic [ref=e828]: Kurikulum
+                    - generic [ref=e829]:
+                      - img [ref=e830]
+                      - generic [ref=e833]: "NIP: NIP-00043"
+              - generic [ref=e834] [cursor=pointer]:
+                - img "Wakil Kepala Sekolah 4" [ref=e836]
+                - generic [ref=e838]:
+                  - heading "Wakil Kepala Sekolah 4" [level=3] [ref=e839]
+                  - paragraph [ref=e840]: Guru Mata Pelajaran
+                  - generic [ref=e841]:
+                    - generic [ref=e842]:
+                      - img [ref=e843]
+                      - generic [ref=e846]: Kurikulum
+                    - generic [ref=e847]:
+                      - img [ref=e848]
+                      - generic [ref=e851]: "NIP: NIP-00044"
+              - generic [ref=e852] [cursor=pointer]:
+                - img "Guru Matematika 2" [ref=e854]
+                - generic [ref=e856]:
+                  - heading "Guru Matematika 2" [level=3] [ref=e857]
+                  - paragraph [ref=e858]: Guru Mata Pelajaran
+                  - generic [ref=e859]:
+                    - generic [ref=e860]:
+                      - img [ref=e861]
+                      - generic [ref=e864]: Kurikulum
+                    - generic [ref=e865]:
+                      - img [ref=e866]
+                      - generic [ref=e869]: "NIP: NIP-00045"
+              - generic [ref=e870] [cursor=pointer]:
+                - img "Guru PJOK 1" [ref=e872]
+                - generic [ref=e874]:
+                  - heading "Guru PJOK 1" [level=3] [ref=e875]
+                  - paragraph [ref=e876]: Guru Mata Pelajaran
+                  - generic [ref=e877]:
+                    - generic [ref=e878]:
+                      - img [ref=e879]
+                      - generic [ref=e882]: Kurikulum
+                    - generic [ref=e883]:
+                      - img [ref=e884]
+                      - generic [ref=e887]: "NIP: NIP-00046"
+              - generic [ref=e888] [cursor=pointer]:
+                - img "Guru Sejarah 2" [ref=e890]
+                - generic [ref=e892]:
+                  - heading "Guru Sejarah 2" [level=3] [ref=e893]
+                  - paragraph [ref=e894]: Guru Mata Pelajaran
+                  - generic [ref=e895]:
+                    - generic [ref=e896]:
+                      - img [ref=e897]
+                      - generic [ref=e900]: Kurikulum
+                    - generic [ref=e901]:
+                      - img [ref=e902]
+                      - generic [ref=e905]: "NIP: NIP-00047"
+              - generic [ref=e906] [cursor=pointer]:
+                - img "Guru Ekonomi 1" [ref=e908]
+                - generic [ref=e910]:
+                  - heading "Guru Ekonomi 1" [level=3] [ref=e911]
+                  - paragraph [ref=e912]: Guru Mata Pelajaran
+                  - generic [ref=e913]:
+                    - generic [ref=e914]:
+                      - img [ref=e915]
+                      - generic [ref=e918]: Kurikulum
+                    - generic [ref=e919]:
+                      - img [ref=e920]
+                      - generic [ref=e923]: "NIP: NIP-00048"
+              - generic [ref=e924] [cursor=pointer]:
+                - img "Anwar Huda, S.Pd" [ref=e926]
+                - generic [ref=e928]:
+                  - heading "Anwar Huda, S.Pd" [level=3] [ref=e929]
+                  - paragraph [ref=e930]: Guru Mata Pelajaran
+                  - generic [ref=e931]:
+                    - generic [ref=e932]:
+                      - img [ref=e933]
+                      - generic [ref=e936]: Kurikulum
+                    - generic [ref=e937]:
+                      - img [ref=e938]
+                      - generic [ref=e941]: "NIP: NIP-00049"
+              - generic [ref=e942] [cursor=pointer]:
+                - img "Wakil Kepala Sekolah 2" [ref=e944]
+                - generic [ref=e946]:
+                  - heading "Wakil Kepala Sekolah 2" [level=3] [ref=e947]
+                  - paragraph [ref=e948]: Guru Mata Pelajaran
+                  - generic [ref=e949]:
+                    - generic [ref=e950]:
+                      - img [ref=e951]
+                      - generic [ref=e954]: Kurikulum
+                    - generic [ref=e955]:
+                      - img [ref=e956]
+                      - generic [ref=e959]: "NIP: NIP-00050"
+              - generic [ref=e960] [cursor=pointer]:
+                - img "Erfan Rifansyah, S.Pd" [ref=e962]
+                - generic [ref=e964]:
+                  - heading "Erfan Rifansyah, S.Pd" [level=3] [ref=e965]
+                  - paragraph [ref=e966]: Guru Mata Pelajaran
+                  - generic [ref=e967]:
+                    - generic [ref=e968]:
+                      - img [ref=e969]
+                      - generic [ref=e972]: Kurikulum
+                    - generic [ref=e973]:
+                      - img [ref=e974]
+                      - generic [ref=e977]: "NIP: NIP-00051"
+              - generic [ref=e978] [cursor=pointer]:
+                - img "Guru Geografi 2" [ref=e980]
+                - generic [ref=e982]:
+                  - heading "Guru Geografi 2" [level=3] [ref=e983]
+                  - paragraph [ref=e984]: Guru Mata Pelajaran
+                  - generic [ref=e985]:
+                    - generic [ref=e986]:
+                      - img [ref=e987]
+                      - generic [ref=e990]: Kurikulum
+                    - generic [ref=e991]:
+                      - img [ref=e992]
+                      - generic [ref=e995]: "NIP: NIP-00052"
+              - generic [ref=e996] [cursor=pointer]:
+                - img "Wakil Kepala Sekolah 3" [ref=e998]
+                - generic [ref=e1000]:
+                  - heading "Wakil Kepala Sekolah 3" [level=3] [ref=e1001]
+                  - paragraph [ref=e1002]: Guru Mata Pelajaran
+                  - generic [ref=e1003]:
+                    - generic [ref=e1004]:
+                      - img [ref=e1005]
+                      - generic [ref=e1008]: Kurikulum
+                    - generic [ref=e1009]:
+                      - img [ref=e1010]
+                      - generic [ref=e1013]: "NIP: NIP-00053"
+              - generic [ref=e1014] [cursor=pointer]:
+                - img "Dra. Hj. Dewi Sartika" [ref=e1016]
+                - generic [ref=e1018]:
+                  - heading "Dra. Hj. Dewi Sartika" [level=3] [ref=e1019]
+                  - paragraph [ref=e1020]: Guru Mata Pelajaran
+                  - generic [ref=e1021]:
+                    - generic [ref=e1022]:
+                      - img [ref=e1023]
+                      - generic [ref=e1026]: Kurikulum
+                    - generic [ref=e1027]:
+                      - img [ref=e1028]
+                      - generic [ref=e1031]: "NIP: NIP-00054"
+              - generic [ref=e1032] [cursor=pointer]:
+                - img "Guru Bahasa Indonesia 2" [ref=e1034]
+                - generic [ref=e1036]:
+                  - heading "Guru Bahasa Indonesia 2" [level=3] [ref=e1037]
+                  - paragraph [ref=e1038]: Guru Mata Pelajaran
+                  - generic [ref=e1039]:
+                    - generic [ref=e1040]:
+                      - img [ref=e1041]
+                      - generic [ref=e1044]: Kurikulum
+                    - generic [ref=e1045]:
+                      - img [ref=e1046]
+                      - generic [ref=e1049]: "NIP: NIP-00055"
+              - generic [ref=e1050] [cursor=pointer]:
+                - img "Guru Sosiologi 2" [ref=e1052]
+                - generic [ref=e1054]:
+                  - heading "Guru Sosiologi 2" [level=3] [ref=e1055]
+                  - paragraph [ref=e1056]: Guru Mata Pelajaran
+                  - generic [ref=e1057]:
+                    - generic [ref=e1058]:
+                      - img [ref=e1059]
+                      - generic [ref=e1062]: Kurikulum
+                    - generic [ref=e1063]:
+                      - img [ref=e1064]
+                      - generic [ref=e1067]: "NIP: NIP-00056"
+              - generic [ref=e1068] [cursor=pointer]:
+                - img "Dra. Hj. Alis Marliati" [ref=e1070]
+                - generic [ref=e1072]:
+                  - heading "Dra. Hj. Alis Marliati" [level=3] [ref=e1073]
+                  - paragraph [ref=e1074]: Guru Mata Pelajaran
+                  - generic [ref=e1075]:
+                    - generic [ref=e1076]:
+                      - img [ref=e1077]
+                      - generic [ref=e1080]: Kurikulum
+                    - generic [ref=e1081]:
+                      - img [ref=e1082]
+                      - generic [ref=e1085]: "NIP: NIP-00057"
+              - generic [ref=e1086] [cursor=pointer]:
+                - img "Dra. Menti Nursapriyantini, M.M.Pd" [ref=e1088]
+                - generic [ref=e1090]:
+                  - heading "Dra. Menti Nursapriyantini, M.M.Pd" [level=3] [ref=e1091]
+                  - paragraph [ref=e1092]: Guru Mata Pelajaran
+                  - generic [ref=e1093]:
+                    - generic [ref=e1094]:
+                      - img [ref=e1095]
+                      - generic [ref=e1098]: Kurikulum
+                    - generic [ref=e1099]:
+                      - img [ref=e1100]
+                      - generic [ref=e1103]: "NIP: NIP-00058"
+              - generic [ref=e1104] [cursor=pointer]:
+                - img "Elan Jaelani, S.Pd" [ref=e1106]
+                - generic [ref=e1108]:
+                  - heading "Elan Jaelani, S.Pd" [level=3] [ref=e1109]
+                  - paragraph [ref=e1110]: Guru Mata Pelajaran
+                  - generic [ref=e1111]:
+                    - generic [ref=e1112]:
+                      - img [ref=e1113]
+                      - generic [ref=e1116]: Kurikulum
+                    - generic [ref=e1117]:
+                      - img [ref=e1118]
+                      - generic [ref=e1121]: "NIP: NIP-00059"
+              - generic [ref=e1122] [cursor=pointer]:
+                - img "Guru Matematika 1" [ref=e1124]
+                - generic [ref=e1126]:
+                  - heading "Guru Matematika 1" [level=3] [ref=e1127]
+                  - paragraph [ref=e1128]: Guru Mata Pelajaran
+                  - generic [ref=e1129]:
+                    - generic [ref=e1130]:
+                      - img [ref=e1131]
+                      - generic [ref=e1134]: Kurikulum
+                    - generic [ref=e1135]:
+                      - img [ref=e1136]
+                      - generic [ref=e1139]: "NIP: NIP-00060"
+              - generic [ref=e1140] [cursor=pointer]:
+                - img "Guru Geografi 1" [ref=e1142]
+                - generic [ref=e1144]:
+                  - heading "Guru Geografi 1" [level=3] [ref=e1145]
+                  - paragraph [ref=e1146]: Guru Mata Pelajaran
+                  - generic [ref=e1147]:
+                    - generic [ref=e1148]:
+                      - img [ref=e1149]
+                      - generic [ref=e1152]: Kurikulum
+                    - generic [ref=e1153]:
+                      - img [ref=e1154]
+                      - generic [ref=e1157]: "NIP: NIP-00061"
+              - generic [ref=e1158] [cursor=pointer]:
+                - img "Riki Khaerul Anwar, S.Pd" [ref=e1160]
+                - generic [ref=e1162]:
+                  - heading "Riki Khaerul Anwar, S.Pd" [level=3] [ref=e1163]
+                  - paragraph [ref=e1164]: Guru Mata Pelajaran
+                  - generic [ref=e1165]:
+                    - generic [ref=e1166]:
+                      - img [ref=e1167]
+                      - generic [ref=e1170]: Kurikulum
+                    - generic [ref=e1171]:
+                      - img [ref=e1172]
+                      - generic [ref=e1175]: "NIP: NIP-00062"
+              - generic [ref=e1176] [cursor=pointer]:
+                - img "Drs. H. Suparman" [ref=e1178]
+                - generic [ref=e1180]:
+                  - heading "Drs. H. Suparman" [level=3] [ref=e1181]
+                  - paragraph [ref=e1182]: Guru Mata Pelajaran
+                  - generic [ref=e1183]:
+                    - generic [ref=e1184]:
+                      - img [ref=e1185]
+                      - generic [ref=e1188]: Kurikulum
+                    - generic [ref=e1189]:
+                      - img [ref=e1190]
+                      - generic [ref=e1193]: "NIP: NIP-00063"
+              - generic [ref=e1194] [cursor=pointer]:
+                - img "Wakil Kepala Sekolah 1" [ref=e1196]
+                - generic [ref=e1198]:
+                  - heading "Wakil Kepala Sekolah 1" [level=3] [ref=e1199]
+                  - paragraph [ref=e1200]: Guru Mata Pelajaran
+                  - generic [ref=e1201]:
+                    - generic [ref=e1202]:
+                      - img [ref=e1203]
+                      - generic [ref=e1206]: Kurikulum
+                    - generic [ref=e1207]:
+                      - img [ref=e1208]
+                      - generic [ref=e1211]: "NIP: NIP-00064"
+    - contentinfo [ref=e1212]:
+      - generic [ref=e1213]:
+        - generic [ref=e1214]:
+          - generic [ref=e1215]:
+            - generic [ref=e1216]:
+              - img "Logo SMAN 1 Baleendah" [ref=e1217]
+              - heading "SMAN 1 Baleendah" [level=3] [ref=e1219]
+            - paragraph [ref=e1220]: SMA Negeri 1 Baleendah adalah sekolah penggerak prestasi dan inovasi masa depan yang berkomitmen mencetak lulusan cerdas dan berakhlak mulia.
+            - generic [ref=e1221]:
+              - link "Instagram" [ref=e1222] [cursor=pointer]:
+                - /url: https://www.instagram.com/sman1baleendah
+                - img [ref=e1223]
+              - link "Facebook" [ref=e1226] [cursor=pointer]:
+                - /url: https://www.facebook.com/SMAN1Baleendah
+                - img [ref=e1227]
+              - link "LinkedIn" [ref=e1229] [cursor=pointer]:
+                - /url: https://www.linkedin.com/school/sman-1-baleendah/
+                - img [ref=e1230]
+              - link "X" [ref=e1234] [cursor=pointer]:
+                - /url: https://twitter.com/sman1baleendah
+                - img [ref=e1235]
+              - link "YouTube" [ref=e1237] [cursor=pointer]:
+                - /url: https://www.youtube.com/@sman1baleendah
+                - img [ref=e1238]
+          - generic [ref=e1241]:
+            - heading "Tautan Cepat" [level=4] [ref=e1242]
+            - list [ref=e1243]:
+              - listitem [ref=e1244]:
+                - link "Profil Sekolah" [ref=e1245] [cursor=pointer]:
+                  - /url: /profil/sejarah
+              - listitem [ref=e1246]:
+                - link "Info PPDB" [ref=e1247] [cursor=pointer]:
+                  - /url: /informasi-spmb
+              - listitem [ref=e1248]:
+                - link "Program Studi" [ref=e1249] [cursor=pointer]:
+                  - /url: /akademik/program-studi/mipa
+              - listitem [ref=e1250]:
+                - link "Berita & Pengumuman" [ref=e1251] [cursor=pointer]:
+                  - /url: /berita-pengumuman
+              - listitem [ref=e1252]:
+                - link "Kontak Kami" [ref=e1253] [cursor=pointer]:
+                  - /url: /kontak
+          - generic [ref=e1254]:
+            - heading "Hubungi Kami" [level=4] [ref=e1255]
+            - generic [ref=e1256]:
+              - generic [ref=e1257]:
+                - img [ref=e1258]
+                - paragraph [ref=e1261]: Jl. R.A.A. Wiranatakoesoemah No.30, Baleendah, Kec. Baleendah, Kabupaten Bandung, Jawa Barat 40375
+              - generic [ref=e1262]:
+                - img [ref=e1263]
+                - link "(022) 5940262" [ref=e1265] [cursor=pointer]:
+                  - /url: tel:(022) 5940262
+              - generic [ref=e1266]:
+                - img [ref=e1267]
+                - link "info@sman1baleendah.sch.id" [ref=e1270] [cursor=pointer]:
+                  - /url: mailto:info@sman1baleendah.sch.id
+          - generic [ref=e1271]:
+            - heading "Lokasi Sekolah" [level=4] [ref=e1272]
+            - iframe [ref=e1274]
+        - paragraph [ref=e1276]: © 2025 SMAN 1 Baleendah. All rights reserved.
+  - button [ref=e1278] [cursor=pointer]:
+    - img [ref=e1279]

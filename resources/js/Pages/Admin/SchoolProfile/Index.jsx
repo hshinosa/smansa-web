@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '@/Utils/logger';
 import { Head, useForm, router } from '@inertiajs/react';
 import {
     History,
@@ -194,7 +195,7 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
                     toast.success('Perubahan berhasil disimpan!');
                 },
                 onError: (errors) => {
-                    console.error('Save errors:', errors);
+                    logger.error('Save errors:', errors);
                     toast.error('Gagal menyimpan perubahan.');
                 }
             });
@@ -207,7 +208,7 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
                     toast.success('Perubahan berhasil disimpan!');
                 },
                 onError: (errors) => {
-                    console.error('Save errors:', errors);
+                    logger.error('Save errors:', errors);
                     toast.error('Gagal menyimpan perubahan. Silakan periksa formulir.');
                 }
             });

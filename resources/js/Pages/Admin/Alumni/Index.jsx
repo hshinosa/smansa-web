@@ -12,6 +12,7 @@ import { Plus, Edit2, Trash2, X, User, GraduationCap, Star, Video, FileText, Ima
 import ContentManagementPage from '@/Components/Admin/ContentManagementPage';
 import Modal from '@/Components/Modal';
 import toast from 'react-hot-toast';
+import { getImageUrl } from '@/Utils/imageUtils';
 
 export default function Index({ alumnis }) {
     const { success } = usePage().props;

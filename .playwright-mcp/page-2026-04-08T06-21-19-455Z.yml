@@ -1,0 +1,252 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "Lewati ke konten utama" [ref=e4] [cursor=pointer]:
+      - /url: "#main-content"
+    - navigation "Navigasi utama" [ref=e5]:
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - link "Logo SMAN 1 Baleendah" [ref=e9] [cursor=pointer]:
+            - /url: /
+            - img "Logo SMAN 1 Baleendah" [ref=e10]
+          - generic [ref=e11]:
+            - link "SMAN 1 Baleendah" [ref=e12] [cursor=pointer]:
+              - /url: /
+            - paragraph [ref=e13]: Unggul dalam Prestasi, Berkarakter Mulia
+        - button "Toggle navigasi utama" [ref=e15] [cursor=pointer]:
+          - generic [ref=e16]: Open main menu
+          - img [ref=e17]
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - button "Profil"
+            - generic:
+              - button "Akademik"
+          - link "Berita Pengumuman":
+            - /url: /berita-pengumuman
+          - link "Alumni":
+            - /url: /alumni
+          - link "Kontak":
+            - /url: /kontak
+          - generic:
+            - link "Info PPDB":
+              - /url: /informasi-spmb
+    - main [active] [ref=e18]:
+      - generic [ref=e19]:
+        - img "Background Organisasi & Ekstrakurikuler SMAN 1 Baleendah" [ref=e21]
+        - generic [ref=e23]:
+          - heading "Organisasi & Ekstrakurikuler" [level=1] [ref=e24]
+          - paragraph [ref=e25]: Wadah pengembangan bakat, minat, dan kreativitas siswa.
+      - generic [ref=e28]:
+        - heading "Organisasi Siswa" [level=2] [ref=e30]
+        - generic [ref=e31]:
+          - generic [ref=e32]:
+            - img "MPK (Majelis Perwakilan Kelas)" [ref=e34]
+            - generic [ref=e36]:
+              - heading "MPK (Majelis Perwakilan Kelas)" [level=3] [ref=e37]
+              - paragraph [ref=e38]: Lembaga legislatif siswa yang bertugas mengawasi kinerja OSIS dan menyalurkan aspirasi siswa.
+              - button "Lihat Detail" [ref=e39] [cursor=pointer]:
+                - text: Lihat Detail
+                - img [ref=e40]
+          - generic [ref=e42]:
+            - img "OSIS (Organisasi Siswa Intra Sekolah)" [ref=e44]
+            - generic [ref=e46]:
+              - heading "OSIS (Organisasi Siswa Intra Sekolah)" [level=3] [ref=e47]
+              - paragraph [ref=e48]: Organisasi kesiswaan tertinggi di sekolah yang bertugas merencanakan dan melaksanakan berbagai kegiatan siswa.
+              - button "Lihat Detail" [ref=e49] [cursor=pointer]:
+                - text: Lihat Detail
+                - img [ref=e50]
+      - generic [ref=e53]:
+        - generic [ref=e54]:
+          - heading "Olahraga" [level=2] [ref=e56]
+          - generic [ref=e57]:
+            - generic [ref=e58]:
+              - img "Futsal" [ref=e60]
+              - generic [ref=e62]:
+                - heading "Futsal" [level=3] [ref=e63]
+                - paragraph [ref=e64]: Mengembangkan bakat sepak bola mini dengan teknik dan strategi permainan yang solid.
+                - button "Lihat Detail" [ref=e65] [cursor=pointer]:
+                  - text: Lihat Detail
+                  - img [ref=e66]
+            - generic [ref=e68]:
+              - img "Voli" [ref=e70]
+              - generic [ref=e72]:
+                - heading "Voli" [level=3] [ref=e73]
+                - paragraph [ref=e74]: Melatih ketangkasan dan kekompakan tim dalam olahraga bola voli.
+                - button "Lihat Detail" [ref=e75] [cursor=pointer]:
+                  - text: Lihat Detail
+                  - img [ref=e76]
+            - generic [ref=e78]:
+              - img "Basket" [ref=e80]
+              - generic [ref=e82]:
+                - heading "Basket" [level=3] [ref=e83]
+                - paragraph [ref=e84]: Klub basket unggulan sekolah yang fokus pada fundamental dribble, shooting, dan defense.
+                - button "Lihat Detail" [ref=e85] [cursor=pointer]:
+                  - text: Lihat Detail
+                  - img [ref=e86]
+        - generic [ref=e88]:
+          - heading "Akademik & Sains" [level=2] [ref=e90]
+          - generic [ref=e91]:
+            - generic [ref=e92]:
+              - img "KIR (Karya Ilmiah Remaja)" [ref=e94]
+              - generic [ref=e96]:
+                - heading "KIR (Karya Ilmiah Remaja)" [level=3] [ref=e97]
+                - paragraph [ref=e98]: Komunitas peneliti muda yang kritis dan inovatif.
+                - button "Lihat Detail" [ref=e99] [cursor=pointer]:
+                  - text: Lihat Detail
+                  - img [ref=e100]
+            - generic [ref=e102]:
+              - img "English Club" [ref=e104]
+              - generic [ref=e106]:
+                - heading "English Club" [level=3] [ref=e107]
+                - paragraph [ref=e108]: Meningkatkan kemampuan bahasa Inggris melalui debate, storytelling, dan speech.
+                - button "Lihat Detail" [ref=e109] [cursor=pointer]:
+                  - text: Lihat Detail
+                  - img [ref=e110]
+        - generic [ref=e112]:
+          - heading "Seni & Budaya" [level=2] [ref=e114]
+          - generic [ref=e115]:
+            - generic [ref=e116]:
+              - img "Paduan Suara (Choir)" [ref=e118]
+              - generic [ref=e120]:
+                - heading "Paduan Suara (Choir)" [level=3] [ref=e121]
+                - paragraph [ref=e122]: Mengasah vokal dan harmoni dalam paduan suara. Rutin tampil dalam upacara bendera dan event-event besar.
+                - button "Lihat Detail" [ref=e123] [cursor=pointer]:
+                  - text: Lihat Detail
+                  - img [ref=e124]
+            - generic [ref=e126]:
+              - img "Seni Tari Tradisional" [ref=e128]
+              - generic [ref=e130]:
+                - heading "Seni Tari Tradisional" [level=3] [ref=e131]
+                - paragraph [ref=e132]: Melestarikan budaya bangsa melalui seni tari daerah.
+                - button "Lihat Detail" [ref=e133] [cursor=pointer]:
+                  - text: Lihat Detail
+                  - img [ref=e134]
+            - generic [ref=e136]:
+              - img "Teater & Drama" [ref=e138]
+              - generic [ref=e140]:
+                - heading "Teater & Drama" [level=3] [ref=e141]
+                - paragraph [ref=e142]: Wadah ekspresi seni peran, penulisan naskah, dan artistik panggung.
+                - button "Lihat Detail" [ref=e143] [cursor=pointer]:
+                  - text: Lihat Detail
+                  - img [ref=e144]
+        - generic [ref=e146]:
+          - heading "Kepemimpinan & Bela Negara" [level=2] [ref=e148]
+          - generic [ref=e149]:
+            - generic [ref=e150]:
+              - img "Paskibra (Pasukan Pengibar Bendera)" [ref=e152]
+              - generic [ref=e154]:
+                - heading "Paskibra (Pasukan Pengibar Bendera)" [level=3] [ref=e155]
+                - paragraph [ref=e156]: Pasukan pengibar bendera yang melatih kedisiplinan, kekompakan, dan rasa nasionalisme.
+                - button "Lihat Detail" [ref=e157] [cursor=pointer]:
+                  - text: Lihat Detail
+                  - img [ref=e158]
+            - generic [ref=e160]:
+              - img "Pramuka" [ref=e162]
+              - generic [ref=e164]:
+                - heading "Pramuka" [level=3] [ref=e165]
+                - paragraph [ref=e166]: Membentuk karakter disiplin, mandiri, dan cinta alam. Kegiatan perkemahan, survival, dan kepemimpinan.
+                - button "Lihat Detail" [ref=e167] [cursor=pointer]:
+                  - text: Lihat Detail
+                  - img [ref=e168]
+        - generic [ref=e170]:
+          - heading "Keagamaan & Sosial" [level=2] [ref=e172]
+          - generic [ref=e173]:
+            - generic [ref=e174]:
+              - img "PMR (Palang Merah Remaja)" [ref=e176]
+              - generic [ref=e178]:
+                - heading "PMR (Palang Merah Remaja)" [level=3] [ref=e179]
+                - paragraph [ref=e180]: Melatih keterampilan pertolongan pertama dan kepedulian sosial kemanusiaan.
+                - button "Lihat Detail" [ref=e181] [cursor=pointer]:
+                  - text: Lihat Detail
+                  - img [ref=e182]
+            - generic [ref=e184]:
+              - img "Rohis (Kerohanian Islam)" [ref=e186]
+              - generic [ref=e188]:
+                - heading "Rohis (Kerohanian Islam)" [level=3] [ref=e189]
+                - paragraph [ref=e190]: Memperdalam ilmu agama Islam, tahsin Al-Quran, dan kegiatan sosial keagamaan.
+                - button "Lihat Detail" [ref=e191] [cursor=pointer]:
+                  - text: Lihat Detail
+                  - img [ref=e192]
+        - generic [ref=e194]:
+          - heading "Teknologi & Inovasi" [level=2] [ref=e196]
+          - generic [ref=e198]:
+            - img "Robotik & IT" [ref=e200]
+            - generic [ref=e202]:
+              - heading "Robotik & IT" [level=3] [ref=e203]
+              - paragraph [ref=e204]: Belajar coding, mikrokontroler, dan perakitan robot.
+              - button "Lihat Detail" [ref=e205] [cursor=pointer]:
+                - text: Lihat Detail
+                - img [ref=e206]
+      - generic [ref=e211]:
+        - heading "Siap Menjadi Bagian dari Keluarga Besar SMAN 1 Baleendah?" [level=2] [ref=e212]:
+          - text: Siap Menjadi Bagian dari
+          - text: Keluarga Besar SMAN 1 Baleendah?
+        - paragraph [ref=e213]: Dapatkan informasi lengkap mengenai pendaftaran peserta didik baru, jadwal, dan persyaratan yang dibutuhkan.
+        - generic [ref=e214]:
+          - link "Daftar Sekarang" [ref=e215] [cursor=pointer]:
+            - /url: /informasi-spmb
+          - link "Hubungi Kami" [ref=e216] [cursor=pointer]:
+            - /url: /kontak
+    - contentinfo [ref=e217]:
+      - generic [ref=e218]:
+        - generic [ref=e219]:
+          - generic [ref=e220]:
+            - generic [ref=e221]:
+              - img "Logo SMAN 1 Baleendah" [ref=e222]
+              - heading "SMAN 1 Baleendah" [level=3] [ref=e224]
+            - paragraph [ref=e225]: SMA Negeri 1 Baleendah adalah sekolah penggerak prestasi dan inovasi masa depan yang berkomitmen mencetak lulusan cerdas dan berakhlak mulia.
+            - generic [ref=e226]:
+              - link "Instagram" [ref=e227] [cursor=pointer]:
+                - /url: https://www.instagram.com/sman1baleendah
+                - img [ref=e228]
+              - link "Facebook" [ref=e231] [cursor=pointer]:
+                - /url: https://www.facebook.com/SMAN1Baleendah
+                - img [ref=e232]
+              - link "LinkedIn" [ref=e234] [cursor=pointer]:
+                - /url: https://www.linkedin.com/school/sman-1-baleendah/
+                - img [ref=e235]
+              - link "X" [ref=e239] [cursor=pointer]:
+                - /url: https://twitter.com/sman1baleendah
+                - img [ref=e240]
+              - link "YouTube" [ref=e242] [cursor=pointer]:
+                - /url: https://www.youtube.com/@sman1baleendah
+                - img [ref=e243]
+          - generic [ref=e246]:
+            - heading "Tautan Cepat" [level=4] [ref=e247]
+            - list [ref=e248]:
+              - listitem [ref=e249]:
+                - link "Profil Sekolah" [ref=e250] [cursor=pointer]:
+                  - /url: /profil/sejarah
+              - listitem [ref=e251]:
+                - link "Info PPDB" [ref=e252] [cursor=pointer]:
+                  - /url: /informasi-spmb
+              - listitem [ref=e253]:
+                - link "Program Studi" [ref=e254] [cursor=pointer]:
+                  - /url: /akademik/program-studi/mipa
+              - listitem [ref=e255]:
+                - link "Berita & Pengumuman" [ref=e256] [cursor=pointer]:
+                  - /url: /berita-pengumuman
+              - listitem [ref=e257]:
+                - link "Kontak Kami" [ref=e258] [cursor=pointer]:
+                  - /url: /kontak
+          - generic [ref=e259]:
+            - heading "Hubungi Kami" [level=4] [ref=e260]
+            - generic [ref=e261]:
+              - generic [ref=e262]:
+                - img [ref=e263]
+                - paragraph [ref=e266]: Jl. R.A.A. Wiranatakoesoemah No.30, Baleendah, Kec. Baleendah, Kabupaten Bandung, Jawa Barat 40375
+              - generic [ref=e267]:
+                - img [ref=e268]
+                - link "(022) 5940262" [ref=e270] [cursor=pointer]:
+                  - /url: tel:(022) 5940262
+              - generic [ref=e271]:
+                - img [ref=e272]
+                - link "info@sman1baleendah.sch.id" [ref=e275] [cursor=pointer]:
+                  - /url: mailto:info@sman1baleendah.sch.id
+          - generic [ref=e276]:
+            - heading "Lokasi Sekolah" [level=4] [ref=e277]
+            - iframe [ref=e279]
+        - paragraph [ref=e281]: © 2025 SMAN 1 Baleendah. All rights reserved.
+  - button [ref=e283] [cursor=pointer]:
+    - img [ref=e284]

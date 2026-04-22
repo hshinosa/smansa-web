@@ -1,7 +1,6 @@
 // FILE: resources/js/Pages/Admin/RagDocuments/Edit.jsx
 // Consistent design with accent color theme
 
-import React from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, useForm, router } from '@inertiajs/react';
 import { ArrowLeft, RefreshCw, AlertCircle } from 'lucide-react';
