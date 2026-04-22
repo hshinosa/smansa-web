@@ -4,16 +4,20 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\ProcessInstagramPost;
+use App\Jobs\RunInstagramScraperJob;
+use App\Models\Post;
+use Carbon\Carbon;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
-use Carbon\Carbon;
-use App\Models\Post;
 
 class InstagramBotAccountController extends Controller
 {
@@ -29,7 +33,7 @@ class InstagramBotAccountController extends Controller
 
         // Get scraper statistics
         $stats = $this->getScraperStatistics();
-        
+
         // Get scraper logs
         $logs = $this->getScraperLogs();
 
@@ -37,27 +41,27 @@ class InstagramBotAccountController extends Controller
         $pendingPostsQuery = DB::table('sc_raw_news_feeds')
             ->where('is_processed', false)
             ->orderBy('scraped_at', 'desc');
-            
+
         $pendingPostsPaginated = $pendingPostsQuery->paginate(6)->withQueryString();
-        
+
         $pendingPosts = [
-            'data' => collect($pendingPostsPaginated->items())->map(function($post) {
+            'data' => collect($pendingPostsPaginated->items())->map(function ($post) {
                 // Parse image paths from JSON if stored as JSON
                 $imagePaths = $post->image_paths;
                 if (is_string($imagePaths)) {
                     $imagePaths = json_decode($imagePaths, true) ?? [];
                 }
-                
+
                 // Get first image for preview - convert to web-accessible URL
                 $firstImage = null;
                 $fixedImagePaths = [];
-                if (!empty($imagePaths) && is_array($imagePaths)) {
+                if (! empty($imagePaths) && is_array($imagePaths)) {
                     foreach ($imagePaths as $path) {
                         // Remove leading slash and "downloads/" prefix for route
                         $cleanPath = ltrim($path, '/\\');
                         $cleanPath = preg_replace('#^downloads/#', '', $cleanPath);
                         // Build URL using the scraped-images route
-                        $fixedImagePaths[] = '/scraped-images/' . $cleanPath;
+                        $fixedImagePaths[] = '/scraped-images/'.$cleanPath;
                     }
                     $firstImage = $fixedImagePaths[0] ?? null;
                 }
@@ -83,7 +87,7 @@ class InstagramBotAccountController extends Controller
                 'current_page' => $pendingPostsPaginated->currentPage(),
                 'last_page' => $pendingPostsPaginated->lastPage(),
                 'total' => $pendingPostsPaginated->total(),
-            ]
+            ],
         ];
 
         return Inertia::render('Admin/InstagramSettings/Index', [
@@ -91,7 +95,7 @@ class InstagramBotAccountController extends Controller
             'statistics' => $stats,
             'logs' => $logs,
             'pendingPosts' => $pendingPosts,
-            'activeTab' => request('tab', 'api-key')
+            'activeTab' => request('tab', 'api-key'),
         ]);
     }
 
@@ -123,7 +127,7 @@ class InstagramBotAccountController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Gagal menyimpan API key: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menyimpan API key: '.$e->getMessage());
         }
     }
 
@@ -143,7 +147,7 @@ class InstagramBotAccountController extends Controller
                 ->where('key', 'apify_api_token')
                 ->value('value');
 
-            if (!$apiToken) {
+            if (! $apiToken) {
                 return back()->with('error', 'API token tidak ditemukan. Silakan atur API token terlebih dahulu.');
             }
 
@@ -161,7 +165,7 @@ class InstagramBotAccountController extends Controller
             ]);
 
             // Dispatch job to queue (instead of Artisan::call)
-            \App\Jobs\RunInstagramScraperJob::dispatch($username, $maxPosts, $logId);
+            RunInstagramScraperJob::dispatch($username, $maxPosts, $logId);
 
             Log::info('[Instagram] Scraper job dispatched', [
                 'username' => $username,
@@ -174,7 +178,7 @@ class InstagramBotAccountController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Gagal memulai scraper: ' . $e->getMessage());
+            return back()->with('error', 'Gagal memulai scraper: '.$e->getMessage());
         }
     }
 
@@ -198,7 +202,7 @@ class InstagramBotAccountController extends Controller
                 ->orderBy('count', 'desc')
                 ->limit(5)
                 ->get()
-                ->map(fn($item) => [
+                ->map(fn ($item) => [
                     'username' => $item->source_username,
                     'count' => $item->count,
                 ]);
@@ -211,7 +215,7 @@ class InstagramBotAccountController extends Controller
                 ->orderBy('scraped_at', 'desc')
                 ->limit(5)
                 ->get()
-                ->map(fn($item) => [
+                ->map(fn ($item) => [
                     'username' => $item->source_username,
                     'time' => Carbon::parse($item->scraped_at)->diffForHumans(),
                     'status' => $item->is_processed ? 'Processed' : 'Pending',
@@ -242,7 +246,7 @@ class InstagramBotAccountController extends Controller
                 ->orderBy('started_at', 'desc')
                 ->limit(20)
                 ->get()
-                ->map(function($log) {
+                ->map(function ($log) {
                     return [
                         'id' => $log->id,
                         'username' => $log->username,
@@ -252,8 +256,8 @@ class InstagramBotAccountController extends Controller
                         'message' => $log->message,
                         'error_message' => $log->error_message,
                         'started_at' => Carbon::parse($log->started_at)->format('Y-m-d H:i:s'),
-                        'duration' => $log->completed_at ? 
-                            Carbon::parse($log->started_at)->diffInSeconds(Carbon::parse($log->completed_at)) . 's' : 'running...',
+                        'duration' => $log->completed_at ?
+                            Carbon::parse($log->started_at)->diffInSeconds(Carbon::parse($log->completed_at)).'s' : 'running...',
                     ];
                 })
                 ->toArray();
@@ -273,23 +277,23 @@ class InstagramBotAccountController extends Controller
                 ->orderBy('scraped_at', 'desc')
                 ->limit(50)
                 ->get()
-                ->map(function($post) {
+                ->map(function ($post) {
                     // Parse image paths from JSON if stored as JSON
                     $imagePaths = $post->image_paths;
                     if (is_string($imagePaths)) {
                         $imagePaths = json_decode($imagePaths, true) ?? [];
                     }
-                    
+
                     // Get first image for preview - convert to web-accessible URL
                     $firstImage = null;
                     $fixedImagePaths = [];
-                    if (!empty($imagePaths) && is_array($imagePaths)) {
+                    if (! empty($imagePaths) && is_array($imagePaths)) {
                         foreach ($imagePaths as $path) {
                             // Remove leading slash and "downloads/" prefix for route
                             $cleanPath = ltrim($path, '/\\');
                             $cleanPath = preg_replace('#^downloads/#', '', $cleanPath);
                             // Build URL using the scraped-images route
-                            $fixedImagePaths[] = '/scraped-images/' . $cleanPath;
+                            $fixedImagePaths[] = '/scraped-images/'.$cleanPath;
                         }
                         $firstImage = $fixedImagePaths[0] ?? null;
                     }
@@ -313,6 +317,7 @@ class InstagramBotAccountController extends Controller
                 ->toArray();
         } catch (\Exception $e) {
             Log::error('[Instagram] Failed to get pending posts', ['error' => $e->getMessage()]);
+
             return [];
         }
     }
@@ -331,7 +336,7 @@ class InstagramBotAccountController extends Controller
             // Get the scraped post
             $scrapedPost = DB::table('sc_raw_news_feeds')->find($id);
 
-            if (!$scrapedPost) {
+            if (! $scrapedPost) {
                 return back()->with('error', 'Post tidak ditemukan');
             }
 
@@ -351,13 +356,13 @@ class InstagramBotAccountController extends Controller
 
             // Process synchronously for manual approval as requested
             $job = new ProcessInstagramPost(
-                (int)$id,
+                (int) $id,
                 $request->title,
                 $request->category,
-                (int)Auth::id(),
+                (int) Auth::id(),
                 false // useAI = false
             );
-            
+
             // Resolve dependencies and execute handle
             // This will handle creating the draft post AND updating sc_raw_news_feeds (is_processed=true, etc)
             app()->call([$job, 'handle']);
@@ -374,7 +379,7 @@ class InstagramBotAccountController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Gagal memproses post: ' . $e->getMessage());
+            return back()->with('error', 'Gagal memproses post: '.$e->getMessage());
         }
     }
 
@@ -390,6 +395,7 @@ class InstagramBotAccountController extends Controller
 
             if ($deleted) {
                 Log::info('[Instagram] Post rejected/deleted', ['id' => $id]);
+
                 return back()->with('success', 'Post berhasil dihapus');
             }
 
@@ -400,7 +406,7 @@ class InstagramBotAccountController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Gagal menghapus post: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menghapus post: '.$e->getMessage());
         }
     }
 
@@ -425,8 +431,9 @@ class InstagramBotAccountController extends Controller
                     ->where('is_processed', false)
                     ->first();
 
-                if (!$scrapedPost) {
+                if (! $scrapedPost) {
                     $failed++;
+
                     continue;
                 }
 
@@ -476,7 +483,7 @@ class InstagramBotAccountController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Gagal bulk approve: ' . $e->getMessage());
+            return back()->with('error', 'Gagal bulk approve: '.$e->getMessage());
         }
     }
 
@@ -498,25 +505,28 @@ class InstagramBotAccountController extends Controller
             // Get the scraped post
             $scrapedPost = DB::table('sc_raw_news_feeds')->find($id);
 
-            if (!$scrapedPost) {
+            if (! $scrapedPost) {
                 Log::warning('[Instagram] Post not found', ['id' => $id]);
+
                 return back()->with('error', 'Post tidak ditemukan');
             }
 
             if ($scrapedPost->is_processed) {
                 Log::warning('[Instagram] Post already processed', ['id' => $id]);
+
                 return back()->with('error', 'Post sudah diproses sebelumnya');
             }
 
             // Check if already being processed (prevent double-click issues)
-            if ($scrapedPost->processing_status && 
-                $scrapedPost->updated_at && 
+            if ($scrapedPost->processing_status &&
+                $scrapedPost->updated_at &&
                 now()->diffInMinutes($scrapedPost->updated_at) < 5) {
                 Log::warning('[Instagram] Post already being processed', [
-                    'id' => $id, 
+                    'id' => $id,
                     'status' => $scrapedPost->processing_status,
                     'updated_at' => $scrapedPost->updated_at,
                 ]);
+
                 return back()->with('error', 'Post sedang dalam proses. Tunggu beberapa saat.');
             }
 
@@ -548,7 +558,7 @@ class InstagramBotAccountController extends Controller
                 Auth::id(),
                 true // useAI = true
             );
-            
+
             // Dispatch job to queue
             dispatch($job);
 
@@ -573,11 +583,11 @@ class InstagramBotAccountController extends Controller
                 ->where('id', $id)
                 ->update([
                     'processing_status' => null,
-                    'error_message' => 'Dispatch failed: ' . $e->getMessage(),
+                    'error_message' => 'Dispatch failed: '.$e->getMessage(),
                     'updated_at' => now(),
                 ]);
 
-            return back()->with('error', 'Gagal memproses dengan AI: ' . $e->getMessage());
+            return back()->with('error', 'Gagal memproses dengan AI: '.$e->getMessage());
         }
     }
 
@@ -589,38 +599,51 @@ class InstagramBotAccountController extends Controller
         try {
             // Check if there are pending jobs
             $pendingJobs = DB::table('jobs')->count();
-            
+
             if ($pendingJobs === 0) {
                 return; // No jobs to process
             }
 
-            // Check if a queue worker process is already running
-            // We'll use a simple cache flag with TTL
-            $workerLockKey = 'queue_worker_running';
-            $cache = \Illuminate\Support\Facades\Cache::store('file');
-            
-            // If worker is already flagged as running (within last 5 minutes), skip
-            if ($cache->get($workerLockKey)) {
-                Log::info('[QueueWorker] Worker already running, skipping spawn');
+            // Use atomic lock to prevent race conditions
+            $lock = Cache::lock('queue_worker_spawn', 300); // 5 minute lock
+
+            // Try to acquire lock (non-blocking)
+            if (! $lock->get()) {
+                Log::info('[QueueWorker] Another process is spawning worker, skipping');
+
                 return;
             }
 
-            // Set flag that worker is starting (5 minute TTL)
-            $cache->put($workerLockKey, true, 300);
+            try {
+                // Double-check if worker is already running
+                $workerLockKey = 'queue_worker_running';
 
-            // Spawn queue worker in background using Laravel Process (safer than exec)
-            $process = \Illuminate\Support\Facades\Process::start([
-                PHP_BINARY,
-                base_path('artisan'),
-                'queue:work',
-                '--once',
-                '--quiet'
-            ]);
+                if (Cache::get($workerLockKey)) {
+                    Log::info('[QueueWorker] Worker already running, skipping spawn');
 
-            Log::info('[QueueWorker] Background queue worker spawned', [
-                'process_id' => $process->id(),
-                'pending_jobs' => $pendingJobs,
-            ]);
+                    return;
+                }
+
+                // Set flag that worker is starting (5 minute TTL)
+                Cache::put($workerLockKey, true, 300);
+
+                // Spawn queue worker in background using Laravel Process (safer than exec)
+                $process = Process::start([
+                    PHP_BINARY,
+                    base_path('artisan'),
+                    'queue:work',
+                    '--once',
+                    '--quiet',
+                ]);
+
+                Log::info('[QueueWorker] Background queue worker spawned', [
+                    'process_id' => $process->id(),
+                    'pending_jobs' => $pendingJobs,
+                ]);
+            } finally {
+                // Always release lock
+                $lock->release();
+            }
         } catch (\Exception $e) {
             Log::warning('[QueueWorker] Failed to spawn background worker', [
                 'error' => $e->getMessage(),
@@ -646,6 +669,7 @@ class InstagramBotAccountController extends Controller
 
             if ($updated) {
                 Log::info('[Instagram] Reset processing status for post', ['id' => $id]);
+
                 return back()->with('success', 'Status processing direset. Post siap diproses ulang.');
             }
 
@@ -655,7 +679,8 @@ class InstagramBotAccountController extends Controller
                 'id' => $id,
                 'error' => $e->getMessage(),
             ]);
-            return back()->with('error', 'Gagal reset status: ' . $e->getMessage());
+
+            return back()->with('error', 'Gagal reset status: '.$e->getMessage());
         }
     }
 
@@ -670,7 +695,7 @@ class InstagramBotAccountController extends Controller
 
         try {
             $url = $request->post_url;
-            
+
             // Parse Instagram URL to get shortcode
             // Supports: instagram.com/p/SHORTCODE, instagram.com/reel/SHORTCODE, instagram.com/tv/SHORTCODE
             $shortcode = null;
@@ -678,7 +703,7 @@ class InstagramBotAccountController extends Controller
                 $shortcode = $matches[2];
             }
 
-            if (!$shortcode) {
+            if (! $shortcode) {
                 return back()->with('error', 'URL Instagram tidak valid. Gunakan format: https://www.instagram.com/p/SHORTCODE atau https://www.instagram.com/reel/SHORTCODE');
             }
 
@@ -696,14 +721,14 @@ class InstagramBotAccountController extends Controller
                 ->where('key', 'apify_api_token')
                 ->value('value');
 
-            if (!$apiToken) {
+            if (! $apiToken) {
                 return back()->with('error', 'API token tidak ditemukan. Silakan atur API token terlebih dahulu.');
             }
 
             Log::info('[Instagram] Scraping single post', ['url' => $url, 'shortcode' => $shortcode]);
 
             // Call Apify to scrape single post
-            $client = new \GuzzleHttp\Client();
+            $client = new Client;
             $actorId = 'apify~instagram-scraper';
 
             $response = $client->post("https://api.apify.com/v2/acts/{$actorId}/runs", [
@@ -720,7 +745,7 @@ class InstagramBotAccountController extends Controller
             $runData = json_decode($response->getBody()->getContents(), true);
             $runId = $runData['data']['id'] ?? null;
 
-            if (!$runId) {
+            if (! $runId) {
                 throw new \Exception('Failed to start Apify actor run');
             }
 
@@ -752,12 +777,12 @@ class InstagramBotAccountController extends Controller
 
             $posts = json_decode($resultsResponse->getBody()->getContents(), true);
 
-            if (empty($posts) || !isset($posts[0]['shortCode'])) {
+            if (empty($posts) || ! isset($posts[0]['shortCode'])) {
                 return back()->with('error', 'Gagal mengambil data post dari Instagram.');
             }
 
             $post = $posts[0];
-            
+
             // Extract username from the post data or URL
             $username = $post['ownerUsername'] ?? 'unknown';
             $caption = $post['caption'] ?? '';
@@ -801,20 +826,22 @@ class InstagramBotAccountController extends Controller
             return redirect()->route('admin.instagram-bots.index', ['tab' => 'pending'])
                 ->with('success', "Post {$shortcode} dari @{$username} berhasil di-scrape! Silakan proses dengan AI.");
 
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
+        } catch (RequestException $e) {
             $errorBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'No response';
             Log::error('[Instagram] Single post scrape failed - Apify error', [
                 'url' => $request->post_url,
                 'error' => $e->getMessage(),
                 'body' => $errorBody,
             ]);
-            return back()->with('error', 'Gagal mengambil data dari Apify: ' . $e->getMessage());
+
+            return back()->with('error', 'Gagal mengambil data dari Apify: '.$e->getMessage());
         } catch (\Exception $e) {
             Log::error('[Instagram] Single post scrape failed', [
                 'url' => $request->post_url,
                 'error' => $e->getMessage(),
             ]);
-            return back()->with('error', 'Gagal scrape post: ' . $e->getMessage());
+
+            return back()->with('error', 'Gagal scrape post: '.$e->getMessage());
         }
     }
 
@@ -826,11 +853,11 @@ class InstagramBotAccountController extends Controller
         $savedPaths = [];
         $downloadDir = base_path("instagram-scraper/downloads/{$username}");
 
-        if (!file_exists($downloadDir)) {
+        if (! file_exists($downloadDir)) {
             mkdir($downloadDir, 0755, true);
         }
 
-        $client = new \GuzzleHttp\Client([
+        $client = new Client([
             'verify' => false,
             'timeout' => 30,
             'connect_timeout' => 10,
@@ -839,7 +866,7 @@ class InstagramBotAccountController extends Controller
         foreach ($imageUrls as $index => $url) {
             try {
                 $extension = 'jpg';
-                $filename = "{$shortcode}_" . ($index + 1) . ".{$extension}";
+                $filename = "{$shortcode}_".($index + 1).".{$extension}";
                 $finalPath = "{$downloadDir}/{$filename}";
 
                 $response = $client->get($url);
@@ -865,7 +892,7 @@ class InstagramBotAccountController extends Controller
     {
         try {
             $minutes = 10; // Posts stuck for more than 10 minutes
-            
+
             $updated = DB::table('sc_raw_news_feeds')
                 ->whereNotNull('processing_status')
                 ->where('is_processed', false)
@@ -878,6 +905,7 @@ class InstagramBotAccountController extends Controller
 
             if ($updated > 0) {
                 Log::info('[Instagram] Cleaned up stuck processing posts', ['count' => $updated]);
+
                 return back()->with('success', "{$updated} post yang stuck berhasil di-reset.");
             }
 
@@ -886,7 +914,8 @@ class InstagramBotAccountController extends Controller
             Log::error('[Instagram] Failed to cleanup stuck posts', [
                 'error' => $e->getMessage(),
             ]);
-            return back()->with('error', 'Gagal cleanup: ' . $e->getMessage());
+
+            return back()->with('error', 'Gagal cleanup: '.$e->getMessage());
         }
     }
 }

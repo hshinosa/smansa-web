@@ -2,20 +2,25 @@
 
 namespace App\Services;
 
+use App\Models\AiSetting;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
-use App\Models\AiSetting;
 
 class GroqService
 {
     protected const BASE_URL = 'https://api.groq.com/openai/v1';
+
     protected const CHAT_TIMEOUT = 120;
+
     protected const EMBEDDING_TIMEOUT = 30;
 
     protected array $apiKeys = [];
+
     protected string $chatModel;
+
     protected string $contentModel;
+
     protected int $currentKeyIndex = 0;
 
     public function __construct()
@@ -46,7 +51,7 @@ class GroqService
 
             Log::warning('[GroqService] Could not load settings from database, using fallback', [
                 'error' => $e->getMessage(),
-                'has_env_key' => !empty($envKey),
+                'has_env_key' => ! empty($envKey),
             ]);
         }
     }
@@ -77,6 +82,7 @@ class GroqService
     public function chatCompletion(array $messages, array $options = []): array
     {
         $context = $options['context'] ?? 'chat';
+
         return $this->completion($messages, $context, $options);
     }
 
@@ -90,21 +96,23 @@ class GroqService
 
     /**
      * Analyze image content using vision model
-     * 
-     * @param string $imagePath Absolute path to the image file
-     * @param string $prompt Description prompt for the AI
+     *
+     * @param  string  $imagePath  Absolute path to the image file
+     * @param  string  $prompt  Description prompt for the AI
      * @return array Result with success status and description
      */
     public function analyzeImage(string $imagePath, string $prompt = 'Describe this image in detail, focusing on people, activities, and school context.'): array
     {
-        if (!file_exists($imagePath)) {
+        if (! file_exists($imagePath)) {
             return ['success' => false, 'error' => "Image not found at: {$imagePath}"];
         }
+
+        $imageData = null; // Initialize for cleanup
 
         try {
             $imageData = base64_encode(file_get_contents($imagePath));
             $extension = pathinfo($imagePath, PATHINFO_EXTENSION);
-            $mimeType = match (strtolower((string)$extension)) {
+            $mimeType = match (strtolower((string) $extension)) {
                 'png' => 'image/png',
                 'webp' => 'image/webp',
                 default => 'image/jpeg',
@@ -128,14 +136,23 @@ class GroqService
                 ],
             ];
 
-            return $this->completion($messages, 'vision', [
+            $result = $this->completion($messages, 'vision', [
                 'model' => 'llama-3.2-11b-vision-preview', // Keep trying vision or fallback
                 'max_tokens' => 1000,
-                'fallback_on_fail' => true, 
+                'fallback_on_fail' => true,
             ]);
+
+            return $result;
         } catch (\Exception $e) {
             Log::error('[GroqService] Image analysis failed', ['error' => $e->getMessage()]);
+
             return ['success' => false, 'error' => $e->getMessage()];
+        } finally {
+            // Explicit cleanup to prevent memory leaks
+            if ($imageData !== null) {
+                unset($imageData);
+                gc_collect_cycles();
+            }
         }
     }
 
@@ -158,9 +175,11 @@ class GroqService
 
         $triedKeys = 0;
         $totalKeys = count($this->apiKeys);
+        $attempt = 0; // Track attempts for exponential backoff
 
         if ($totalKeys === 0) {
             Log::error('[GroqService] No API keys configured');
+
             return $this->getHardcodedFallback($messages);
         }
 
@@ -179,20 +198,31 @@ class GroqService
                     'elapsed_ms' => $elapsed,
                     'key_index' => ($this->currentKeyIndex - 1) % $totalKeys,
                 ]);
+
                 return $result;
             }
 
             if ($result['error_type'] === 'rate_limit' && $triedKeys < $totalKeys) {
-                Log::warning('[GroqService] Rate limited, trying next API key', [
+                // Exponential backoff: 1s, 2s, 4s, 8s, max 30s
+                $delay = min(1000 * pow(2, $attempt), 30000);
+                $delaySeconds = $delay / 1000;
+
+                Log::warning('[GroqService] Rate limited, applying exponential backoff', [
                     'tried' => $triedKeys,
                     'total_keys' => $totalKeys,
+                    'delay_ms' => $delay,
+                    'attempt' => $attempt,
                 ]);
+
+                usleep($delay * 1000); // Convert to microseconds
+                $attempt++;
+
                 continue;
             }
 
             // If we specifically requested NOT to fallback on fail
-            if (!($options['fallback_on_fail'] ?? true)) {
-                 return $result;
+            if (! ($options['fallback_on_fail'] ?? true)) {
+                return $result;
             }
 
             break;
@@ -222,18 +252,18 @@ class GroqService
             ];
 
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
+                'Authorization' => 'Bearer '.$apiKey,
                 'Content-Type' => 'application/json',
             ])->timeout(self::CHAT_TIMEOUT)
-              ->connectTimeout(30)
-              ->post(self::BASE_URL . '/chat/completions', $payload);
+                ->connectTimeout(30)
+                ->post(self::BASE_URL.'/chat/completions', $payload);
 
             $elapsed = round((microtime(true) - $startTime) * 1000);
 
             if ($response->successful()) {
                 $data = $response->json();
 
-                if (!isset($data['choices']) || empty($data['choices'])) {
+                if (! isset($data['choices']) || empty($data['choices'])) {
                     return ['success' => false, 'error' => 'Empty response from Groq API', 'error_type' => 'empty'];
                 }
 
@@ -267,15 +297,16 @@ class GroqService
                 'elapsed_ms' => $elapsed,
             ]);
 
-            return ['success' => false, 'error' => 'Groq API error: ' . $response->status(), 'error_type' => $errorType];
+            return ['success' => false, 'error' => 'Groq API error: '.$response->status(), 'error_type' => $errorType];
 
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+        } catch (ConnectionException $e) {
             $elapsed = round((microtime(true) - $startTime) * 1000);
             Log::error('[GroqService] Connection Exception', [
                 'message' => $e->getMessage(),
                 'elapsed_ms' => $elapsed,
             ]);
-            return ['success' => false, 'error' => 'Connection timeout: ' . $e->getMessage(), 'error_type' => 'connection'];
+
+            return ['success' => false, 'error' => 'Connection timeout: '.$e->getMessage(), 'error_type' => 'connection'];
         } catch (\Exception $e) {
             $elapsed = round((microtime(true) - $startTime) * 1000);
             Log::error('[GroqService] Exception', [
@@ -283,7 +314,8 @@ class GroqService
                 'type' => get_class($e),
                 'elapsed_ms' => $elapsed,
             ]);
-            return ['success' => false, 'error' => 'Exception: ' . $e->getMessage(), 'error_type' => 'exception'];
+
+            return ['success' => false, 'error' => 'Exception: '.$e->getMessage(), 'error_type' => 'exception'];
         }
     }
 
@@ -294,6 +326,7 @@ class GroqService
     public function createEmbedding(string $text): array
     {
         Log::warning('[GroqService] Embedding not supported by Groq API');
+
         return [
             'success' => false,
             'error' => 'Groq does not support embeddings. Configure an external embedding provider.',
@@ -306,7 +339,7 @@ class GroqService
      */
     public function isAvailable(): bool
     {
-        return !empty($this->apiKeys);
+        return ! empty($this->apiKeys);
     }
 
     /**
@@ -315,17 +348,18 @@ class GroqService
     public function getAvailableModels(): array
     {
         $apiKey = $this->getApiKey();
-        if (!$apiKey) {
+        if (! $apiKey) {
             return [];
         }
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
-            ])->timeout(10)->get(self::BASE_URL . '/models');
+                'Authorization' => 'Bearer '.$apiKey,
+            ])->timeout(10)->get(self::BASE_URL.'/models');
 
             if ($response->successful()) {
                 $data = $response->json();
+
                 return $data['data'] ?? [];
             }
 
@@ -334,6 +368,7 @@ class GroqService
             Log::error('[GroqService] Failed to fetch models', [
                 'error' => $e->getMessage(),
             ]);
+
             return [];
         }
     }
@@ -354,7 +389,7 @@ class GroqService
                             }
                         }
                     } else {
-                        $userQuery = strtolower((string)$content);
+                        $userQuery = strtolower((string) $content);
                         break;
                     }
                 }
@@ -385,10 +420,12 @@ class GroqService
 
     protected function maskSensitiveData(string $data): string
     {
-        if (empty($data)) return 'EMPTY';
+        if (empty($data)) {
+            return 'EMPTY';
+        }
 
         if (strlen($data) > 10) {
-            return substr($data, 0, 6) . '...' . substr($data, -4);
+            return substr($data, 0, 6).'...'.substr($data, -4);
         }
 
         return $data;
