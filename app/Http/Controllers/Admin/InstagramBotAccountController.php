@@ -608,24 +608,17 @@ class InstagramBotAccountController extends Controller
             // Set flag that worker is starting (5 minute TTL)
             $cache->put($workerLockKey, true, 300);
 
-            // Spawn queue worker in background
-            $phpBinary = PHP_BINARY ?: 'php';
-            $artisan = base_path('artisan');
-            
-            // Windows: use 'start /B' for background process
-            // Linux/Mac: use '&' and nohup
-            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                // Windows - use start /B for background
-                $command = "start /B {$phpBinary} {$artisan} queue:work --once --quiet 2>&1";
-                pclose(popen($command, 'r'));
-            } else {
-                // Linux/Mac - use nohup and &
-                $command = "nohup {$phpBinary} {$artisan} queue:work --once --quiet > /dev/null 2>&1 &";
-                exec($command);
-            }
+            // Spawn queue worker in background using Laravel Process (safer than exec)
+            $process = \Illuminate\Support\Facades\Process::start([
+                PHP_BINARY,
+                base_path('artisan'),
+                'queue:work',
+                '--once',
+                '--quiet'
+            ]);
 
             Log::info('[QueueWorker] Background queue worker spawned', [
-                'command' => $command,
+                'process_id' => $process->id(),
                 'pending_jobs' => $pendingJobs,
             ]);
         } catch (\Exception $e) {
