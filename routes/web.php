@@ -2,15 +2,31 @@
 
 use App\Http\Controllers\AcademicCalendarPublicController;
 use App\Http\Controllers\Admin\AcademicCalendarController;
-use App\Http\Controllers\Admin\AiSettingActionController;
-use App\Http\Controllers\Admin\CurriculumController;
 use App\Http\Controllers\Admin\ActivityLogController;
+use App\Http\Controllers\Admin\AiSettingActionController;
+use App\Http\Controllers\Admin\AiSettingController;
 use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\Admin\CloudflareStatsController;
+use App\Http\Controllers\Admin\ContactMessageController;
+use App\Http\Controllers\Admin\CurriculumController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ExtracurricularController;
+use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\IndexController;
+use App\Http\Controllers\Admin\InstagramBotAccountController;
 use App\Http\Controllers\Admin\LandingPageContentController;
+use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\Admin\ProgramController;
+use App\Http\Controllers\Admin\PtnAdmissionController;
+use App\Http\Controllers\Admin\RagDocumentController;
+use App\Http\Controllers\Admin\SchoolProfileController;
+use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\SpmbContentController;
+use App\Http\Controllers\Admin\TeacherController;
+use App\Http\Controllers\Admin\TkaAverageController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\HealthController;
 use App\Http\Controllers\MediaProxyController;
 use App\Http\Controllers\Public\AkademikController;
 use App\Http\Controllers\Public\AlumniController;
@@ -22,74 +38,55 @@ use App\Http\Controllers\Public\LandingPageController;
 use App\Http\Controllers\Public\PrestasiController;
 use App\Http\Controllers\Public\ProfilController;
 use App\Http\Controllers\Public\ProgramStudiController;
+use App\Http\Controllers\Public\SeragamController;
 use App\Http\Controllers\Public\SpmbController;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\ScrapedImageController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 // ============================================================================
-// PUBLIC ROUTES
+// PUBLIC ROUTES (Rate Limited: 60 requests per minute)
 // ============================================================================
 
-// Landing Page
-Route::get('/', [LandingPageController::class, 'index'])->name('home');
+Route::middleware('throttle:60,1')->group(function () {
+    Route::get('/', [LandingPageController::class, 'index'])->name('home');
+    Route::get('/informasi-spmb', [SpmbController::class, 'index'])->name('informasi.spmb');
+    Route::get('/alumni', [AlumniController::class, 'index'])->name('alumni');
 
-// SPMB (PPDB) Information
-Route::get('/informasi-spmb', [SpmbController::class, 'index'])->name('informasi.spmb');
+    Route::get('/profil-sekolah', [ProfilController::class, 'profilSekolah'])->name('profil.sekolah');
+    Route::get('/visi-misi', [ProfilController::class, 'visiMisi'])->name('visi.misi');
+    Route::get('/struktur-organisasi', [ProfilController::class, 'strukturOrganisasi'])->name('struktur.organisasi');
 
-// Alumni
-Route::get('/alumni', [AlumniController::class, 'index'])->name('alumni');
+    Route::get('/akademik/prestasi-akademik', [PrestasiController::class, 'index'])->name('prestasi.akademik');
+    Route::get('/akademik/prestasi-akademik/serapan-ptn', [RedirectController::class, 'serapanPtn'])->name('prestasi.serapan-ptn');
+    Route::get('/akademik/prestasi-akademik/hasil-tka', [RedirectController::class, 'hasilTka'])->name('hasil.tka');
 
-// School Profile
-Route::get('/profil-sekolah', [ProfilController::class, 'profilSekolah'])->name('profil.sekolah');
-Route::get('/visi-misi', [ProfilController::class, 'visiMisi'])->name('visi.misi');
-Route::get('/struktur-organisasi', [ProfilController::class, 'strukturOrganisasi'])->name('struktur.organisasi');
+    Route::get('/akademik/ekstrakurikuler', [AkademikController::class, 'ekstrakurikuler'])->name('akademik.ekstrakurikuler');
+    Route::get('/akademik/organisasi-ekstrakurikuler', [AkademikController::class, 'organisasiEkstrakurikuler'])->name('akademik.organisasi_ekstrakurikuler');
+    Route::get('/akademik/kurikulum', [AkademikController::class, 'kurikulum'])->name('akademik.kurikulum');
+    Route::get('/akademik/kalender-akademik', [AkademikController::class, 'kalenderAkademik'])->name('akademik.kalender');
 
-// Academic Achievement
-Route::get('/akademik/prestasi-akademik', [PrestasiController::class, 'index'])->name('prestasi.akademik');
-Route::get('/akademik/prestasi-akademik/serapan-ptn', [RedirectController::class, 'serapanPtn'])
-    ->name('prestasi.serapan-ptn');
-Route::get('/akademik/prestasi-akademik/hasil-tka', [RedirectController::class, 'hasilTka'])
-    ->name('hasil.tka');
+    Route::get('/akademik/program-studi/mipa', [ProgramStudiController::class, 'mipa'])->name('akademik.program.mipa');
+    Route::get('/akademik/program-studi/ips', [ProgramStudiController::class, 'ips'])->name('akademik.program.ips');
+    Route::get('/akademik/program-studi/bahasa', [ProgramStudiController::class, 'bahasa'])->name('akademik.program.bahasa');
 
-// Academic Pages
-Route::get('/akademik/ekstrakurikuler', [AkademikController::class, 'ekstrakurikuler'])->name('akademik.ekstrakurikuler');
-Route::get('/akademik/organisasi-ekstrakurikuler', [AkademikController::class, 'organisasiEkstrakurikuler'])->name('akademik.organisasi_ekstrakurikuler');
-Route::get('/akademik/kurikulum', [AkademikController::class, 'kurikulum'])->name('akademik.kurikulum');
-Route::get('/akademik/kalender-akademik', [AkademikController::class, 'kalenderAkademik'])->name('akademik.kalender');
+    Route::get('/program', [AkademikController::class, 'program'])->name('program.sekolah');
+    Route::get('/kalender-akademik', [AcademicCalendarPublicController::class, 'index'])->name('kalender.akademik');
 
-// Program Studi
-Route::get('/akademik/program-studi/mipa', [ProgramStudiController::class, 'mipa'])->name('akademik.program.mipa');
-Route::get('/akademik/program-studi/ips', [ProgramStudiController::class, 'ips'])->name('akademik.program.ips');
-Route::get('/akademik/program-studi/bahasa', [ProgramStudiController::class, 'bahasa'])->name('akademik.program.bahasa');
+    Route::get('/berita-pengumuman', [BeritaController::class, 'index'])->name('berita.pengumuman');
+    Route::get('/berita/{slug}', [BeritaController::class, 'show'])->name('berita.detail');
 
-// Program Sekolah
-Route::get('/program', [AkademikController::class, 'program'])->name('program.sekolah');
+    Route::get('/kontak', [KontakController::class, 'index'])->name('kontak');
+    Route::get('/galeri', [GaleriController::class, 'index'])->name('galeri');
+    Route::get('/guru-staff', [GuruStaffController::class, 'index'])->name('guru.staff');
+    Route::get('/seragam', [SeragamController::class, 'index'])->name('seragam');
+    Route::get('/login', [RedirectController::class, 'login'])->name('login');
+});
 
-// Kalender Akademik (using existing controller)
-Route::get('/kalender-akademik', [AcademicCalendarPublicController::class, 'index'])->name('kalender.akademik');
-
-// News/Berita
-Route::get('/berita-pengumuman', [BeritaController::class, 'index'])->name('berita.pengumuman');
-Route::get('/berita/{slug}', [BeritaController::class, 'show'])->name('berita.detail');
-
-// Contact
-Route::get('/kontak', [KontakController::class, 'index'])->name('kontak');
-Route::post('/kontak', [\App\Http\Controllers\ContactController::class, 'store'])
+Route::post('/kontak', [ContactController::class, 'store'])
     ->middleware('throttle:3,1')
     ->name('kontak.store');
-
-// Gallery
-Route::get('/galeri', [GaleriController::class, 'index'])->name('galeri');
-
-// Teachers & Staff
-Route::get('/guru-staff', [GuruStaffController::class, 'index'])->name('guru.staff');
-
-// Seragam (School Uniforms)
-Route::get('/seragam', [\App\Http\Controllers\Public\SeragamController::class, 'index'])->name('seragam');
-
-// Login redirect
-Route::get('/login', [RedirectController::class, 'login'])->name('login');
 
 // ============================================================================
 // ADMIN ROUTES
@@ -122,7 +119,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/api/activity-logs', [ActivityLogController::class, 'index'])->name('api.activitylogs.index');
         Route::get('/api/cloudflare-stats', [CloudflareStatsController::class, 'getUniqueVisitors'])->name('api.cloudflare.stats');
         Route::get('/api/cloudflare-chart-stats', [CloudflareStatsController::class, 'getVisitorStatsForChart'])->name('api.cloudflare.chart.stats');
-        
+
         // Landing Page Content
         Route::get('/landing-page-content', [LandingPageContentController::class, 'index'])->name('landingpage.content.index');
         Route::post('/landing-page-content/update-all', [LandingPageContentController::class, 'storeOrUpdate'])->name('landingpage.content.update_all');
@@ -136,99 +133,99 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('/spmb-content/update-all', [SpmbContentController::class, 'storeOrUpdate'])->name('spmb.update_all');
 
         // Program Studi
-        Route::get('/program-studi', [\App\Http\Controllers\Admin\ProgramStudiController::class, 'index'])->name('program-studi.index');
-        Route::post('/program-studi/update-all', [\App\Http\Controllers\Admin\ProgramStudiController::class, 'storeOrUpdate'])->name('program-studi.update_all');
+        Route::get('/program-studi', [App\Http\Controllers\Admin\ProgramStudiController::class, 'index'])->name('program-studi.index');
+        Route::post('/program-studi/update-all', [App\Http\Controllers\Admin\ProgramStudiController::class, 'storeOrUpdate'])->name('program-studi.update_all');
 
         // Programs & Galleries
-        Route::resource('programs', \App\Http\Controllers\Admin\ProgramController::class);
-        Route::resource('galleries', \App\Http\Controllers\Admin\GalleryController::class);
+        Route::resource('programs', ProgramController::class);
+        Route::resource('galleries', GalleryController::class);
 
         // Teachers
-        Route::post('/teachers/update-settings', [\App\Http\Controllers\Admin\TeacherController::class, 'updateSettings'])->name('teachers.update_settings');
-        Route::resource('teachers', \App\Http\Controllers\Admin\TeacherController::class);
+        Route::post('/teachers/update-settings', [TeacherController::class, 'updateSettings'])->name('teachers.update_settings');
+        Route::resource('teachers', TeacherController::class);
 
         // Posts
-        Route::resource('posts', \App\Http\Controllers\Admin\PostController::class);
+        Route::resource('posts', PostController::class);
 
         // Alumni
-        Route::resource('alumni', \App\Http\Controllers\Admin\AlumniController::class)
+        Route::resource('alumni', App\Http\Controllers\Admin\AlumniController::class)
             ->parameters(['alumni' => 'alumni']);
 
         // FAQs
-        Route::post('/faqs/reorder', [\App\Http\Controllers\Admin\FaqController::class, 'reorder'])->name('faqs.reorder');
-        Route::resource('faqs', \App\Http\Controllers\Admin\FaqController::class);
+        Route::post('/faqs/reorder', [FaqController::class, 'reorder'])->name('faqs.reorder');
+        Route::resource('faqs', FaqController::class);
 
         // School Profile
-        Route::get('/school-profile', [\App\Http\Controllers\Admin\SchoolProfileController::class, 'index'])->name('school-profile.index');
-        Route::post('/school-profile', [\App\Http\Controllers\Admin\SchoolProfileController::class, 'update'])->name('school-profile.update');
+        Route::get('/school-profile', [SchoolProfileController::class, 'index'])->name('school-profile.index');
+        Route::post('/school-profile', [SchoolProfileController::class, 'update'])->name('school-profile.update');
 
         // Curriculum
         Route::get('/kurikulum', [CurriculumController::class, 'index'])->name('curriculum.index');
         Route::post('/kurikulum', [CurriculumController::class, 'update'])->name('curriculum.update');
 
         // Site Settings
-        Route::get('/site-settings', [\App\Http\Controllers\Admin\SiteSettingController::class, 'index'])->name('site-settings.index');
-        Route::post('/site-settings', [\App\Http\Controllers\Admin\SiteSettingController::class, 'update'])->name('site-settings.update');
-        
+        Route::get('/site-settings', [SiteSettingController::class, 'index'])->name('site-settings.index');
+        Route::post('/site-settings', [SiteSettingController::class, 'update'])->name('site-settings.update');
+
         // Contact Messages
-        Route::get('/contact-messages', [\App\Http\Controllers\Admin\ContactMessageController::class, 'index'])->name('contact-messages.index');
-        Route::get('/contact-messages/{contactMessage}', [\App\Http\Controllers\Admin\ContactMessageController::class, 'show'])->name('contact-messages.show');
-        Route::delete('/contact-messages/{contactMessage}', [\App\Http\Controllers\Admin\ContactMessageController::class, 'destroy'])->name('contact-messages.destroy');
+        Route::get('/contact-messages', [ContactMessageController::class, 'index'])->name('contact-messages.index');
+        Route::get('/contact-messages/{contactMessage}', [ContactMessageController::class, 'show'])->name('contact-messages.show');
+        Route::delete('/contact-messages/{contactMessage}', [ContactMessageController::class, 'destroy'])->name('contact-messages.destroy');
 
         // Extracurriculars
-        Route::get('/extracurriculars', [\App\Http\Controllers\Admin\ExtracurricularController::class, 'index'])->name('extracurriculars.index');
-        Route::post('/extracurriculars', [\App\Http\Controllers\Admin\ExtracurricularController::class, 'store'])->name('extracurriculars.store');
-        Route::put('/extracurriculars/{extracurricular}', [\App\Http\Controllers\Admin\ExtracurricularController::class, 'update'])->name('extracurriculars.update');
-        Route::delete('/extracurriculars/{extracurricular}', [\App\Http\Controllers\Admin\ExtracurricularController::class, 'destroy'])->name('extracurriculars.destroy');
+        Route::get('/extracurriculars', [ExtracurricularController::class, 'index'])->name('extracurriculars.index');
+        Route::post('/extracurriculars', [ExtracurricularController::class, 'store'])->name('extracurriculars.store');
+        Route::put('/extracurriculars/{extracurricular}', [ExtracurricularController::class, 'update'])->name('extracurriculars.update');
+        Route::delete('/extracurriculars/{extracurricular}', [ExtracurricularController::class, 'destroy'])->name('extracurriculars.destroy');
 
         // RAG Documents
-        Route::resource('rag-documents', \App\Http\Controllers\Admin\RagDocumentController::class);
-        Route::post('/rag-documents/{ragDocument}/reprocess', [\App\Http\Controllers\Admin\RagDocumentController::class, 'reprocess'])->name('rag-documents.reprocess');
+        Route::resource('rag-documents', RagDocumentController::class);
+        Route::post('/rag-documents/{ragDocument}/reprocess', [RagDocumentController::class, 'reprocess'])->name('rag-documents.reprocess');
 
         // AI Settings
-        Route::get('/ai-settings', [\App\Http\Controllers\Admin\AiSettingController::class, 'index'])->name('ai-settings.index');
-        Route::post('/ai-settings', [\App\Http\Controllers\Admin\AiSettingController::class, 'update'])->name('ai-settings.update');
-        Route::post('/ai-settings/apify-token', [\App\Http\Controllers\Admin\AiSettingController::class, 'updateApifyToken'])->name('ai-settings.apify-token.update');
-        Route::get('/ai-settings/models', [\App\Http\Controllers\Admin\AiSettingController::class, 'models'])->name('ai-settings.models');
+        Route::get('/ai-settings', [AiSettingController::class, 'index'])->name('ai-settings.index');
+        Route::post('/ai-settings', [AiSettingController::class, 'update'])->name('ai-settings.update');
+        Route::post('/ai-settings/apify-token', [AiSettingController::class, 'updateApifyToken'])->name('ai-settings.apify-token.update');
+        Route::get('/ai-settings/models', [AiSettingController::class, 'models'])->name('ai-settings.models');
 
         // RAG DB Content Indexing
         Route::post('/ai-settings/reindex-db-content', [AiSettingActionController::class, 'reindexDbContent'])
             ->name('ai-settings.reindex-db-content');
 
         // Instagram Bot Management
-        Route::get('/instagram-bots', [\App\Http\Controllers\Admin\InstagramBotAccountController::class, 'index'])->name('instagram-bots.index');
-        Route::post('/instagram-settings', [\App\Http\Controllers\Admin\InstagramBotAccountController::class, 'updateSettings'])->name('instagram-settings.update');
-        Route::post('/instagram-scraper/run', [\App\Http\Controllers\Admin\InstagramBotAccountController::class, 'runScraper'])->name('instagram-scraper.run');
-        Route::post('/instagram-scraper/single-post', [\App\Http\Controllers\Admin\InstagramBotAccountController::class, 'scrapeSinglePost'])->name('instagram-scraper.single-post');
-        Route::post('/instagram-posts/{id}/approve', [\App\Http\Controllers\Admin\InstagramBotAccountController::class, 'approvePost'])->name('instagram-posts.approve');
-        Route::post('/instagram-posts/{id}/process-ai', [\App\Http\Controllers\Admin\InstagramBotAccountController::class, 'processWithAI'])->name('instagram-posts.process-ai');
-        Route::post('/instagram-posts/{id}/reset-status', [\App\Http\Controllers\Admin\InstagramBotAccountController::class, 'resetProcessingStatus'])->name('instagram-posts.reset-status');
-        Route::delete('/instagram-posts/{id}/reject', [\App\Http\Controllers\Admin\InstagramBotAccountController::class, 'rejectPost'])->name('instagram-posts.reject');
-        Route::post('/instagram-posts/bulk-approve', [\App\Http\Controllers\Admin\InstagramBotAccountController::class, 'bulkApprove'])->name('instagram-posts.bulk-approve');
-        Route::post('/instagram-posts/cleanup-stuck', [\App\Http\Controllers\Admin\InstagramBotAccountController::class, 'cleanupStuckPosts'])->name('instagram-posts.cleanup-stuck');
+        Route::get('/instagram-bots', [InstagramBotAccountController::class, 'index'])->name('instagram-bots.index');
+        Route::post('/instagram-settings', [InstagramBotAccountController::class, 'updateSettings'])->name('instagram-settings.update');
+        Route::post('/instagram-scraper/run', [InstagramBotAccountController::class, 'runScraper'])->name('instagram-scraper.run');
+        Route::post('/instagram-scraper/single-post', [InstagramBotAccountController::class, 'scrapeSinglePost'])->name('instagram-scraper.single-post');
+        Route::post('/instagram-posts/{id}/approve', [InstagramBotAccountController::class, 'approvePost'])->name('instagram-posts.approve');
+        Route::post('/instagram-posts/{id}/process-ai', [InstagramBotAccountController::class, 'processWithAI'])->name('instagram-posts.process-ai');
+        Route::post('/instagram-posts/{id}/reset-status', [InstagramBotAccountController::class, 'resetProcessingStatus'])->name('instagram-posts.reset-status');
+        Route::delete('/instagram-posts/{id}/reject', [InstagramBotAccountController::class, 'rejectPost'])->name('instagram-posts.reject');
+        Route::post('/instagram-posts/bulk-approve', [InstagramBotAccountController::class, 'bulkApprove'])->name('instagram-posts.bulk-approve');
+        Route::post('/instagram-posts/cleanup-stuck', [InstagramBotAccountController::class, 'cleanupStuckPosts'])->name('instagram-posts.cleanup-stuck');
 
         // PTN Admissions Management
-        Route::get('/ptn-admissions', [\App\Http\Controllers\Admin\PtnAdmissionController::class, 'index'])->name('ptn-admissions.index');
-        Route::post('/ptn-admissions/batches', [\App\Http\Controllers\Admin\PtnAdmissionController::class, 'storeBatch'])->name('ptn-admissions.batches.store');
-        Route::put('/ptn-admissions/batches/{batch}', [\App\Http\Controllers\Admin\PtnAdmissionController::class, 'updateBatch'])->name('ptn-admissions.batches.update');
-        Route::delete('/ptn-admissions/batches/{batch}', [\App\Http\Controllers\Admin\PtnAdmissionController::class, 'destroyBatch'])->name('ptn-admissions.batches.destroy');
-        Route::get('/ptn-admissions/batches/{batch}', [\App\Http\Controllers\Admin\PtnAdmissionController::class, 'showBatch'])->name('ptn-admissions.batches.show');
-        Route::post('/ptn-admissions/batches/{batch}/admissions', [\App\Http\Controllers\Admin\PtnAdmissionController::class, 'storeAdmission'])->name('ptn-admissions.batches.admissions.store');
-        Route::post('/ptn-admissions/batches/{batch}/bulk-import', [\App\Http\Controllers\Admin\PtnAdmissionController::class, 'bulkImport'])->name('ptn-admissions.batches.bulk-import');
-        Route::post('/ptn-admissions/batches/{batch}/import-excel', [\App\Http\Controllers\Admin\PtnAdmissionController::class, 'importExcel'])->name('ptn-admissions.batches.import-excel');
-        Route::get('/ptn-admissions/download-template', [\App\Http\Controllers\Admin\PtnAdmissionController::class, 'downloadTemplate'])->name('ptn-admissions.download-template');
-        Route::put('/ptn-admissions/admissions/{admission}', [\App\Http\Controllers\Admin\PtnAdmissionController::class, 'updateAdmission'])->name('ptn-admissions.admissions.update');
-        Route::delete('/ptn-admissions/admissions/{admission}', [\App\Http\Controllers\Admin\PtnAdmissionController::class, 'destroyAdmission'])->name('ptn-admissions.admissions.destroy');
-        Route::post('/ptn-admissions/universities', [\App\Http\Controllers\Admin\PtnAdmissionController::class, 'storeUniversity'])->name('ptn-admissions.universities.store');
-        Route::put('/ptn-admissions/universities/{university}', [\App\Http\Controllers\Admin\PtnAdmissionController::class, 'updateUniversity'])->name('ptn-admissions.universities.update');
-        Route::delete('/ptn-admissions/universities/{university}', [\App\Http\Controllers\Admin\PtnAdmissionController::class, 'destroyUniversity'])->name('ptn-admissions.universities.destroy');
+        Route::get('/ptn-admissions', [PtnAdmissionController::class, 'index'])->name('ptn-admissions.index');
+        Route::post('/ptn-admissions/batches', [PtnAdmissionController::class, 'storeBatch'])->name('ptn-admissions.batches.store');
+        Route::put('/ptn-admissions/batches/{batch}', [PtnAdmissionController::class, 'updateBatch'])->name('ptn-admissions.batches.update');
+        Route::delete('/ptn-admissions/batches/{batch}', [PtnAdmissionController::class, 'destroyBatch'])->name('ptn-admissions.batches.destroy');
+        Route::get('/ptn-admissions/batches/{batch}', [PtnAdmissionController::class, 'showBatch'])->name('ptn-admissions.batches.show');
+        Route::post('/ptn-admissions/batches/{batch}/admissions', [PtnAdmissionController::class, 'storeAdmission'])->name('ptn-admissions.batches.admissions.store');
+        Route::post('/ptn-admissions/batches/{batch}/bulk-import', [PtnAdmissionController::class, 'bulkImport'])->name('ptn-admissions.batches.bulk-import');
+        Route::post('/ptn-admissions/batches/{batch}/import-excel', [PtnAdmissionController::class, 'importExcel'])->name('ptn-admissions.batches.import-excel');
+        Route::get('/ptn-admissions/download-template', [PtnAdmissionController::class, 'downloadTemplate'])->name('ptn-admissions.download-template');
+        Route::put('/ptn-admissions/admissions/{admission}', [PtnAdmissionController::class, 'updateAdmission'])->name('ptn-admissions.admissions.update');
+        Route::delete('/ptn-admissions/admissions/{admission}', [PtnAdmissionController::class, 'destroyAdmission'])->name('ptn-admissions.admissions.destroy');
+        Route::post('/ptn-admissions/universities', [PtnAdmissionController::class, 'storeUniversity'])->name('ptn-admissions.universities.store');
+        Route::put('/ptn-admissions/universities/{university}', [PtnAdmissionController::class, 'updateUniversity'])->name('ptn-admissions.universities.update');
+        Route::delete('/ptn-admissions/universities/{university}', [PtnAdmissionController::class, 'destroyUniversity'])->name('ptn-admissions.universities.destroy');
 
         // TKA Averages Management
-        Route::delete('/tka-averages/group', [\App\Http\Controllers\Admin\TkaAverageController::class, 'destroyGroup'])->name('tka-averages.group.destroy');
-        Route::resource('tka-averages', \App\Http\Controllers\Admin\TkaAverageController::class);
+        Route::delete('/tka-averages/group', [TkaAverageController::class, 'destroyGroup'])->name('tka-averages.group.destroy');
+        Route::resource('tka-averages', TkaAverageController::class);
 
         // Seragam (School Uniforms) - Using modal-based approach
-        Route::resource('seragam', \App\Http\Controllers\Admin\SeragamController::class)->except(['create', 'show', 'edit']);
+        Route::resource('seragam', App\Http\Controllers\Admin\SeragamController::class)->except(['create', 'show', 'edit']);
     });
 });
 
@@ -250,10 +247,10 @@ Route::get('/media/{path}', [MediaProxyController::class, 'show'])
 // ============================================================================
 // SEO ROUTES
 // ============================================================================
-Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
-Route::get('/robots.txt', [\App\Http\Controllers\SitemapController::class, 'robots'])->name('robots');
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
 
 // ============================================================================
 // HEALTH CHECK ROUTE
 // ============================================================================
-Route::get('/health', [\App\Http\Controllers\HealthController::class, 'index'])->name('health');
+Route::get('/health', [HealthController::class, 'index'])->name('health');

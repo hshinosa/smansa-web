@@ -317,6 +317,18 @@ class ProcessInstagramPost implements ShouldQueue
                     } else {
                         Log::warning('[InstagramJob] Image file not found', ['path' => $fullPath]);
                     }
+
+                    // Explicit memory cleanup to prevent leaks during bulk image processing
+                    unset($fullPath);
+
+                    // Force garbage collection every 10 images to prevent memory buildup
+                    if (($index + 1) % 10 === 0) {
+                        gc_collect_cycles();
+                        Log::debug('[InstagramJob] Memory cleanup triggered', [
+                            'images_processed' => $index + 1,
+                            'memory_usage' => memory_get_usage(true) / 1024 / 1024 .' MB',
+                        ]);
+                    }
                 }
 
                 Log::info('[InstagramJob] Image attachment completed', [
