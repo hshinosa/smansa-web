@@ -43,7 +43,8 @@ export default defineConfig(({ mode }) => {
                         'react-vendor': ['react', 'react-dom'],
                         'inertia-vendor': ['@inertiajs/react'],
                         'markdown-vendor': ['react-markdown', 'remark-gfm', 'rehype-raw'],
-                        'ui-vendor': ['lucide-react'],
+                        'chart-vendor': ['chart.js', 'react-chartjs-2'],
+                        'ui-vendor': ['lucide-react', '@headlessui/react', '@radix-ui/react-navigation-menu'],
                     },
                     // Configure asset URLs for CDN
                     assetFileNames: (assetInfo) => {
