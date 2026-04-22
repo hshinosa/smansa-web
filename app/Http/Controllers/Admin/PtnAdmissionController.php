@@ -3,18 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\PtnUniversity;
-use App\Models\PtnAdmissionBatch;
-use App\Models\PtnAdmission;
 use App\Http\Requests\PtnAdmissionImportRequest;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\PtnAdmissionsImport;
-use App\Services\PtnPdfParser;
-
 use App\Http\Requests\PtnAdmissionRequest;
+use App\Imports\PtnAdmissionsImport;
+use App\Models\PtnAdmission;
+use App\Models\PtnAdmissionBatch;
+use App\Models\PtnUniversity;
+use App\Services\PtnPdfParser;
+use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PtnAdmissionController extends Controller
 {
@@ -28,6 +25,7 @@ class PtnAdmissionController extends Controller
                     ->groupBy('university_id')
                     ->map(function ($items) {
                         $first = $items->first();
+
                         return [
                             'university_id' => $first->university_id,
                             'university_name' => $first->university->name ?? 'Unknown',
@@ -143,7 +141,7 @@ class PtnAdmissionController extends Controller
                 'program_studi' => $validated['program_studi'],
             ],
             [
-                'count' => $validated['count']
+                'count' => $validated['count'],
             ]
         );
 
@@ -218,9 +216,10 @@ class PtnAdmissionController extends Controller
             }
 
             $batch->updateTotalStudents(); // Recalculate totals
+
             return back()->with('success', 'Data berhasil diimport.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal mengimport file: ' . $e->getMessage());
+            return back()->with('error', 'Gagal mengimport file: '.$e->getMessage());
         }
     }
 
@@ -237,6 +236,11 @@ class PtnAdmissionController extends Controller
 
         $callback = function () use ($columns, $example1, $example2) {
             $file = fopen('php://output', 'w');
+
+            if ($file === false) {
+                throw new \RuntimeException('Failed to open output stream');
+            }
+
             fputcsv($file, $columns);
             fputcsv($file, $example1);
             fputcsv($file, $example2);

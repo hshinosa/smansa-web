@@ -35,7 +35,9 @@ class PtnAdmission extends Model
     protected static function booted()
     {
         static::saved(function ($admission) {
-            $admission->batch->updateTotalStudents();
+            if ($admission->batch) {
+                $admission->batch->updateTotalStudents();
+            }
         });
 
         static::deleted(function ($admission) {

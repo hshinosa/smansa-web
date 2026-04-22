@@ -29,7 +29,7 @@ class PrestasiController extends Controller
                         $majors = $items->map(function ($item) {
                             return [
                                 'name' => $item->program_studi,
-                                'count' => $item->count
+                                'count' => $item->count,
                             ];
                         })->sortByDesc('count')->values();
 
@@ -39,7 +39,7 @@ class PrestasiController extends Controller
                             'fullName' => $first->university->name,
                             'count' => $items->sum('count'),
                             'color' => $first->university->color ?? '#6B7280',
-                            'majors' => $majors
+                            'majors' => $majors,
                         ];
                     })
                     ->sortByDesc('count')
@@ -77,13 +77,19 @@ class PrestasiController extends Controller
             ->take(4)
             ->get()
             ->map(function ($item) {
+                if (! $item->university) {
+                    return null;
+                }
+
                 return [
                     'name' => $item->university->short_name ?? $item->university->name,
                     'fullName' => $item->university->name,
                     'total' => (int) $item->total,
-                    'color' => $item->university->color,
+                    'color' => $item->university->color ?? '#6B7280',
                 ];
-            });
+            })
+            ->filter()
+            ->values();
 
         $tkaGroups = TkaAverage::select('academic_year', 'exam_type')
             ->groupBy('academic_year', 'exam_type')
@@ -93,11 +99,11 @@ class PrestasiController extends Controller
                 $subjects = TkaAverage::where('academic_year', $group->academic_year)
                     ->where('exam_type', $group->exam_type)
                     ->get();
-                
+
                 return [
                     'academic_year' => $group->academic_year,
                     'exam_type' => $group->exam_type,
-                    'subjects' => $subjects
+                    'subjects' => $subjects,
                 ];
             });
 
@@ -109,7 +115,7 @@ class PrestasiController extends Controller
                 'totalPtn' => $totalPtn,
             ],
             'ptnFavorites' => $ptnFavorites,
-            'tkaGroups' => $tkaGroups
+            'tkaGroups' => $tkaGroups,
         ]);
     }
 
@@ -125,12 +131,12 @@ class PrestasiController extends Controller
                     ->groupBy('university_id')
                     ->map(function ($items) {
                         $first = $items->first();
-                        
+
                         // Group majors within this university
                         $majors = $items->map(function ($item) {
                             return [
                                 'name' => $item->program_studi,
-                                'count' => $item->count
+                                'count' => $item->count,
                             ];
                         })->sortByDesc('count')->values();
 
@@ -140,7 +146,7 @@ class PrestasiController extends Controller
                             'fullName' => $first->university->name,
                             'count' => $items->sum('count'),
                             'color' => $first->university->color ?? '#6B7280',
-                            'majors' => $majors
+                            'majors' => $majors,
                         ];
                     })
                     ->sortByDesc('count')
@@ -169,7 +175,7 @@ class PrestasiController extends Controller
             });
 
         $totalAdmissions = PtnAdmission::sum('count');
-        
+
         // Count unique universities that have admissions
         $totalPtn = PtnAdmission::distinct('university_id')->count('university_id');
 
@@ -213,16 +219,16 @@ class PrestasiController extends Controller
                 $subjects = TkaAverage::where('academic_year', $group->academic_year)
                     ->where('exam_type', $group->exam_type)
                     ->get();
-                
+
                 return [
                     'academic_year' => $group->academic_year,
                     'exam_type' => $group->exam_type,
-                    'subjects' => $subjects
+                    'subjects' => $subjects,
                 ];
             });
 
         return Inertia::render('HasilTkaPage', [
-            'tkaGroups' => $tkaGroups
+            'tkaGroups' => $tkaGroups,
         ]);
     }
 }
