@@ -70,7 +70,7 @@ export default function LandingPage({
             />
 
             {/* HERO SECTION */}
-            <section className="relative pt-32 md:pt-40 overflow-hidden">
+            <section className="relative py-24 md:py-32 lg:py-40 overflow-hidden">
                 <link rel="preload" as="image" href={heroContent?.background_image_url || '/images/hero-bg-sman1baleendah.jpeg'} fetchpriority="high" />
                 
                 {/* Hero Background Image */}
@@ -86,11 +86,14 @@ export default function LandingPage({
                         />
                     )}
                 </div>
-                {/* Overlay for readability */}
-                <div className="absolute inset-0 bg-black/60 z-0"></div>
+                {/* Refined gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-900/80 via-blue-900/70 to-slate-900/80 z-0"></div>
 
-                {/* Blue Rectangle behind Student */}
-                <div className="absolute top-0 left-1/2 h-full w-full md:w-[720px] bg-primary/80 z-0 hidden md:block"></div>
+                {/* Geometric accent - subtle gradient */}
+                <div className="absolute top-0 left-1/2 h-full w-full md:w-[720px] bg-gradient-to-br from-blue-600/20 to-indigo-600/20 z-0 hidden md:block"></div>
+
+                {/* Top-right atmospheric glow */}
+                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-radial from-blue-500/10 to-transparent z-0 pointer-events-none"></div>
 
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
