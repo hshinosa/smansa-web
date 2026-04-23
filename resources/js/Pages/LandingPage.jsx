@@ -70,7 +70,7 @@ export default function LandingPage({
             />
 
             {/* HERO SECTION */}
-            <section className="relative py-24 md:py-32 lg:py-40 overflow-hidden">
+            <section className="relative pt-32 md:pt-40 overflow-hidden">
                 <link rel="preload" as="image" href={heroContent?.background_image_url || '/images/hero-bg-sman1baleendah.jpeg'} fetchpriority="high" />
                 
                 {/* Hero Background Image */}
@@ -86,36 +86,33 @@ export default function LandingPage({
                         />
                     )}
                 </div>
-                {/* Refined gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-900/80 via-blue-900/70 to-slate-900/80 z-0"></div>
+                {/* Overlay for readability */}
+                <div className="absolute inset-0 bg-black/60 z-0"></div>
 
-                {/* Geometric accent - subtle gradient */}
-                <div className="absolute top-0 left-1/2 h-full w-full md:w-[720px] bg-gradient-to-br from-blue-600/20 to-indigo-600/20 z-0 hidden md:block"></div>
-
-                {/* Top-right atmospheric glow */}
-                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-radial from-blue-500/10 to-transparent z-0 pointer-events-none"></div>
+                {/* Blue Rectangle behind Student */}
+                <div className="absolute top-0 left-1/2 h-full w-full md:w-[720px] bg-primary/80 z-0 hidden md:block"></div>
 
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-16 md:gap-20 items-end">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                         {/* Left Column: Text */}
-                        <div className="space-y-10">
-                            <h1 className="font-display text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.1] text-white animate-fade-in-up">
+                        <div className="space-y-6">
+                            <h1 className={TYPOGRAPHY.heroTitle}>
                                 {heroContent?.title_line1 || 'Selamat Datang di'} <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-200 animate-fade-in-up animation-delay-100">{heroContent?.title_line2 || 'SMA Negeri 1 Baleendah'}</span>
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">{heroContent?.title_line2 || 'SMA Negeri 1 Baleendah'}</span>
                             </h1>
-                            <p className="text-lg md:text-xl lg:text-2xl leading-relaxed text-gray-100/90 max-w-lg animate-fade-in animation-delay-400">
+                            <p className={`${TYPOGRAPHY.heroText} max-w-lg`}>
                                 {heroContent?.hero_text || 'Sekolah penggerak prestasi dan inovasi masa depan.'}
                             </p>
-                            <div className="flex flex-wrap gap-4 animate-fade-in-up animation-delay-600">
+                            <div className="flex flex-wrap gap-4 pt-4">
                                 <Link 
                                     href="/profil-sekolah" 
-                                    className="px-8 py-3.5 bg-amber-400 text-gray-900 font-bold rounded-full shadow-lg hover:shadow-xl hover:bg-amber-300 hover:scale-[1.02] transition-all duration-300"
+                                    className="px-8 py-3.5 bg-accent-yellow text-gray-900 font-bold rounded-full shadow-lg hover:shadow-xl hover:bg-yellow-400 transition-all"
                                 >
                                     Jelajahi Profil
                                 </Link>
                                 <Link 
                                     href="/informasi-spmb" 
-                                    className="px-8 py-3.5 bg-transparent border-2 border-white/80 text-white font-bold rounded-full hover:bg-white/10 hover:scale-[1.02] transition-all duration-300"
+                                    className="px-8 py-3.5 bg-white border-2 border-primary text-primary font-bold rounded-full hover:bg-blue-50 transition-all"
                                 >
                                     Info PPDB
                                 </Link>
@@ -123,18 +120,16 @@ export default function LandingPage({
                         </div>
 
                         {/* Right Column: Visual */}
-                        <div className="relative mx-auto max-w-lg md:max-w-none w-full h-[420px] md:h-[480px] lg:h-[560px] flex justify-center items-end">
-                            {/* Main Image with refined shadow and animation */}
+                        <div className="relative mx-auto max-w-lg md:max-w-none w-full h-[420px] md:h-[480px] lg:h-[540px] flex justify-center items-end">
+                            {/* Main Image */}
                             {(heroContent?.student_image_url || heroContent?.studentImage) && (
-                                <div className="animate-fade-in-scale animation-delay-200">
-                                    <ResponsiveImage 
-                                        src={heroContent?.student_image_url} 
-                                        media={heroContent?.studentImage}
-                                        alt={`Siswa Berprestasi ${siteName}`}
-                                        className="relative z-10 h-[400px] md:h-[480px] lg:h-[560px] w-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.4)] drop-shadow-[0_10px_20px_rgba(0,0,0,0.3)]"
-                                        loading="eager"
-                                    />
-                                </div>
+                                <ResponsiveImage 
+                                    src={heroContent?.student_image_url} 
+                                    media={heroContent?.studentImage}
+                                    alt={`Siswa Berprestasi ${siteName}`}
+                                    className="relative z-10 h-[380px] md:h-[440px] lg:h-[500px] w-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                                    loading="eager"
+                                />
                             )}
 
                             {/* Floating Glass Cards - Stats */}
@@ -149,18 +144,22 @@ export default function LandingPage({
                                     'top-1/2 -right-4 md:-right-12',    // Middle Right (Lulusan) - Moved up & adjusted
                                     'bottom-8 left-2 md:-left-8'        // Bottom Left (Siswa) - Adjusted
                                 ];
+                                const colors = [
+                                    'bg-yellow-100 text-yellow-600',
+                                    'bg-blue-100 text-primary',
+                                    'bg-green-100 text-green-600'
+                                ];
                                 return (
                                     <div 
                                         key={idx}
-                                        className={`absolute ${positions[idx % 3]} bg-white/8 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 p-4 rounded-2xl shadow-2xl shadow-black/20 flex items-center gap-3 max-w-[220px] z-20 hover:scale-105 hover:bg-white/12 transition-all duration-300 animate-fade-in-up`}
-                                        style={{animationDelay: `${800 + idx * 100}ms`}}
+                                        className={`absolute ${positions[idx % 3]} bg-white/70 backdrop-blur-md border border-white/40 p-4 rounded-xl shadow-lg flex items-center gap-3 max-w-[220px] z-20`}
                                     >
-                                        <div className="p-3 rounded-full bg-gradient-to-br from-amber-400/20 to-yellow-300/20">
-                                            <Icon size={24} className="text-amber-300" />
+                                        <div className={`p-2 rounded-full ${colors[idx % 3]}`}>
+                                            <Icon size={24} fill="currentColor" />
                                         </div>
                                         <div>
-                                            <p className="text-xs uppercase tracking-wider text-gray-300 font-medium">{stat.label}</p>
-                                            <p className="text-2xl font-bold text-white">{stat.value}</p>
+                                            <p className="text-xs text-gray-500 font-medium">{stat.label}</p>
+                                            <p className="text-sm font-bold text-gray-900">{stat.value}</p>
                                         </div>
                                     </div>
                                 );

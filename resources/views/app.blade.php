@@ -15,9 +15,6 @@
 
         <!-- Fonts with font-display: swap for performance -->
         <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
-        
-        <!-- Google Fonts: Playfair Display -->
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
         <link rel="icon" href="{{ (isset($siteSettings['general']['site_favicon']) && !str_starts_with($siteSettings['general']['site_favicon'], '/')) ? asset('storage/' . $siteSettings['general']['site_favicon']) : asset($siteSettings['general']['site_favicon'] ?? 'favicon.ico') }}" type="image/x-icon">
         <link rel="shortcut icon" href="{{ (isset($siteSettings['general']['site_favicon']) && !str_starts_with($siteSettings['general']['site_favicon'], '/')) ? asset('storage/' . $siteSettings['general']['site_favicon']) : asset($siteSettings['general']['site_favicon'] ?? 'favicon.ico') }}" type="image/x-icon">

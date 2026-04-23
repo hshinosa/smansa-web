@@ -22,8 +22,7 @@ export default {
                 serif: [
                     'Merriweather',
                     ...defaultTheme.fontFamily.serif
-                ],
-                'display': ['Playfair Display', 'serif'],
+                ]
     		},
 			boxShadow: {
                 'navbar': '0 0 5px 1px rgba(0, 0, 0, 0.25)',
@@ -71,13 +70,21 @@ export default {
     				'5': 'hsl(var(--chart-5))'
     			}
     		},
+            keyframes: {
+                float: {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-15px)' },
+                },
+                fadeInUp: {
+                    '0%': { opacity: '0', transform: 'translateY(20px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' },
+                }
+            },
             animation: {
                 'float-slow': 'float 6s ease-in-out infinite',
                 'float-medium': 'float 5s ease-in-out infinite',
                 'float-fast': 'float 4s ease-in-out infinite',
-                'fade-in-up': 'fadeInUp 0.6s ease-out',
-                'fade-in-scale': 'fadeInScale 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                'fade-in': 'fadeIn 0.6s ease-out',
+                'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
                 'scroll': 'scroll 80s linear infinite',
                 'scroll-reverse': 'scroll-reverse 80s linear infinite',
             },
@@ -87,16 +94,8 @@ export default {
                     '50%': { transform: 'translateY(-20px)' },
                 },
                 fadeInUp: {
-                    'from': { opacity: '0', transform: 'translateY(20px)' },
-                    'to': { opacity: '1', transform: 'translateY(0)' },
-                },
-                fadeInScale: {
-                    'from': { opacity: '0', transform: 'scale(0.95)' },
-                    'to': { opacity: '1', transform: 'scale(1)' },
-                },
-                fadeIn: {
-                    'from': { opacity: '0' },
-                    'to': { opacity: '1' },
+                    '0%': { opacity: '0', transform: 'translateY(20px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' },
                 },
                 scroll: {
                     '0%': { transform: 'translateX(0)' },
