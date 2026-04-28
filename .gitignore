@@ -33,6 +33,7 @@ storage/framework/sessions/*
 storage/framework/views/*
 storage/logs/*
 storage/app/*.php
+storage/app/public/*
 storage/media-library/*
 
 # Docker
@@ -91,3 +92,6 @@ tests-results
 .swarm/
 .agents/
 .sisyphus/
+
+# Playwright MCP logs
+.playwright-mcp/

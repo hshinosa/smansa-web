@@ -97,7 +97,7 @@ case "$1" in
     "backup-db")
         BACKUP_FILE="backup-$(date +%Y%m%d-%H%M%S).sql"
         echo -e "${BLUE}Creating database backup: $BACKUP_FILE${NC}"
-        docker-compose exec db mysqldump -u sman1_user -psman1_password_2024 sman1_baleendah > "$BACKUP_FILE"
+        docker-compose exec -e PGPASSWORD=sman1_password_2024 db pg_dump -U sman1_user -d sman1_baleendah > "$BACKUP_FILE"
         echo -e "${GREEN}Database backup created: $BACKUP_FILE${NC}"
         ;;
     
@@ -107,7 +107,7 @@ case "$1" in
             exit 1
         fi
         echo -e "${BLUE}Restoring database from: $2${NC}"
-        docker-compose exec -T db mysql -u sman1_user -psman1_password_2024 sman1_baleendah < "$2"
+        docker-compose exec -T -e PGPASSWORD=sman1_password_2024 db psql -U sman1_user -d sman1_baleendah < "$2"
         echo -e "${GREEN}Database restored successfully!${NC}"
         ;;
     

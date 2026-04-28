@@ -22,18 +22,21 @@ const sanitizeHtml = (html) => {
 };
 
 export default function ChatWidget() {
-    let siteSettings = null;
-    let siteName = 'SMAN 1 Baleendah';
+    const [mounted, setMounted] = useState(false);
     
+    let page = null;
     try {
-        const page = usePage();
-        if (page && page.props) {
-            siteSettings = page.props.siteSettings;
-            siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
-        }
+        page = usePage();
     } catch (error) {
-        logger.warn('ChatWidget: usePage() not available, using default site name');
+        // usePage() not available yet
     }
+    
+    const siteSettings = mounted && page?.props ? page.props.siteSettings : null;
+    const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
+    
+    useEffect(() => {
+        setMounted(true);
+    }, []);
     
     // Get initial WhatsApp number from site settings (state for dynamic updates from API)
     const [whatsappNumber, setWhatsappNumber] = useState(() => {

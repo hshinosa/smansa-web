@@ -1,15 +1,39 @@
 name: sman1baleendah
 
 services:
-  # Redis: Cache and Session Store
-  redis:
-    image: redis:7-alpine
-    container_name: sman1-baleendah-redis
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: smansa-web:prod
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    working_dir: /var/www
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CACHE_STORE: redis
+      SESSION_DRIVER: redis
+      QUEUE_CONNECTION: database
+      EMBEDDING_BASE_URL: http://embedding:8080
     volumes:
-      - redis_data:/data
+      - ./:/var/www
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "php -v >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - sman1-network
     logging:
@@ -17,29 +41,186 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./public:/var/www/public:ro
+      - ./storage:/var/www/storage:ro
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/sites/:/etc/nginx/sites-available/:ro
+      - ./docker/nginx/ssl/:/etc/nginx/ssl/:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      app:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - sman1-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  queue:
+    image: smansa-web:prod
+    restart: unless-stopped
+    working_dir: /var/www
+    command: php artisan queue:work --sleep=1 --tries=3 --timeout=120 --queue=default,instagram
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CACHE_STORE: redis
+      SESSION_DRIVER: redis
+      QUEUE_CONNECTION: database
+      EMBEDDING_BASE_URL: http://embedding:8080
+    volumes:
+      - ./:/var/www
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      embedding:
+        condition: service_healthy
+    networks:
+      - sman1-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  scheduler:
+    image: smansa-web:prod
+    restart: unless-stopped
+    working_dir: /var/www
+    command: /bin/sh -c "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CACHE_STORE: redis
+      SESSION_DRIVER: redis
+      QUEUE_CONNECTION: database
+    volumes:
+      - ./:/var/www
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - sman1-network
+
+  db:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-sman1_baleendah}
+      POSTGRES_USER: ${DB_USERNAME:-sman1_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-sman1_password_2024}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-sman1_user} -d ${DB_DATABASE:-sman1_baleendah}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sman1-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru --requirepass ${REDIS_PASSWORD:-BuUyzCCiCIC3MhAkXzpyRtrEnFtHBeSK}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-BuUyzCCiCIC3MhAkXzpyRtrEnFtHBeSK}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - sman1-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
-  # Monitoring: Prometheus metrics exporter
-  # prometheus-exporter:
-  #   image: saint/haproxy-exporter:latest
-  #   container_name: sman1-baleendah-metrics
-  #   restart: unless-stopped
-  #   ports:
-  #     - "9100:9100"
-  #   networks:
-  #     - sman1-network
-  #   depends_on:
-  #     - app
+  embedding:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-latest
+    restart: unless-stopped
+    command: ["--model-id", "intfloat/multilingual-e5-small", "--port", "8080"]
+    environment:
+      - HF_HOME=/data
+    volumes:
+      - embedding_cache:/data
+    ports:
+      - "8090:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - sman1-network
 
-  # Backup: Automated PostgreSQL backups
+  instagram-scraper:
+    image: smansa-web:prod
+    restart: unless-stopped
+    command: /bin/sh -c "while true; do python3 instagram-scraper/scraper.py; echo 'Scraping finished, sleeping for 6 hours...'; sleep 21600; done"
+    working_dir: /var/www
+    volumes:
+      - instagram_scraper:/var/www/instagram-scraper
+      - ./storage:/var/www/storage
+      - ./.env:/var/www/.env
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - sman1-network
+
   db-backup:
     image: prodrigestivill/postgres-backup-local:latest
-    container_name: sman1-baleendah-db-backup
     restart: unless-stopped
     volumes:
       - backups:/backups
@@ -57,10 +238,8 @@ services:
       db:
         condition: service_healthy
 
-  # Storage Backup: Automated file backups
   storage-backup:
     image: alpine:latest
-    container_name: sman1-baleendah-storage-backup
     restart: unless-stopped
     volumes:
       - ./storage:/var/www/storage:ro
@@ -70,199 +249,8 @@ services:
     networks:
       - sman1-network
 
-  app:
-    image: hshinosa/smansa-web:latest
-    container_name: sman1-baleendah-app
-    restart: unless-stopped
-    working_dir: /var/www
-    volumes:
-      - app_storage:/var/www/storage
-      - app_public:/var/www/public
-      - ./docker/php-fpm/php.ini:/usr/local/etc/php/conf.d/custom.ini
-    env_file:
-      - .env
-    environment:
-      - APP_ENV=production
-      - APP_KEY=${APP_KEY}
-      - DB_CONNECTION=pgsql
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_DATABASE=${DB_DATABASE:-sman1_baleendah}
-      - DB_USERNAME=${DB_USERNAME:-sman1_user}
-      - DB_PASSWORD=${DB_PASSWORD:-sman1_password_2024}
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - CACHE_STORE=redis
-      - SESSION_DRIVER=redis
-      - QUEUE_CONNECTION=database
-      - EMBEDDING_BASE_URL=http://embedding:8080
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    networks:
-      - sman1-network
-
-  nginx:
-    image: nginx:alpine
-    container_name: sman1-baleendah-nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - app_public:/var/www/public:ro
-      - app_storage:/var/www/storage:ro
-      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./docker/nginx/sites/:/etc/nginx/sites-available
-      - ./docker/nginx/ssl/:/etc/nginx/ssl/:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
-    depends_on:
-      - app
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    networks:
-      - sman1-network
-
-  db:
-    image: pgvector/pgvector:pg16
-    container_name: sman1-baleendah-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${DB_DATABASE:-sman1_baleendah}
-      POSTGRES_USER: ${DB_USERNAME:-sman1_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-sman1_password_2024}
-      PGDATA: /var/lib/postgresql/data/pgdata
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5433:5432"
-    networks:
-      - sman1-network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-sman1_user} -d ${DB_DATABASE:-sman1_baleendah}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  queue:
-    image: hshinosa/smansa-web:latest
-    restart: unless-stopped
-    command: php artisan queue:work --sleep=1 --tries=3 --timeout=120 --queue=default,instagram
-    working_dir: /var/www
-    volumes:
-      - app_storage:/var/www/storage
-    env_file:
-      - .env
-    environment:
-      - APP_ENV=production
-      - DB_CONNECTION=pgsql
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_DATABASE=${DB_DATABASE:-sman1_baleendah}
-      - DB_USERNAME=${DB_USERNAME:-sman1_user}
-      - DB_PASSWORD=${DB_PASSWORD:-sman1_password_2024}
-      - CACHE_STORE=redis
-      - SESSION_DRIVER=redis
-      - QUEUE_CONNECTION=database
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - EMBEDDING_BASE_URL=http://embedding:8080
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      embedding:
-        condition: service_healthy
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    networks:
-      - sman1-network
-
-  scheduler:
-    image: hshinosa/smansa-web:latest
-    container_name: sman1-baleendah-scheduler
-    restart: unless-stopped
-    command: /bin/sh -c "while true; do php artisan schedule:run; sleep 60; done"
-    working_dir: /var/www
-    volumes:
-      - app_storage:/var/www/storage
-    env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - sman1-network
-
-  # Self-hosted embedding service (HuggingFace TEI)
-  embedding:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-latest
-    container_name: sman1-baleendah-embedding
-    restart: unless-stopped
-    command: ["--model-id", "intfloat/multilingual-e5-small", "--port", "8080"]
-    environment:
-      - HF_HOME=/data
-    volumes:
-      - embedding_cache:/data
-    ports:
-      - "8090:8080"
-    networks:
-      - sman1-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-  # Python Instagram Scraper Service
-  instagram-scraper:
-    image: hshinosa/smansa-web:latest
-    container_name: sman1-baleendah-scraper
-    restart: unless-stopped
-    command: /bin/sh -c "while true; do python3 instagram-scraper/scraper.py; echo 'Scraping finished, sleeping for 6 hours...'; sleep 21600; done"
-    working_dir: /var/www
-    volumes:
-      - instagram_scraper:/var/www/instagram-scraper
-      - app_storage:/var/www/storage
-      - ./.env:/var/www/.env
-    env_file:
-      - .env
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - sman1-network
-
 volumes:
   postgres_data:
-    driver: local
-  app_storage:
-    driver: local
-  app_public:
     driver: local
   backups:
     driver: local

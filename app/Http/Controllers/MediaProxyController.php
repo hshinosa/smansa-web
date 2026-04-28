@@ -8,7 +8,6 @@ class MediaProxyController extends Controller
 {
     public function show(string $path): BinaryFileResponse
     {
-        // Normalize path - remove leading slashes and prevent directory traversal
         $path = trim($path, '/');
         if (str_contains($path, '..')) {
             abort(404);
@@ -20,6 +19,12 @@ class MediaProxyController extends Controller
             abort(404);
         }
 
-        return response()->file($fullPath);
+        $response = response()->file($fullPath);
+        
+        if (str_ends_with(strtolower($path), '.pdf')) {
+            $response->headers->set('Content-Disposition', 'inline; filename="'.basename($path).'"');
+        }
+        
+        return $response;
     }
 }

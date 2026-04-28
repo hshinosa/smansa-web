@@ -307,6 +307,7 @@ export default function LandingPage({
             </section>
 
             {/* NEWS & ANNOUNCEMENTS */}
+            {latestPosts.length > 0 && (
             <section className="py-20 bg-slate-50">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col md:flex-row justify-between items-end mb-12">
@@ -350,11 +351,6 @@ export default function LandingPage({
                                 </div>
                             </div>
                         ))}
-                        {latestPosts.length === 0 && (
-                            <div className="col-span-3 text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-                                <p className="text-gray-500">Belum ada berita terbaru.</p>
-                            </div>
-                        )}
                     </div>
 
                     <div className="mt-8 text-center md:hidden">
@@ -364,24 +360,25 @@ export default function LandingPage({
                     </div>
                 </div>
             </section>
+            )}
 
             {/* GALLERY SECTION - Full Width Infinite Carousel */}
             <section className="py-20 bg-white overflow-hidden">
                 {/* Animation Styles */}
                 <style>{`
                     @keyframes scroll {
-                        0% { transform: translateX(0); }
-                        100% { transform: translateX(-50%); }
+                        from { transform: translateX(0); }
+                        to { transform: translateX(-50%); }
                     }
                     @keyframes scroll-reverse {
-                        0% { transform: translateX(-50%); }
-                        100% { transform: translateX(0); }
+                        from { transform: translateX(0); }
+                        to { transform: translateX(50%); }
                     }
                     .animate-scroll {
-                        animation: scroll 30s linear infinite;
+                        animation: scroll 80s linear infinite;
                     }
                     .animate-scroll-reverse {
-                        animation: scroll-reverse 30s linear infinite;
+                        animation: scroll-reverse 80s linear infinite;
                     }
                     .animate-scroll:hover,
                     .animate-scroll-reverse:hover {
@@ -421,14 +418,13 @@ export default function LandingPage({
                         );
                     }
                     
-                    // Duplicate images enough times for seamless infinite scroll
-                    const row1Images = [...validImages, ...validImages, ...validImages, ...validImages];
-                    const row2Images = [...validImages, ...validImages, ...validImages, ...validImages].reverse();
+                    // Duplicate images 2x for seamless infinite scroll
+                    const row1Images = [...validImages, ...validImages];
+                    const row2Images = [...validImages, ...validImages];
                     
                     return (
                         <div className="flex flex-col gap-4 w-full">
-                            {/* Row 1 - Scroll Left */}
-                            <div className="flex gap-4 animate-scroll" style={{ width: 'max-content', animationDuration: '80s' }}>
+                            <div className="flex gap-4 animate-scroll" style={{ width: 'max-content' }}>
                                 {row1Images.map((imgUrl, idx) => (
                                     <div key={`row1-${idx}`} className="w-72 h-72 md:w-80 md:h-80 flex-shrink-0 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all relative group">
                                         <GalleryImage 
@@ -441,8 +437,7 @@ export default function LandingPage({
                                 ))}
                             </div>
 
-                            {/* Row 2 - Scroll Right (Reverse) */}
-                            <div className="flex gap-4 animate-scroll-reverse" style={{ width: 'max-content', animationDuration: '80s' }}>
+                            <div className="flex gap-4 animate-scroll-reverse" style={{ width: 'max-content' }}>
                                 {row2Images.map((imgUrl, idx) => (
                                     <div key={`row2-${idx}`} className="w-72 h-72 md:w-80 md:h-80 flex-shrink-0 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all relative group">
                                         <GalleryImage 

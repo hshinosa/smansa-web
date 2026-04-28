@@ -59,8 +59,6 @@ Route::middleware('throttle:60,1')->group(function () {
     Route::get('/struktur-organisasi', [ProfilController::class, 'strukturOrganisasi'])->name('struktur.organisasi');
 
     Route::get('/akademik/prestasi-akademik', [PrestasiController::class, 'index'])->name('prestasi.akademik');
-    Route::get('/akademik/prestasi-akademik/serapan-ptn', [RedirectController::class, 'serapanPtn'])->name('prestasi.serapan-ptn');
-    Route::get('/akademik/prestasi-akademik/hasil-tka', [RedirectController::class, 'hasilTka'])->name('hasil.tka');
 
     Route::get('/akademik/ekstrakurikuler', [AkademikController::class, 'ekstrakurikuler'])->name('akademik.ekstrakurikuler');
     Route::get('/akademik/organisasi-ekstrakurikuler', [AkademikController::class, 'organisasiEkstrakurikuler'])->name('akademik.organisasi_ekstrakurikuler');
@@ -226,6 +224,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Seragam (School Uniforms) - Using modal-based approach
         Route::resource('seragam', App\Http\Controllers\Admin\SeragamController::class)->except(['create', 'show', 'edit']);
+        
+        // Academic Documents (Prestasi Akademik PDFs)
+        Route::post('/academic-documents/reorder', [App\Http\Controllers\Admin\AcademicDocumentController::class, 'reorder'])->name('academic-documents.reorder');
+        Route::resource('academic-documents', App\Http\Controllers\Admin\AcademicDocumentController::class)->except(['create', 'show', 'edit']);
     });
 });
 
