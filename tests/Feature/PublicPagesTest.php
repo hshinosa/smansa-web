@@ -98,7 +98,7 @@ class PublicPagesTest extends TestCase
         $response = $this->get('/akademik/program-studi/mipa');
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
-            ->component('ProgramMipaPage')
+            ->component('ProgramStudiPage')
         );
     }
 
@@ -107,7 +107,7 @@ class PublicPagesTest extends TestCase
         $response = $this->get('/akademik/program-studi/ips');
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
-            ->component('ProgramIpsPage')
+            ->component('ProgramStudiPage')
         );
     }
 
@@ -116,7 +116,7 @@ class PublicPagesTest extends TestCase
         $response = $this->get('/akademik/program-studi/bahasa');
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
-            ->component('ProgramBahasaPage')
+            ->component('ProgramStudiPage')
         );
     }
 

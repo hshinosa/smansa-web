@@ -6,20 +6,38 @@ export const programStudyData = {
         title: 'MIPA',
         subtitle: 'Matematika & Ilmu Pengetahuan Alam',
         description: 'Program Matematika dan Ilmu Pengetahuan Alam',
-        color: 'blue'
+        gradient: 'from-blue-400 to-cyan-300',
+        heroFallback: 'Membangun logika berpikir analitis dan pemahaman mendalam tentang alam semesta melalui penguasaan sains, teknologi, dan metode ilmiah.',
+        defaultSubjectIcon: 'Calculator',
+        defaultCareerIcon: 'Stethoscope',
+        facilitiesFallback: { title: 'Fasilitas Riset & Praktikum', mainTitle: 'Laboratorium Kimia & Fisika' },
+        careerFallback: { title: 'Membuka Jalan Menuju Karir Masa Depan' },
+        seoKeywords: 'peminatan MIPA, IPA, matematika, fisika, kimia, biologi, jurusan IPA, SMAN 1 Baleendah',
     },
     ips: {
         title: 'IPS',
         subtitle: 'Ilmu Pengetahuan Sosial',
         description: 'Program Ilmu Pengetahuan Sosial',
-        color: 'green'
+        gradient: 'from-emerald-400 to-teal-300',
+        heroFallback: 'Mempelajari dinamika masyarakat, ekonomi, dan sejarah untuk membentuk pemimpin masa depan yang peka terhadap isu sosial.',
+        defaultSubjectIcon: 'Users',
+        defaultCareerIcon: 'Briefcase',
+        facilitiesFallback: { title: 'Fasilitas Penunjang', mainTitle: 'Perpustakaan & Ruang Diskusi' },
+        careerFallback: { title: 'Membuka Jalan Menuju Karir Profesional' },
+        seoKeywords: 'peminatan IPS, ekonomi, sosiologi, geografi, sejarah, jurusan IPS, SMAN 1 Baleendah',
     },
     bahasa: {
         title: 'Bahasa',
         subtitle: 'Bahasa & Ilmu Budaya',
         description: 'Program Bahasa',
-        color: 'purple'
-    }
+        gradient: 'from-violet-400 to-purple-300',
+        heroFallback: 'Mengeksplorasi kekayaan bahasa dan budaya dunia sebagai jembatan komunikasi global dan pelestarian kearifan lokal.',
+        defaultSubjectIcon: 'BookOpen',
+        defaultCareerIcon: 'Globe',
+        facilitiesFallback: { title: 'Laboratorium Bahasa', mainTitle: 'Language Center' },
+        careerFallback: { title: 'Membuka Jalan Menuju Karir Global' },
+        seoKeywords: 'peminatan Bahasa, bahasa Indonesia, bahasa Inggris, sastra, linguistik, SMAN 1 Baleendah',
+    },
 };
 
 export const getPageMetadata = (pageName, customMeta = {}) => {

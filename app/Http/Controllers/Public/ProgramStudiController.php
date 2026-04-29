@@ -20,26 +20,22 @@ class ProgramStudiController extends Controller
         $this->imageService = $imageService;
     }
 
-    /**
-     * Get program studi data by program name
-     */
     protected function getProgramData(string $programName): array
     {
         $settings = ProgramStudiSetting::where('program_name', $programName)
             ->with('media')
             ->get()
             ->keyBy('section_key');
-        
+
         $pageData = [];
         foreach (array_keys(ProgramStudiSetting::getSectionFields()) as $key) {
             $dbRow = $settings->get($key);
             $dbContent = ($dbRow && isset($dbRow['content'])) ? $dbRow['content'] : null;
             $content = ProgramStudiSetting::getContent($key, $dbContent);
-            
-            // Inject Media
+
             if ($dbRow) {
                 if ($key === 'hero') {
-                    $media = $this->imageService->getFirstMediaData($dbRow, 'hero_bg');
+                    $media = $this->imageService->getFirstMediaData($dbRow, 'hero_background_image');
                     if ($media) {
                         $content['background_image'] = $media;
                     }
@@ -50,7 +46,6 @@ class ProgramStudiController extends Controller
                         $content['main_image'] = $media;
                     }
 
-                    // Inject images for facility items list
                     if (isset($content['items']) && is_array($content['items'])) {
                         foreach ($content['items'] as $index => &$item) {
                             $itemMedia = $this->imageService->getFirstMediaData($dbRow, "facilities_item_{$index}_image");
@@ -61,40 +56,33 @@ class ProgramStudiController extends Controller
                     }
                 }
             }
-            
+
             $pageData[$key] = $content;
         }
-        
+
         return $pageData;
     }
 
-    /**
-     * Display the MIPA program page
-     */
+    protected function renderProgram(string $programName)
+    {
+        return Inertia::render('ProgramStudiPage', [
+            'content' => $this->getProgramData($programName),
+            'programName' => $programName,
+        ]);
+    }
+
     public function mipa()
     {
-        return Inertia::render('ProgramMipaPage', [
-            'content' => $this->getProgramData('mipa')
-        ]);
+        return $this->renderProgram('mipa');
     }
 
-    /**
-     * Display the IPS program page
-     */
     public function ips()
     {
-        return Inertia::render('ProgramIpsPage', [
-            'content' => $this->getProgramData('ips')
-        ]);
+        return $this->renderProgram('ips');
     }
 
-    /**
-     * Display the Bahasa program page
-     */
     public function bahasa()
     {
-        return Inertia::render('ProgramBahasaPage', [
-            'content' => $this->getProgramData('bahasa')
-        ]);
+        return $this->renderProgram('bahasa');
     }
 }
