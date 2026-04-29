@@ -180,7 +180,11 @@ export default function PrestasiAkademikPage({ documents = [], heroContent }) {
                 </section>
             </main>
 
-            <Footer />
+            <Footer
+                logoSman1={navigationData.logoSman1}
+                googleMapsEmbedUrl={navigationData.googleMapsEmbedUrl}
+                socialMediaLinks={navigationData.socialMediaLinks}
+            />
         </div>
     );
 }
