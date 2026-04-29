@@ -65,34 +65,46 @@ class UpdateSchoolProfileContentSeeder extends Seeder
             ])]
         );
 
-        // 3. FACILITIES
+        // 3. FACILITIES - 16 items with distinct images from EKSKUL & ORGANISASI
         $facilities = SchoolProfileSetting::updateOrCreate(
             ['section_key' => 'facilities'],
             ['content' => json_encode([
                 'title' => 'Lingkungan Belajar Modern',
                 'description' => 'Fasilitas lengkap yang mendukung pengembangan akademik dan karakter siswa.',
                 'items' => [
-                    ['name' => 'Lab Komputer', 'image' => 'temp'],
-                    ['name' => 'Perpustakaan', 'image' => 'temp'],
-                    ['name' => 'Masjid Sekolah', 'image' => 'temp'],
-                    ['name' => 'Lapangan Olahraga', 'image' => 'temp'],
-                    ['name' => 'Ruang Kelas Modern', 'image' => 'temp'],
+                    ['name' => 'Lab Komputer', 'description' => 'Laboratorium komputer modern dengan perangkat terbaru untuk mendukung pembelajaran teknologi informasi.'],
+                    ['name' => 'Perpustakaan', 'description' => 'Perpustakaan lengkap dengan koleksi buku akademik dan non-akademik yang mendukung budaya literasi.'],
+                    ['name' => 'Masjid Sekolah', 'description' => 'Masjid yang nyaman sebagai pusat kegiatan keagamaan dan pembentukan karakter siswa.'],
+                    ['name' => 'Lapangan Olahraga', 'description' => 'Lapangan olahraga luas untuk berbagai kegiatan jasmani dan ekstrakurikuler.'],
+                    ['name' => 'Ruang Kelas Modern', 'description' => 'Ruang kelas ber-AC dengan fasilitas multimedia untuk proses belajar mengajar yang efektif.'],
+                    ['name' => 'Laboratorium IPA', 'description' => 'Lab sains lengkap untuk praktikum Fisika, Kimia, dan Biologi.'],
+                    ['name' => 'Laboratorium Bahasa', 'description' => 'Lab bahasa multimedia untuk pengembangan kemampuan berbahasa siswa.'],
+                    ['name' => 'Ruang Kepala Sekolah', 'description' => 'Ruang pimpinan yang representatif untuk administrasi dan pertemuan.'],
+                    ['name' => 'Ruang Guru', 'description' => 'Ruang kerja guru yang nyaman untuk persiapan mengajar dan diskusi.'],
+                    ['name' => 'Kantin Sekolah', 'description' => 'Kantin sehat dengan pilihan makanan berguna untuk siswa.'],
+                    ['name' => 'UKS', 'description' => 'Unit Kesehatan Sekolah untuk pelayanan kesehatan siswa dan warga sekolah.'],
+                    ['name' => 'Aula Serbaguna', 'description' => 'Aula untuk berbagai kegiatan seperti upacara, seminar, dan pertemuan besar.'],
+                    ['name' => 'Ruang OSIS', 'description' => 'Ruang kegiatan organisasi siswa untuk pengembangan kepemimpinan.'],
+                    ['name' => 'Taman Sekolah', 'description' => 'Area hijau yang asri untuk menciptakan lingkungan belajar yang nyaman.'],
+                    ['name' => 'Parkir Luas', 'description' => 'Area parkir yang memadai untuk kendaraan siswa, guru, dan tamu.'],
+                    ['name' => 'Ruang BK', 'description' => 'Ruang Bimbingan Konseling untuk layanan psikologis dan akademik siswa.'],
                 ],
             ])]
         );
 
-        // User requested: all facility items use SMANSA.jpeg
-        $smansaPath = base_path('data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU/SMANSA.jpeg');
-        if (File::exists($smansaPath)) {
-            // Main Collection
-            $facilities->clearMediaCollection('facilities_images');
-            $facilities->addMedia($smansaPath)->preservingOriginal()->toMediaCollection('facilities_images');
+        // Attach distinct images from EKSKUL & ORGANISASI folder
+        $ekskulPath = base_path('data_smansa/SMAN 1 BALEENDAH - 2026/EKSKUL & ORGANISASI');
+        $imageFiles = File::glob($ekskulPath . '/*.jpg');
+        sort($imageFiles); // Deterministic ordering
 
-            // Item-specific collections as per frontend mapping
-            foreach (range(0, 4) as $index) {
+        // Take first 16 images for facilities
+        $facilityImages = array_slice($imageFiles, 0, 16);
+
+        foreach ($facilityImages as $index => $imagePath) {
+            if (File::exists($imagePath)) {
                 $collectionName = "facilities_item_{$index}";
                 $facilities->clearMediaCollection($collectionName);
-                $facilities->addMedia($smansaPath)->preservingOriginal()->toMediaCollection($collectionName);
+                $facilities->addMedia($imagePath)->preservingOriginal()->toMediaCollection($collectionName);
             }
         }
     }

@@ -115,19 +115,7 @@ class PopulateTeachersWithPhotosSeeder extends Seeder
             $imageName = basename($sourceImage);
             $destPath = 'teachers/'.Str::random(20).'_'.$imageName;
 
-            $imageContent = File::get($sourceImage);
-            $image = imagecreatefromstring($imageContent);
-
-            $rotated = imagerotate($image, 90, 0);
-
-            $tempFile = tempnam(sys_get_temp_dir(), 'teacher_').'.jpg';
-            imagejpeg($rotated, $tempFile, 90);
-
-            Storage::disk('public')->put($destPath, File::get($tempFile));
-
-            imagedestroy($image);
-            imagedestroy($rotated);
-            unlink($tempFile);
+            Storage::disk('public')->put($destPath, File::get($sourceImage));
 
             $fullPath = Storage::disk('public')->path($destPath);
 

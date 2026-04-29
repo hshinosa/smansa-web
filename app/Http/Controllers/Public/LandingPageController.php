@@ -116,7 +116,9 @@ class LandingPageController extends Controller
         return $this->imageService->mapProgramsWithThumbnails(
             Program::where('is_featured', true)
                 ->where('category', 'Program Studi')
+                ->whereIn('title', ['MIPA', 'IPS', 'Bahasa'])
                 ->orderBy('sort_order')
+                ->limit(3)
                 ->with('media')
                 ->get(),
             $programStudiThumbnails

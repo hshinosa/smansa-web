@@ -12,7 +12,10 @@ class PopulateProgramsTableSeeder extends Seeder
     public function run()
     {
         $fotoGuruPath = base_path('data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU');
+        $ekskulPath = base_path('data_smansa/SMAN 1 BALEENDAH - 2026/EKSKUL & ORGANISASI');
         $smansaPath = $fotoGuruPath.DIRECTORY_SEPARATOR.'SMANSA.jpeg';
+        $ekskulImages = File::glob($ekskulPath.'/*.jpg');
+        sort($ekskulImages);
 
         // 1. Update Hero Section Title
         $hero = SiteSetting::updateOrCreate(
@@ -38,6 +41,7 @@ class PopulateProgramsTableSeeder extends Seeder
                 'icon_name' => 'Microscope',
                 'link' => '/akademik/program-studi/mipa',
                 'category' => 'Program Studi',
+                'is_featured' => true,
                 'sort_order' => 1,
             ],
             [
@@ -47,6 +51,7 @@ class PopulateProgramsTableSeeder extends Seeder
                 'icon_name' => 'Globe',
                 'link' => '/akademik/program-studi/ips',
                 'category' => 'Program Studi',
+                'is_featured' => true,
                 'sort_order' => 2,
             ],
             [
@@ -56,34 +61,38 @@ class PopulateProgramsTableSeeder extends Seeder
                 'icon_name' => 'BookOpen',
                 'link' => '/akademik/program-studi/bahasa',
                 'category' => 'Program Studi',
+                'is_featured' => true,
                 'sort_order' => 3,
             ],
             // 3. Program Sekolah (Non-Prodi) - NEW
             [
                 'title' => 'Sekolah Adiwiyata',
                 'description' => 'Program sekolah berbudaya lingkungan untuk menciptakan kesadaran pelestarian alam.',
-                'path' => $smansaPath,
+                'path' => $ekskulImages[0] ?? $smansaPath,
                 'icon_name' => 'Leaf',
                 'link' => '#',
                 'category' => 'Program Unggulan',
+                'is_featured' => false,
                 'sort_order' => 4,
             ],
             [
                 'title' => 'Sekolah Ramah Anak',
                 'description' => 'Menciptakan lingkungan belajar yang aman, nyaman, dan menyenangkan bagi seluruh siswa.',
-                'path' => $smansaPath,
+                'path' => $ekskulImages[1] ?? $smansaPath,
                 'icon_name' => 'Heart',
                 'link' => '#',
                 'category' => 'Program Unggulan',
+                'is_featured' => false,
                 'sort_order' => 5,
             ],
             [
                 'title' => 'Literasi Digital',
                 'description' => 'Penguatan kemampuan siswa dalam memanfaatkan teknologi digital secara bijak dan produktif.',
-                'path' => $smansaPath,
+                'path' => $ekskulImages[2] ?? $smansaPath,
                 'icon_name' => 'Cpu',
                 'link' => '#',
                 'category' => 'Program Unggulan',
+                'is_featured' => false,
                 'sort_order' => 6,
             ],
         ];
@@ -96,15 +105,16 @@ class PopulateProgramsTableSeeder extends Seeder
                     'icon_name' => $data['icon_name'],
                     'link' => $data['link'],
                     'category' => $data['category'],
-                    'is_featured' => true,
+                    'is_featured' => $data['is_featured'] ?? true,
                     'sort_order' => $data['sort_order'],
                 ]
             );
 
-            // Use SMANSA.jpeg for all programs as requested
-            if (File::exists($smansaPath)) {
+            $programImagePath = $data['path'] ?? $smansaPath;
+
+            if (File::exists($programImagePath)) {
                 $program->clearMediaCollection('program_images');
-                $program->addMedia($smansaPath)->preservingOriginal()->toMediaCollection('program_images');
+                $program->addMedia($programImagePath)->preservingOriginal()->toMediaCollection('program_images');
             }
         }
     }

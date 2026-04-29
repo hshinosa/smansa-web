@@ -43,15 +43,21 @@ class PopulateProgramStudiSeeder extends Seeder
         $imagePath = null;
         $collection = null;
         $smansaPath = base_path('data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU/SMANSA.jpeg');
+        $programThumbnailPaths = [
+            'mipa' => base_path('data_smansa/SERAGAM SEKOLAH SMAN 1 BALEENDAH/IMG_2473.png'),
+            'ips' => base_path('data_smansa/SERAGAM SEKOLAH SMAN 1 BALEENDAH/IMG_2519.png'),
+            'bahasa' => base_path('data_smansa/SERAGAM SEKOLAH SMAN 1 BALEENDAH/IMG_2526.png'),
+        ];
 
         if ($sectionKey === 'hero') {
             $imagePath = base_path('data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU/SMANSA.jpeg');
             $collection = 'hero_background_image';
 
             // Also attach thumbnail_card (Student photo)
-            if (File::exists($imagePath)) {
+            $thumbnailPath = $programThumbnailPaths[$setting->program_name] ?? null;
+            if ($thumbnailPath && File::exists($thumbnailPath)) {
                 $setting->clearMediaCollection('thumbnail_card');
-                $setting->addMedia($imagePath)
+                $setting->addMedia($thumbnailPath)
                     ->preservingOriginal()
                     ->toMediaCollection('thumbnail_card');
             }

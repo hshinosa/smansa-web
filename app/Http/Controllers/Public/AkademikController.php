@@ -132,7 +132,7 @@ class AkademikController extends Controller
         // Transform programs to include responsive image data
         $programs = $programsQuery->map(function ($program) {
             $data = $program->toArray();
-            $media = $this->imageService->getFirstMediaData($program, 'program_image');
+            $media = $this->imageService->getFirstMediaData($program, 'program_images');
             if ($media) {
                 $data['image'] = $media; // Inject media object
             }

@@ -176,7 +176,7 @@ class ImageService
             }
 
             if (empty($data['image']) && empty($data['image_url'])) {
-                $media = $this->getFirstMediaData($program, 'program_image');
+        $media = $this->getFirstMediaData($program, 'program_images');
                 if ($media) {
                     $data['image'] = $media;
                     $data['image_url'] = $media['original_url'] ?? null;

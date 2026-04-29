@@ -19,7 +19,7 @@ class UpdateLandingPageContentSeeder extends Seeder
                 'title_line2' => 'SMA Negeri 1 Baleendah',
                 'hero_text' => 'Sekolah penggerak prestasi dan inovasi masa depan. Kami berkomitmen mencetak lulusan yang cerdas, berakhlak mulia, dan siap bersaing di era global.',
                 'background_image_url' => '/images/hero-bg-sman1baleendah.jpeg',
-                'student_image_url' => '/images/anak-sma.png',
+                'student_image_url' => '/images/hero/student-hero.png',
                 'stats' => [
                     ['label' => 'Akreditasi', 'value' => 'A', 'icon_name' => 'Trophy'],
                     ['label' => 'Lulusan', 'value' => '15k+', 'icon_name' => 'GraduationCap'],
@@ -62,25 +62,25 @@ class UpdateLandingPageContentSeeder extends Seeder
                 'title' => 'Sambutan Kepala Sekolah',
                 'kepsek_name' => 'H. Dudi Rohdiana, S.Pd., M.M.',
                 'kepsek_title' => 'Kepala SMA Negeri 1 Baleendah',
-                'kepsek_image_url' => '/images/hero-bg-sman1baleendah.jpeg',
+                'kepsek_image_url' => '/images/kepsek/dudi-rohdiana.JPG',
                 'welcome_text_html' => '<p class="mb-4">Assalamu\'alaikum Warahmatullahi Wabarakatuh,</p><p class="mb-4">Selamat datang di website resmi SMA Negeri 1 Baleendah. Website ini kami hadirkan sebagai media informasi dan komunikasi antara sekolah dengan masyarakat luas.</p><p>Kami berkomitmen untuk terus meningkatkan kualitas pelayanan pendidikan demi terwujudnya visi sekolah yang unggul dalam prestasi, berkarakter, dan berwawasan lingkungan.</p>',
             ])]
         );
 
         $kepsekImgPath = $fotoGuruPath.DIRECTORY_SEPARATOR.'KEPALA SEKOLAH ( H. Dudi Rohdiana, S.Pd., M.M ).JPG';
         if (file_exists($kepsekImgPath)) {
-            $kepsek->clearMediaCollection('kepsek_photo');
+            $kepsek->clearMediaCollection('kepsek_image');
             $kepsek->addMedia($kepsekImgPath)
                 ->preservingOriginal()
-                ->toMediaCollection('kepsek_photo');
+                ->toMediaCollection('kepsek_image');
         }
 
         // 4. PROGRAMS SECTION (Intro Text Only)
         LandingPageSetting::updateOrCreate(
             ['section_key' => 'programs_lp'],
             ['content' => json_encode([
-                'title' => 'Program Unggulan',
-                'description' => 'Kami menawarkan berbagai program akademik dan non-akademik yang dirancang untuk mengembangkan potensi siswa secara maksimal, baik dalam bidang sains, sosial, maupun bahasa.',
+                'title' => 'Program Studi',
+                'description' => 'Tiga program studi utama kami dirancang untuk mengembangkan potensi siswa secara maksimal dalam bidang sains, sosial, dan bahasa.',
             ])]
         );
 
