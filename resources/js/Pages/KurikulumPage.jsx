@@ -1,25 +1,22 @@
 import { 
     BookOpen, 
-    Microscope, 
     Globe, 
-    Languages, 
     CheckCircle, 
-    Lightbulb, 
     Users, 
     Monitor,
-    Award,
-    TrendingUp,
     Target,
     Activity,
     Repeat,
-    Network
+    Network,
+    ChevronRight,
+    ImageIcon
 } from 'lucide-react';
 
 // Import Components
 import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import SEOHead from '@/Components/SEOHead';
-import ResponsiveImage from '@/Components/ResponsiveImage';
+import ResponsiveImage, { HeroImage } from '@/Components/ResponsiveImage';
 
 // Import utilities
 import { TYPOGRAPHY } from '@/Utils/typography';
@@ -46,7 +43,6 @@ export default function KurikulumPage({ curriculumData }) {
         infographic_education_2045,
     } = curriculumData || {};
 
-    // Helper to format image path correctly
     const formatImagePath = (path) => {
         if (!path) return null;
         if (typeof path !== 'string') return null;
@@ -66,20 +62,12 @@ export default function KurikulumPage({ curriculumData }) {
         );
     };
 
-    // Map icon names to Lucide components
-    const iconMap = {
-        Microscope,
-        Globe,
-        BookOpen,
-        Languages,
-        Monitor,
-        Award,
-        TrendingUp,
-        Target,
-        Users,
-        Activity,
-        Repeat,
-        Network
+    // Map framework items to icons by keyword
+    const frameworkIcons = [Users, Network, Globe, Monitor];
+
+    // Check if infographic has a usable image
+    const hasInfoImage = (info) => {
+        return info?.image?.original_url || info?.image_url;
     };
 
     return (
@@ -99,24 +87,16 @@ export default function KurikulumPage({ curriculumData }) {
             />
 
             <main id="main-content" className="pt-20" tabIndex="-1">
-            {/* 1. HERO SECTION (Redefined) */}
+
+            {/* ═══ 1. HERO ═══ */}
             <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
-                    <ResponsiveImage
-                        media={hero?.image}
-                        src={formatImagePath(heroImage)}
-                        alt="Background Kurikulum"
-                        className="w-full h-full object-cover"
-                        loading="eager"
-                        fetchpriority="high"
-                        width="1920"
-                        height="1080"
-                    />
+                    <HeroImage src={formatImagePath(heroImage)} media={hero?.image} alt="Background Kurikulum" />
                     <div className="absolute inset-0 bg-black/60"></div>
                 </div>
 
                 <div className="relative z-10 container mx-auto px-4 text-center text-white">
-                    <h1 className={`${TYPOGRAPHY.heroTitle} mb-4`}>
+                    <h1 className={`${TYPOGRAPHY.heroTitle} mb-4 drop-shadow-lg`}>
                         {renderHighlightedTitle(hero?.title || 'Pembelajaran Mendalam')}
                     </h1>
                     <p className={`${TYPOGRAPHY.heroText} max-w-2xl mx-auto opacity-90`}>
@@ -125,7 +105,7 @@ export default function KurikulumPage({ curriculumData }) {
                 </div>
             </section>
 
-            {/* 2. SECTION: MASALAH & PISA 2022 */}
+            {/* ═══ 2. MASALAH & PISA 2022 — impactful stat cards ═══ */}
             {problem && (
                 <section className="py-20 bg-white">
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -135,10 +115,18 @@ export default function KurikulumPage({ curriculumData }) {
                         </div>
                         <div className="grid md:grid-cols-3 gap-6">
                             {(problem.stats || []).map((stat, idx) => (
-                                <div key={idx} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2">{stat.label}</h3>
-                                    <div className="text-sm text-gray-600">LOTS: <span className="font-semibold">{stat.lots}</span></div>
-                                    <div className="text-sm text-gray-600">HOTS: <span className="font-semibold">{stat.hots}</span></div>
+                                <div key={idx} className="relative bg-white border border-gray-200 rounded-2xl p-8 shadow-sm overflow-hidden">
+                                    <h3 className="text-xl font-bold text-gray-900 mb-4">{stat.label}</h3>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50">
+                                            <span className="text-sm font-medium text-gray-600">LOTS (Level 1-3)</span>
+                                            <span className="text-lg font-bold text-gray-900">{stat.lots?.split(' ')[0]}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between p-3 rounded-xl bg-primary/5">
+                                            <span className="text-sm font-medium text-primary">HOTS (Level 4-6)</span>
+                                            <span className="text-lg font-bold text-primary">{stat.hots?.split(' ')[0]}</span>
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -146,38 +134,56 @@ export default function KurikulumPage({ curriculumData }) {
                 </section>
             )}
 
-            {/* 3. SECTION: DEFINISI & 4 OLAH */}
+            {/* ═══ 3. DEFINISI & 4 OLAH — editorial split ═══ */}
             {definition && (
                 <section className="py-20 bg-gray-50">
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center max-w-3xl mx-auto mb-12">
-                            <h2 className={`${TYPOGRAPHY.sectionHeading} mb-4`}>{definition.title}</h2>
-                            <p className={TYPOGRAPHY.bodyText}>{definition.description}</p>
-                        </div>
-                        <div className="grid md:grid-cols-4 gap-6">
-                            {(definition.items || []).map((item, idx) => (
-                                <div key={idx} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
-                                    <p className="text-sm text-gray-600">{item.description}</p>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-stretch">
+                            {/* Left: primary card */}
+                            <div className="bg-primary rounded-3xl p-10 md:p-14 text-white relative overflow-hidden flex flex-col justify-center shadow-xl">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                                <div className="relative z-10">
+                                    <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-sm">
+                                        <BookOpen className="text-accent-yellow w-7 h-7" />
+                                    </div>
+                                    <h2 className="text-3xl md:text-4xl font-bold font-serif mb-6">
+                                        {definition.title}
+                                    </h2>
+                                    <p className="text-lg leading-relaxed text-blue-100">
+                                        {definition.description}
+                                    </p>
                                 </div>
-                            ))}
+                            </div>
+
+                            {/* Right: 2x2 grid of 4 olah */}
+                            <div className="grid grid-cols-2 gap-4">
+                                {(definition.items || []).map((item, idx) => (
+                                    <div key={idx} className="rounded-2xl p-6 border border-gray-200 bg-white flex flex-col justify-center">
+                                        <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
+                                        <p className="text-sm text-gray-600">{item.description}</p>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </section>
             )}
 
-            {/* 4. SECTION: PRINSIP 3M */}
+            {/* ═══ 4. PRINSIP 3M — numbered steps ═══ */}
             {principles && (
                 <section className="py-20 bg-white">
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center max-w-3xl mx-auto mb-12">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
                             <h2 className={`${TYPOGRAPHY.sectionHeading} mb-4`}>{principles.title}</h2>
                         </div>
-                        <div className="grid md:grid-cols-3 gap-6">
+                        <div className="grid md:grid-cols-3 gap-8">
                             {(principles.items || []).map((item, idx) => (
-                                <div key={idx} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
-                                    <p className="text-sm text-gray-600">{item.description}</p>
+                                <div key={idx} className="relative">
+                                    <div className="text-7xl font-black text-gray-100 leading-none mb-4">
+                                        {String(idx + 1).padStart(2, '0')}
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
+                                    <p className="text-gray-600 leading-relaxed">{item.description}</p>
                                 </div>
                             ))}
                         </div>
@@ -185,45 +191,66 @@ export default function KurikulumPage({ curriculumData }) {
                 </section>
             )}
 
-            {/* 5. SECTION: SIKLUS BELAJAR */}
+            {/* ═══ 5. SIKLUS BELAJAR — horizontal flow with arrows ═══ */}
             {learning_cycle && (
                 <section className="py-20 bg-gray-50">
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center max-w-3xl mx-auto mb-12">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
                             <h2 className={`${TYPOGRAPHY.sectionHeading} mb-4`}>{learning_cycle.title}</h2>
                         </div>
-                        <div className="grid md:grid-cols-3 gap-6">
-                            {(learning_cycle.steps || []).map((step, idx) => (
-                                <div key={idx} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
-                                    <p className="text-sm text-gray-600">{step.description}</p>
-                                </div>
-                            ))}
+                        <div className="flex flex-col md:flex-row items-stretch gap-4 md:gap-0">
+                            {(learning_cycle.steps || []).map((step, idx) => {
+                                const stepIcons = [Target, Activity, Repeat];
+                                const StepIcon = stepIcons[idx] || Target;
+                                const isLast = idx === (learning_cycle.steps || []).length - 1;
+                                return (
+                                    <div key={idx} className="flex flex-col md:flex-row items-center flex-1">
+                                        <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm flex-1 w-full text-center">
+                                            <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                                <StepIcon className="w-7 h-7 text-primary" />
+                                            </div>
+                                            <h3 className="text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
+                                            <p className="text-sm text-gray-600">{step.description}</p>
+                                        </div>
+                                        {!isLast && (
+                                            <div className="flex items-center justify-center py-2 md:py-0 md:px-3 flex-shrink-0">
+                                                <ChevronRight className="w-6 h-6 text-primary/40 rotate-90 md:rotate-0" />
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </section>
             )}
 
-            {/* 6. SECTION: KERANGKA IMPLEMENTASI */}
+            {/* ═══ 6. KERANGKA IMPLEMENTASI — icon cards ═══ */}
             {design_framework && (
                 <section className="py-20 bg-white">
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center max-w-3xl mx-auto mb-12">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
                             <h2 className={`${TYPOGRAPHY.sectionHeading} mb-4`}>{design_framework.title}</h2>
                         </div>
-                        <div className="grid md:grid-cols-4 gap-6">
-                            {(design_framework.items || []).map((item, idx) => (
-                                <div key={idx} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
-                                    <p className="text-sm text-gray-600">{item.description}</p>
-                                </div>
-                            ))}
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {(design_framework.items || []).map((item, idx) => {
+                                const FrameworkIcon = frameworkIcons[idx] || Network;
+                                return (
+                                    <div key={idx} className="bg-gray-50 rounded-2xl p-8 border border-gray-100">
+                                        <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-5">
+                                            <FrameworkIcon className="w-7 h-7 text-primary" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
+                                        <p className="text-sm text-gray-600">{item.description}</p>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </section>
             )}
 
-            {/* 7. SECTION: DIMENSI KOMPETENSI & PROFIL PELAJAR */}
+            {/* ═══ 7. DIMENSI KOMPETENSI & PROFIL PELAJAR — dark section (kept) ═══ */}
             <section className="py-20 bg-gray-900 text-white">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid lg:grid-cols-2 gap-16">
@@ -265,32 +292,41 @@ export default function KurikulumPage({ curriculumData }) {
                 </div>
             </section>
 
-            {/* 8. SECTION: INFOGRAFIS */}
+            {/* ═══ 8. INFOGRAFIS — with fallback placeholder ═══ */}
             <section className="py-20 bg-white">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
                     {[infographic_deep_learning, infographic_education_2045].filter(Boolean).map((info, idx) => (
-                        <div key={idx} className="grid lg:grid-cols-2 gap-10 items-center">
-                            <div>
+                        <div key={idx} className={`grid lg:grid-cols-2 gap-10 items-center ${idx % 2 === 1 ? 'lg:direction-rtl' : ''}`}>
+                            <div className={idx % 2 === 1 ? 'lg:order-2' : ''}>
                                 <h2 className={`${TYPOGRAPHY.sectionHeading} mb-4`}>{info.title}</h2>
                                 <p className={TYPOGRAPHY.bodyText}>{info.description}</p>
                                 {info.source && <p className="text-sm text-gray-500 mt-4">Sumber: {info.source}</p>}
                             </div>
-                            <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
-                                <ResponsiveImage
-                                    media={info.image}
-                                    src={info.image?.original_url || info.image_url}
-                                    alt={info.title}
-                                    className="w-full h-full object-cover"
-                                />
+                            <div className={`rounded-2xl overflow-hidden border border-gray-200 shadow-sm ${idx % 2 === 1 ? 'lg:order-1' : ''}`}>
+                                {(info.image || hasInfoImage(info)) ? (
+                                    <ResponsiveImage
+                                        media={info.image}
+                                        src={info.image?.original_url || info.image_url}
+                                        alt={info.title}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-20 px-8 bg-gray-50 text-center">
+                                        <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mb-4">
+                                            <ImageIcon className="w-8 h-8 text-gray-400" />
+                                        </div>
+                                        <p className="text-gray-500 font-medium">Infografis belum tersedia</p>
+                                        <p className="text-sm text-gray-400 mt-1">Gambar akan ditambahkan melalui panel admin</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}
                 </div>
             </section>
 
-            {/* CTA SECTION - Updated Style */}
+            {/* ═══ CTA ═══ */}
             <section className="py-20 bg-primary relative overflow-hidden rounded-3xl mx-4 mb-16">
-                {/* Decorative Circles */}
                 <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
                 <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/2 translate-y-1/2"></div>
 
@@ -318,7 +354,8 @@ export default function KurikulumPage({ curriculumData }) {
                 </div>
             </section>
 
-           </main> <Footer
+            </main>
+            <Footer
                 logoSman1={navigationData.logoSman1}
                 googleMapsEmbedUrl={navigationData.googleMapsEmbedUrl}
                 socialMediaLinks={navigationData.socialMediaLinks}

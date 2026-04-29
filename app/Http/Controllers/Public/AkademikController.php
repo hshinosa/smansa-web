@@ -56,16 +56,6 @@ class AkademikController extends Controller
      */
     public function kurikulum()
     {
-        $programStudiThumbnails = $this->imageService->getProgramStudiThumbnails();
-
-        $programs = $this->imageService->mapProgramsWithThumbnails(
-            Program::where('category', 'Program Studi')
-                ->orderBy('sort_order')
-                ->with('media')
-                ->get(),
-            $programStudiThumbnails
-        );
-
         $settings = CurriculumSetting::with('media')->get()->keyBy('section_key');
         $mediaCollections = CurriculumSetting::getMediaCollections();
 
@@ -85,7 +75,6 @@ class AkademikController extends Controller
         }
 
         return Inertia::render('KurikulumPage', [
-            'programs' => $programs,
             'curriculumData' => $curriculumData,
         ]);
     }
