@@ -1,21 +1,19 @@
 import React, { useState, useMemo } from 'react';
 import { logger } from '@/Utils/logger';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { Search, ChevronLeft, ChevronRight, X, Play, Image as ImageIcon } from 'lucide-react';
 
 // Import Components
 import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
-import ResponsiveImage from '@/Components/ResponsiveImage';
+import Modal from '@/Components/Modal';
 import { normalizeUrl } from '@/Utils/imageUtils';
 import { getNavigationData } from '@/Utils/navigationData';
 
 // Import typography constants
 import { TYPOGRAPHY } from '@/Utils/typography';
-import { useNavigation, useHeroSettings } from '@/Hooks';
-import { useSearchFilter, usePagination, useLightbox } from '@/Hooks';
 
-const GalleryThumbnail = ({ item }) => {
+const GalleryThumbnail = React.memo(function GalleryThumbnail({ item }) {
     const [imgSrc, setImgSrc] = React.useState('');
     const [hasError, setHasError] = React.useState(false);
 
@@ -47,7 +45,7 @@ const GalleryThumbnail = ({ item }) => {
         setImgSrc(source);
     }, [item]);
 
-    const handleError = (e) => {
+    const handleError = () => {
         if (!hasError) {
             logger.warn("Image load failed for:", item.title, "Source:", imgSrc);
             
@@ -123,7 +121,52 @@ const GalleryThumbnail = ({ item }) => {
             style={{ objectPosition: 'center' }}
         />
     );
-};
+});
+
+const GalleryItem = React.memo(function GalleryItem({ item, index, onOpen }) {
+    return (
+        <div
+            className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer"
+            onClick={() => onOpen(item, index)}
+        >
+            {/* Image Wrapper - Using Padding Hack for 16:9 Aspect Ratio to ensure visibility */}
+            <div className="relative w-full pb-[56.25%] overflow-hidden bg-gray-200">
+                <div className="absolute inset-0 w-full h-full">
+                    <GalleryThumbnail item={item} />
+                </div>
+                {/* Overlay Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+                {/* Video Indicator */}
+                {item.type === 'video' && (
+                    <div className="absolute inset-0 m-auto w-12 h-12 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full border border-white/50 group-hover:bg-accent-yellow group-hover:border-accent-yellow transition-colors duration-300 z-10">
+                        <Play className="w-5 h-5 text-white group-hover:text-white ml-1" fill="currentColor" />
+                    </div>
+                )}
+            </div>
+
+            {/* Content Body */}
+            <div className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                    <span className="text-primary font-bold uppercase tracking-wider text-[10px] bg-blue-50 px-2 py-1 rounded-md">
+                        {item.category || 'Umum'}
+                    </span>
+                    <span className="text-gray-400 text-xs font-medium">
+                        {new Date(item.date || item.created_at).toLocaleDateString('id-ID', {
+                            year: 'numeric', month: 'short', day: 'numeric'
+                        })}
+                    </span>
+                </div>
+                <h3 className="font-bold text-gray-900 mb-1 line-clamp-1 group-hover:text-primary transition-colors text-sm">
+                    {item.title}
+                </h3>
+                <p className="text-xs text-gray-500 line-clamp-2 font-sans">
+                    {item.description}
+                </p>
+            </div>
+        </div>
+    );
+});
 
 export default function GaleriPage({ galleries = [] }) {
     const { siteSettings } = usePage().props;
@@ -227,49 +270,6 @@ export default function GaleriPage({ galleries = [] }) {
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, [lightboxOpen, filteredData.length]);
 
-    const GalleryItem = ({ item, index }) => (
-        <div 
-            className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer"
-            onClick={() => openLightbox(item, index)}
-        >
-            {/* Image Wrapper - Using Padding Hack for 16:9 Aspect Ratio to ensure visibility */}
-            <div className="relative w-full pb-[56.25%] overflow-hidden bg-gray-200">
-                <div className="absolute inset-0 w-full h-full">
-                    <GalleryThumbnail item={item} />
-                </div>
-                {/* Overlay Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                
-                {/* Video Indicator */}
-                {item.type === 'video' && (
-                    <div className="absolute inset-0 m-auto w-12 h-12 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full border border-white/50 group-hover:bg-accent-yellow group-hover:border-accent-yellow transition-colors duration-300 z-10">
-                        <Play className="w-5 h-5 text-white group-hover:text-white ml-1" fill="currentColor" />
-                    </div>
-                )}
-            </div>
-
-            {/* Content Body */}
-            <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-primary font-bold uppercase tracking-wider text-[10px] bg-blue-50 px-2 py-1 rounded-md">
-                        {item.category || 'Umum'}
-                    </span>
-                    <span className="text-gray-400 text-xs font-medium">
-                        {new Date(item.date || item.created_at).toLocaleDateString('id-ID', {
-                            year: 'numeric', month: 'short', day: 'numeric'
-                        })}
-                    </span>
-                </div>
-                <h3 className="font-bold text-gray-900 mb-1 line-clamp-1 group-hover:text-primary transition-colors text-sm">
-                    {item.title}
-                </h3>
-                <p className="text-xs text-gray-500 line-clamp-2 font-sans">
-                    {item.description}
-                </p>
-            </div>
-        </div>
-    );
-
     return (
         <div className="bg-secondary min-h-screen font-sans text-gray-800 flex flex-col">
             <Head title={`Galeri - ${siteName}`} description={`Galeri kehidupan sekolah ${siteName}.`} />
@@ -342,7 +342,7 @@ export default function GaleriPage({ galleries = [] }) {
                                 {paginatedData.map((item, index) => {
                                     const globalIndex = (currentPage - 1) * itemsPerPage + index;
                                     return (
-                                        <GalleryItem key={item.id} item={item} index={globalIndex} />
+                                        <GalleryItem key={item.id} item={item} index={globalIndex} onOpen={openLightbox} />
                                     );
                                 })}
                             </div>
@@ -400,90 +400,111 @@ export default function GaleriPage({ galleries = [] }) {
                 socialMediaLinks={navigationData.socialMediaLinks}
             />
 
-            {/* LIGHTBOX */}
-            {lightboxOpen && currentItem && (
-                <div className="fixed inset-0 bg-black/95 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
-                    <div className="relative w-full max-w-6xl max-h-[90vh] flex flex-col">
-                        
-                        {/* Close Button */}
-                        <button
-                            onClick={closeLightbox}
-                            className="absolute -top-12 right-0 text-white/70 hover:text-white transition-colors"
-                        >
-                            <X className="w-8 h-8" />
-                        </button>
-
-                        {/* Content */}
-                        <div className="flex-grow flex items-center justify-center bg-black rounded-lg overflow-hidden relative min-h-[400px] md:min-h-[500px]">
+            {/* DETAIL MODAL */}
+            <Modal show={lightboxOpen} onClose={closeLightbox} maxWidth="4xl">
+                {currentItem && (
+                    <div className="bg-white rounded-2xl overflow-hidden">
+                        <div className="relative bg-gray-200 overflow-hidden min-h-[280px] md:min-h-[360px]">
                             {(() => {
                                 const url = normalizeUrl(currentItem.url) || '';
                                 if (currentItem.type === 'photo') {
-                                    const imgSrc = (currentItem.image && currentItem.image.original_url) 
-                                        ? normalizeUrl(currentItem.image.original_url) 
+                                    const imgSrc = (currentItem.image && currentItem.image.original_url)
+                                        ? normalizeUrl(currentItem.image.original_url)
                                         : url;
+
                                     return (
-                                        <img 
-                                            src={imgSrc} 
-                                            alt={currentItem.title} 
-                                            className="max-w-full max-h-[85vh] object-contain" 
+                                        <img
+                                            src={imgSrc}
+                                            alt={currentItem.title}
+                                            className="absolute inset-0 w-full h-full object-cover"
                                         />
                                     );
                                 }
+
                                 const youtubeMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
                                 if (youtubeMatch) {
                                     return (
-                                        <div className="w-full h-full flex items-center justify-center p-4">
-                                            <div className="w-full max-w-5xl" style={{ aspectRatio: '16/9' }}>
-                                                <iframe 
-                                                    src={`https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=1&modestbranding=1&rel=0`}
-                                                    className="w-full h-full border-0 rounded-lg shadow-2xl"
-                                                    allowFullScreen
-                                                    allow="autoplay; encrypted-media; picture-in-picture"
-                                                />
-                                            </div>
-                                        </div>
+                                        <iframe
+                                            src={`https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=1&modestbranding=1&rel=0`}
+                                            className="absolute inset-0 w-full h-full border-0"
+                                            allowFullScreen
+                                            allow="autoplay; encrypted-media; picture-in-picture"
+                                            title={currentItem.title}
+                                        />
                                     );
                                 }
+
                                 return (
-                                    <video 
-                                        src={url} 
-                                        controls 
-                                        className="max-w-full max-h-[85vh] aspect-video" 
-                                        autoPlay 
+                                    <video
+                                        src={url}
+                                        controls
+                                        className="absolute inset-0 w-full h-full object-cover bg-black"
+                                        autoPlay
                                         playsInline
                                     >
                                         Your browser does not support the video tag.
                                     </video>
                                 );
                             })()}
+
+                            <button
+                                onClick={closeLightbox}
+                                className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 bg-white/90 rounded-full p-2 hover:bg-white transition-colors focus:outline-none z-10 shadow-sm"
+                                aria-label="Tutup"
+                            >
+                                <X size={24} />
+                            </button>
+
+                            {currentItem.type === 'photo' && (
+                                <div className="absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-black/85 via-black/50 to-transparent"></div>
+                            )}
+
+                            <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
+                                <span className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-2 shadow-sm bg-white text-primary">
+                                    {currentItem.category || 'Umum'}
+                                </span>
+                                <h2 className="text-2xl font-bold text-white drop-shadow-sm">{currentItem.title}</h2>
+                            </div>
+
+                            {filteredData.length > 1 && (
+                                <>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); navigateLightbox('prev'); }}
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/85 hover:bg-white rounded-full transition-colors shadow-sm z-10"
+                                        aria-label="Sebelumnya"
+                                    >
+                                        <ChevronLeft className="w-6 h-6 text-gray-700" />
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); navigateLightbox('next'); }}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/85 hover:bg-white rounded-full transition-colors shadow-sm z-10"
+                                        aria-label="Berikutnya"
+                                    >
+                                        <ChevronRight className="w-6 h-6 text-gray-700" />
+                                    </button>
+                                </>
+                            )}
                         </div>
 
-                        {/* Info */}
-                        <div className="mt-4 text-white text-center">
-                            <h2 className="text-xl font-bold font-serif mb-1">{currentItem.title}</h2>
-                            <p className="text-white/70 text-sm">{currentItem.description}</p>
-                        </div>
+                        <div className="p-6 md:p-8">
+                            <div className="flex items-center gap-3 mb-4">
+                                {currentItem.type === 'video' ? (
+                                    <Play className="w-5 h-5 text-primary" fill="currentColor" />
+                                ) : (
+                                    <ImageIcon className="w-5 h-5 text-primary" />
+                                )}
+                                <span className="text-gray-500 text-sm font-medium">
+                                    {currentItem.type === 'video' ? 'Video Kegiatan' : 'Foto Kegiatan'}
+                                </span>
+                            </div>
 
-                        {/* Navigation */}
-                        {filteredData.length > 1 && (
-                            <>
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); navigateLightbox('prev'); }}
-                                    className="absolute left-0 top-1/2 -translate-y-1/2 -ml-12 p-2 text-white/50 hover:text-white transition-colors"
-                                >
-                                    <ChevronLeft className="w-10 h-10" />
-                                </button>
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); navigateLightbox('next'); }}
-                                    className="absolute right-0 top-1/2 -translate-y-1/2 -mr-12 p-2 text-white/50 hover:text-white transition-colors"
-                                >
-                                    <ChevronRight className="w-10 h-10" />
-                                </button>
-                            </>
-                        )}
+                            <p className="text-gray-600 leading-relaxed text-base md:text-lg">
+                                {currentItem.description || 'Dokumentasi kegiatan sekolah SMAN 1 Baleendah.'}
+                            </p>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+            </Modal>
         </div>
     );
 }

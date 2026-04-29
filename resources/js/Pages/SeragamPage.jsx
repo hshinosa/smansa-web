@@ -123,8 +123,8 @@ export default function SeragamPage({ seragams = [] }) {
 
                     {/* Cards Grid */}
                     {seragams.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 md:gap-y-14">
-                            {seragams.map((seragam, idx) => (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-9">
+                            {seragams.map((seragam) => (
                                 <article key={seragam.id} className="group flex flex-col h-full">
                                     {/* Visual */}
                                     <div className="relative z-20 mx-auto w-56 h-56 sm:w-56 sm:h-56 md:w-60 md:h-60 -mb-18 md:-mb-20">
@@ -136,37 +136,36 @@ export default function SeragamPage({ seragams = [] }) {
                                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                 />
                                             ) : (
-                                                <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                                                    <Shirt className="w-14 h-14 text-gray-300" />
+                                                <div className="w-full h-full bg-gradient-to-b from-gray-100 to-gray-200 flex items-center justify-center">
+                                                    <Shirt className="w-14 h-14 text-gray-400" />
                                                 </div>
                                             )}
                                         </div>
                                     </div>
 
                                     {/* Card Content */}
-                                    <div className="relative z-10 bg-white rounded-3xl p-4 md:p-6 pt-18 md:pt-24 shadow-sm border border-gray-100 flex flex-col w-full h-full hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
-                                        {/* Category Badge */}
+                                    <div className="relative z-10 bg-white rounded-3xl p-5 md:p-6 pt-18 md:pt-24 shadow-sm border border-gray-100 flex flex-col flex-1 w-full hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
                                         <div className="mb-4">
-                                            <span className="inline-flex items-center px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full">
+                                            <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
                                                 {seragam.category || 'Seragam'}
                                             </span>
                                         </div>
 
                                         {/* Title */}
-                                        <h3 className="text-lg md:text-2xl font-bold text-gray-900 mb-2.5 leading-tight">
+                                        <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2.5 leading-tight">
                                             {seragam.name}
                                         </h3>
 
                                         {/* Description */}
                                         {seragam.description && (
-                                            <p className="text-gray-600 text-xs md:text-base mb-4.5 leading-relaxed">
+                                            <p className="text-sm md:text-base text-gray-600 leading-relaxed mb-5">
                                                 {seragam.description}
                                             </p>
                                         )}
 
                                         {/* Schedule */}
-                                        <div className="bg-blue-50/70 rounded-2xl p-3.5 mb-4.5 border border-blue-100">
-                                            <div className="flex items-start gap-2.5">
+                                        <div className="rounded-2xl bg-blue-50/70 border border-blue-100 p-4 mb-5">
+                                            <div className="flex items-start gap-3">
                                                 <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
                                                     <Calendar className="w-4 h-4 text-primary" />
                                                 </div>
@@ -179,7 +178,7 @@ export default function SeragamPage({ seragams = [] }) {
                                                             {getUsageDays(seragam.usage_days).map((day) => (
                                                                 <span
                                                                     key={`${seragam.id}-${day}`}
-                                                                    className="inline-flex items-center rounded-lg bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 border border-blue-100"
+                                                                    className="inline-flex items-center px-2.5 py-1 rounded-lg border border-blue-100 bg-white text-[11px] font-semibold text-gray-700"
                                                                 >
                                                                     {day}
                                                                 </span>
@@ -194,8 +193,8 @@ export default function SeragamPage({ seragams = [] }) {
 
                                         {/* Rules */}
                                         {seragam.rules && (
-                                            <div className="mt-auto">
-                                                <div className="flex items-start gap-2.5 text-[11px] md:text-sm text-gray-600">
+                                            <div className="mt-auto pt-4 border-t border-gray-100">
+                                                <div className="flex items-start gap-2.5 text-xs md:text-sm text-gray-600">
                                                     <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-gray-400" />
                                                     <div className="space-y-1.5">
                                                         {parseRules(seragam.rules).map((rule, ruleIndex) => (

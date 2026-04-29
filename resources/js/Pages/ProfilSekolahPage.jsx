@@ -31,6 +31,10 @@ export default function ProfilSekolahPage({ auth, hero, history, facilities, abo
     const [selectedFacility, setSelectedFacility] = useState(null);
     const [isFacilityModalOpen, setIsFacilityModalOpen] = useState(false);
     
+    // Pagination state for facilities (6 items per page)
+    const [facilityPage, setFacilityPage] = useState(1);
+    const itemsPerPage = 6;
+    
     // Icon mapping
     const iconMap = {
         Microscope,
@@ -55,6 +59,12 @@ export default function ProfilSekolahPage({ auth, hero, history, facilities, abo
     const facilityList = Array.isArray(facilities?.items) ? facilities.items : [];
     const facilitiesTitle = facilities?.title || 'Lingkungan Belajar Modern';
     const facilitiesDescription = facilities?.description || 'Fasilitas lengkap yang mendukung pengembangan akademik dan karakter siswa.';
+    
+    // Pagination calculations
+    const totalPages = Math.ceil(facilityList.length / itemsPerPage);
+    const startIndex = (facilityPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentFacilities = facilityList.slice(startIndex, endIndex);
 
     // Program studi data
     const programs = programsContent?.items || [
@@ -179,6 +189,10 @@ export default function ProfilSekolahPage({ auth, hero, history, facilities, abo
 
                 {/* SECTION C: TIMELINE SEJARAH (Enhanced) */}
                 <section className="py-20 bg-gray-50 relative overflow-hidden">
+                    <div className="absolute inset-0 pointer-events-none">
+                        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[28rem] h-[28rem] rounded-full bg-primary/5 blur-3xl"></div>
+                    </div>
+
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                         <div className="text-center mb-16">
                             <SanitizedContent 
@@ -194,36 +208,46 @@ export default function ProfilSekolahPage({ auth, hero, history, facilities, abo
                             )}
                         </div>
 
-                        <div className="relative max-w-4xl mx-auto">
-                            {/* Center Line */}
-                            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-primary/30 via-primary to-primary/30 rounded-full hidden md:block"></div>
+                        <div className="relative max-w-5xl mx-auto">
+                            {/* Central timeline spine */}
+                            <div className="absolute left-5 top-0 h-full w-px bg-gradient-to-b from-primary/15 via-primary/60 to-primary/15 md:left-1/2 md:-translate-x-1/2"></div>
+                            <div className="absolute left-5 top-0 h-full w-6 -translate-x-1/2 bg-gradient-to-b from-transparent via-primary/10 to-transparent blur-sm md:left-1/2"></div>
 
-                            <div className="space-y-12">
+                            <div className="space-y-10 md:space-y-14">
                                 {timelineEvents.map((event, idx) => {
                                     return (
-                                        <div key={idx} className={`flex flex-col md:flex-row items-center justify-between ${idx % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
+                                        <div
+                                            key={idx}
+                                            className={`relative flex flex-col pl-14 md:pl-0 md:flex-row items-stretch justify-between ${idx % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}
+                                        >
                                             {/* Content Side */}
-                                            <div className="w-full md:w-5/12 mb-8 md:mb-0">
-                                                <div className={`bg-white p-6 rounded-2xl shadow-lg border-l-4 border-primary hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${idx % 2 !== 0 ? 'md:text-right md:border-l-0 md:border-r-4' : ''}`}>
-                                                    <div className={`flex items-center gap-3 mb-3 ${idx % 2 !== 0 ? 'md:justify-end' : ''}`}>
-                                                        <span className="inline-block px-3 py-1 bg-blue-50 text-primary font-bold rounded-full text-sm">
+                                            <div className="w-full md:w-[44%]">
+                                                <article
+                                                    className={`relative bg-white/95 backdrop-blur-sm p-6 md:p-7 rounded-2xl md:rounded-3xl border border-gray-200/80 shadow-[0_12px_35px_-18px_rgba(13,71,161,0.45)] hover:shadow-[0_20px_45px_-20px_rgba(13,71,161,0.55)] transition-all duration-300 hover:-translate-y-1 ${idx % 2 !== 0 ? 'md:text-right' : ''}`}
+                                                >
+                                                    <div className={`mb-4 flex items-center ${idx % 2 !== 0 ? 'md:justify-end' : ''}`}>
+                                                        <span className="inline-flex items-center rounded-full px-4 py-1.5 md:px-5 md:py-2 bg-gradient-to-r from-primary to-primary-darker text-white text-base md:text-lg font-bold tracking-wide shadow-lg shadow-primary/25 ring-4 ring-blue-100/70">
                                                             {event.year}
                                                         </span>
                                                     </div>
-                                                    <h3 className={`${TYPOGRAPHY.cardTitle} mb-2 text-gray-900`}>
+
+                                                    <h3 className={`${TYPOGRAPHY.cardTitle} mb-2.5 text-gray-900 leading-snug`}>
                                                         {event.title}
                                                     </h3>
-                                                    <p className={TYPOGRAPHY.bodyText}>
+
+                                                    <p className={`${TYPOGRAPHY.bodyText} text-gray-600`}>
                                                         {event.description}
                                                     </p>
-                                                </div>
+                                                </article>
                                             </div>
 
-                                            {/* Center Dot */}
-                                            <div className="absolute left-1/2 transform -translate-x-1/2 w-5 h-5 bg-accent-yellow rounded-full border-4 border-white shadow-lg hidden md:block z-10"></div>
+                                            {/* Center marker */}
+                                            <div className="absolute left-5 top-7 -translate-x-1/2 md:left-1/2 md:top-10 z-10">
+                                                <span className="block w-4 h-4 rounded-full bg-accent-yellow border-[3px] border-white shadow-[0_0_0_6px_rgba(13,71,161,0.12)]"></span>
+                                            </div>
 
-                                            {/* Empty Side for Spacing */}
-                                            <div className="w-full md:w-5/12 hidden md:block"></div>
+                                            {/* Empty Side for desktop spacing */}
+                                            <div className="hidden md:block md:w-[44%]"></div>
                                         </div>
                                     );
                                 })}
@@ -281,37 +305,38 @@ export default function ProfilSekolahPage({ auth, hero, history, facilities, abo
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {facilityList.map((facility, idx) => {
+                            {currentFacilities.map((facility, idx) => {
+                                const globalIdx = startIndex + idx;
                                 const imageUrl = facility.image_url || facility.image || '';
                                 const title = facility.title || facility.name || 'Fasilitas';
                                 const description = facility.description || '';
 
                                 return (
                                     <div 
-                                        key={idx} 
-                                        className="group relative rounded-2xl overflow-hidden shadow-lg aspect-[4/3] cursor-pointer hover:shadow-xl transition-all duration-300"
+                                        key={globalIdx} 
+                                        className="group relative rounded-2xl overflow-hidden shadow-lg aspect-[4/3] cursor-pointer hover:shadow-xl transition-all duration-300 bg-gray-100"
                                         onClick={() => openFacilityModal(facility)}
                                     >
                                         {imageUrl ? (
-                                            <ResponsiveImage 
-                                                src={imageUrl} 
-                                                alt={title} 
-                                                className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                            <img
+                                                src={imageUrl}
+                                                alt={title}
+                                                className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                                                 loading="lazy"
                                             />
                                         ) : (
-                                            <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white">
+                                            <div className="absolute inset-0 bg-blue-600 flex items-center justify-center text-white">
                                                 <Building className="w-16 h-16 opacity-20" />
                                                 <span className="absolute inset-0 flex items-center justify-center font-bold text-lg p-4 text-center">
                                                     {title}
                                                 </span>
                                             </div>
                                         )}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90 transition-opacity"></div>
-                                        <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-2 group-hover:translate-y-0 transition-transform">
-                                            <h3 className="text-xl font-bold text-white mb-1">{title}</h3>
-                                            <p className="text-white/80 text-sm line-clamp-2 mb-3">{description}</p>
-                                            <span className="inline-flex items-center text-accent-yellow text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[65%] bg-gradient-to-t from-black/85 via-black/55 to-transparent"></div>
+                                        <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
+                                            <h3 className="text-lg font-bold text-white mb-1">{title}</h3>
+                                            <p className="text-white/85 text-sm line-clamp-2 mb-3">{description}</p>
+                                            <span className="inline-flex items-center text-accent-yellow text-sm font-medium opacity-90 group-hover:opacity-100 transition-opacity duration-300">
                                                 Lihat Detail <ArrowRight size={16} className="ml-1" />
                                             </span>
                                         </div>
@@ -319,6 +344,43 @@ export default function ProfilSekolahPage({ auth, hero, history, facilities, abo
                                 );
                             })}
                         </div>
+                        
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                            <div className="flex justify-center items-center gap-2 mt-12">
+                                <button
+                                    onClick={() => setFacilityPage(prev => Math.max(prev - 1, 1))}
+                                    disabled={facilityPage === 1}
+                                    className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Sebelumnya
+                                </button>
+                                
+                                <div className="flex gap-1">
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                        <button
+                                            key={page}
+                                            onClick={() => setFacilityPage(page)}
+                                            className={`w-10 h-10 rounded-lg font-medium transition-colors ${
+                                                facilityPage === page
+                                                    ? 'bg-primary text-white'
+                                                    : 'border border-gray-300 text-gray-600 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            {page}
+                                        </button>
+                                    ))}
+                                </div>
+                                
+                                <button
+                                    onClick={() => setFacilityPage(prev => Math.min(prev + 1, totalPages))}
+                                    disabled={facilityPage === totalPages}
+                                    className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Selanjutnya
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </section>
 
@@ -373,23 +435,25 @@ export default function ProfilSekolahPage({ auth, hero, history, facilities, abo
                     {selectedFacility && (
                         <div>
                             {/* Image Header */}
-                            <div className="h-64 bg-gray-200 relative">
+                            <div className="h-64 bg-gray-200 relative overflow-hidden">
                                 {selectedFacility.image_url || selectedFacility.image ? (
-                                    <ResponsiveImage 
-                                        src={selectedFacility.image_url || selectedFacility.image} 
+                                    <img
+                                        src={selectedFacility.image_url || selectedFacility.image}
                                         alt={selectedFacility.title || selectedFacility.name}
-                                        className="w-full h-full object-cover"
+                                        className="absolute inset-0 w-full h-full object-cover"
                                     />
                                 ) : (
-                                    <div className="w-full h-full bg-blue-600 flex items-center justify-center">
+                                    <div className="absolute inset-0 bg-blue-600 flex items-center justify-center">
                                         <Building className="w-20 h-20 text-white/30" />
                                     </div>
                                 )}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                                <div className="absolute bottom-4 left-6 right-6">
-                                    <h3 className="text-2xl font-bold text-white">
-                                        {selectedFacility.title || selectedFacility.name}
-                                    </h3>
+                                <div className="absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-black/85 via-black/50 to-transparent"></div>
+                                <div className="absolute bottom-0 left-0 right-0 p-6">
+                                    <div className="max-w-xl">
+                                        <h3 className="text-2xl font-bold text-white drop-shadow-sm">
+                                            {selectedFacility.title || selectedFacility.name}
+                                        </h3>
+                                    </div>
                                 </div>
                             </div>
                             

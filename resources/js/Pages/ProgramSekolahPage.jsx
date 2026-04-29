@@ -173,16 +173,16 @@ export default function ProgramSekolahPage({ programs = [], heroSettings }) {
                                     {/* Card Image (New) */}
                                     <div className="h-48 overflow-hidden relative bg-gray-100">
                                         {program.image ? (
-                                            <ResponsiveImage 
-                                                media={program.image}
+                                            <img
+                                                src={program.image.original_url}
                                                 alt={program.title}
-                                                className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                                className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                                             />
                                         ) : (
-                                            <ResponsiveImage 
+                                            <img
                                                 src={program.image_url || "/images/panen-karya-sman1-baleendah.jpg"}
                                                 alt={program.title}
-                                                className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                                className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                                             />
                                         )}
                                         <div className="absolute top-4 left-4">
@@ -228,31 +228,31 @@ export default function ProgramSekolahPage({ programs = [], heroSettings }) {
             {/* DETAIL MODAL */}
             <Modal show={isModalOpen} onClose={closeModal} maxWidth="2xl">
                 {selectedProgram && (
-                    <div className="bg-white rounded-2xl overflow-hidden">
-                        {/* Modal Header */}
-                        <div className="relative h-64 bg-gray-200">
-                             {selectedProgram.image ? (
-                                <ResponsiveImage 
-                                    media={selectedProgram.image}
+                        <div className="bg-white rounded-2xl overflow-hidden">
+                            {/* Modal Header */}
+                            <div className="relative h-64 bg-gray-200 overflow-hidden">
+                              {selectedProgram.image ? (
+                                <img
+                                    src={selectedProgram.image.original_url}
                                     alt={selectedProgram.title}
-                                    className="w-full h-full object-cover"
+                                    className="absolute inset-0 w-full h-full object-cover"
                                 />
                             ) : (
-                                <ResponsiveImage 
+                                <img
                                     src={selectedProgram.image_url || "/images/panen-karya-sman1-baleendah.jpg"}
                                     alt={selectedProgram.title}
-                                    className="w-full h-full object-cover"
+                                    className="absolute inset-0 w-full h-full object-cover"
                                 />
                             )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                            <button onClick={closeModal} className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 rounded-full transition-colors backdrop-blur-sm">
+                            <div className="absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-black/85 via-black/50 to-transparent"></div>
+                            <button onClick={closeModal} className="absolute top-4 right-4 p-2 bg-white/90 hover:bg-white rounded-full transition-colors shadow-sm">
                                 <X size={24} className="text-white" />
                             </button>
-                            <div className="absolute bottom-6 left-6 right-6">
+                            <div className="absolute bottom-0 left-0 right-0 p-6">
                                 <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-2 shadow-sm ${selectedProgram.color_class || 'bg-white text-primary'}`}>
                                     {selectedProgram.category}
                                 </span>
-                                <h2 className="text-2xl font-bold text-white drop-shadow-md">{selectedProgram.title}</h2>
+                                <h2 className="text-2xl font-bold text-white drop-shadow-sm">{selectedProgram.title}</h2>
                             </div>
                         </div>
 

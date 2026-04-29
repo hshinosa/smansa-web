@@ -85,6 +85,7 @@ const SortableMissionItem = ({ id, value, index, onUpdate, onRemove }) => {
 
 export default function SchoolProfileIndex({ auth, sections, activeSection: initialSection }) {
     const [activeTab, setActiveTab] = useState(initialSection || 'history');
+    const [activeFacilityIndex, setActiveFacilityIndex] = useState(0);
     
     const { data, setData, post, processing, errors } = useForm({
         section: activeTab,
@@ -108,6 +109,9 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
 
     const handleTabChange = (tabId) => {
         setActiveTab(tabId);
+        if (tabId === 'facilities') {
+            setActiveFacilityIndex(0);
+        }
         setData({
             section: tabId,
             content: sections[tabId] || {}
@@ -558,19 +562,36 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
         const facilityData = data.content || {};
         // Get items directly from data.content.items (don't create new array each render)
         const facilities = Array.isArray(facilityData.items) ? facilityData.items : [];
+        const selectedFacilityIndex = facilities.length > 0
+            ? Math.min(activeFacilityIndex, facilities.length - 1)
+            : -1;
+        const selectedFacility = selectedFacilityIndex >= 0 ? facilities[selectedFacilityIndex] : null;
 
         const updateFacilities = (newItems) => {
             updateContent('items', newItems);
         };
 
         const addFacility = () => {
-            updateFacilities([...facilities, { title: '', image_url: '' }]);
+            const newFacilities = [...facilities, { title: '', image_url: '' }];
+            updateFacilities(newFacilities);
+            setActiveFacilityIndex(newFacilities.length - 1);
         };
 
         const removeFacility = (index) => {
             const newList = [...facilities];
             newList.splice(index, 1);
             updateFacilities(newList);
+
+            if (newList.length === 0) {
+                setActiveFacilityIndex(0);
+                return;
+            }
+
+            if (index < selectedFacilityIndex) {
+                setActiveFacilityIndex((prev) => Math.max(0, prev - 1));
+            } else if (index === selectedFacilityIndex) {
+                setActiveFacilityIndex(Math.min(index, newList.length - 1));
+            }
         };
 
         const updateFacility = (index, field, value) => {
@@ -628,7 +649,7 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
                                 <span className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">2</span>
                                 Daftar Fasilitas
                             </h3>
-                            <p className="text-sm text-gray-600 mt-1">Kelola fasilitas-fasilitas yang tersedia di sekolah</p>
+                            <p className="text-sm text-gray-600 mt-1">Kelola fasilitas-fasilitas yang tersedia di sekolah (lebih ringkas untuk daftar panjang)</p>
                         </div>
                         <button
                             type="button"
@@ -639,9 +660,9 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
                         </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         {facilities.length === 0 ? (
-                            <div className="md:col-span-2 text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                            <div className="xl:col-span-3 text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
                                 <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                                 <p className="text-gray-500 mb-4">Belum ada fasilitas</p>
                                 <button
@@ -653,53 +674,101 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
                                 </button>
                             </div>
                         ) : (
-                            facilities.map((facility, index) => (
-                                <div key={index} className="relative">
-                                    {/* Numbering di luar card */}
-                                    <div className="absolute -left-4 top-4 bg-primary text-white rounded-full w-10 h-10 flex items-center justify-center text-sm font-bold shadow-lg z-10">
-                                        {index + 1}
+                            <>
+                                {/* Master list (ringkas & mudah discan) */}
+                                <div className="xl:col-span-1 border-2 border-gray-200 rounded-xl bg-gray-50/60">
+                                    <div className="px-4 py-3 border-b border-gray-200 bg-white rounded-t-xl">
+                                        <p className="text-sm font-semibold text-gray-800">
+                                            Pilih Item Fasilitas ({facilities.length})
+                                        </p>
                                     </div>
-                                    
-                                    {/* Card */}
-                                    <div className="bg-gradient-to-r from-gray-50 to-white p-5 rounded-xl border-2 border-gray-200 relative group hover:shadow-md transition-all pl-10">
-                                        <button
-                                            type="button"
-                                            onClick={() => removeFacility(index)}
-                                            className="absolute top-3 right-3 bg-red-500 text-white p-1.5 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-red-600"
-                                            title="Hapus fasilitas"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                        
-                                        <div className="space-y-4">
+                                    <div className="max-h-[520px] overflow-y-auto p-3 space-y-2">
+                                        {facilities.map((facility, index) => {
+                                            const isActive = index === selectedFacilityIndex;
+                                            const hasImage = Boolean(facility.image_file || facility.image || facility.image_url);
+
+                                            return (
+                                                <button
+                                                    key={index}
+                                                    type="button"
+                                                    onClick={() => setActiveFacilityIndex(index)}
+                                                    className={`w-full text-left rounded-lg border px-3 py-2.5 transition-all ${
+                                                        isActive
+                                                            ? 'bg-primary/10 border-primary shadow-sm'
+                                                            : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <div className="min-w-0">
+                                                            <p className={`text-xs font-bold ${isActive ? 'text-primary' : 'text-gray-500'}`}>
+                                                                #{index + 1}
+                                                            </p>
+                                                            <p className="text-sm font-semibold text-gray-900 truncate">
+                                                                {facility.title || facility.name || `Fasilitas ${index + 1}`}
+                                                            </p>
+                                                        </div>
+                                                        <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${
+                                                            hasImage ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+                                                        }`}>
+                                                            {hasImage ? 'Foto OK' : 'Belum Foto'}
+                                                        </span>
+                                                    </div>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Detail editor item terpilih */}
+                                <div className="xl:col-span-2">
+                                    {selectedFacility ? (
+                                        <div className="bg-gradient-to-r from-gray-50 to-white p-5 rounded-xl border-2 border-gray-200 space-y-4">
+                                            <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
+                                                <div>
+                                                    <p className="text-xs font-bold uppercase tracking-wide text-primary">Item Terpilih</p>
+                                                    <h4 className="text-base font-bold text-gray-900">
+                                                        Fasilitas #{selectedFacilityIndex + 1}
+                                                    </h4>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeFacility(selectedFacilityIndex)}
+                                                    className="inline-flex items-center px-3 py-2 text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                                                    title="Hapus fasilitas"
+                                                >
+                                                    <Trash2 className="w-4 h-4 mr-1.5" /> Hapus Item
+                                                </button>
+                                            </div>
+
                                             <div>
                                                 <label className="block text-xs font-bold text-gray-700 uppercase mb-2 flex items-center gap-1">
                                                     <span>📝</span> Nama Fasilitas
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    value={facility.title || facility.name || ''}
-                                                    onChange={(e) => updateFacility(index, 'title', e.target.value)}
+                                                    value={selectedFacility.title || selectedFacility.name || ''}
+                                                    onChange={(e) => updateFacility(selectedFacilityIndex, 'title', e.target.value)}
                                                     className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary font-semibold"
                                                     placeholder="Contoh: Laboratorium Komputer"
                                                 />
                                             </div>
+
                                             <div>
                                                 <label className="block text-xs font-bold text-gray-700 uppercase mb-2 flex items-center gap-1">
                                                     <span>📷</span> Foto Fasilitas
                                                 </label>
                                                 <FileUploadField
-                                                    id={`facility-image-${index}`}
+                                                    id={`facility-image-${selectedFacilityIndex}`}
                                                     label=""
-                                                    previewUrl={getImageUrl(facility.image?.original_url || facility.image_url || facility.image)}
-                                                    onChange={(file) => updateFacility(index, 'image_file', file)}
+                                                    previewUrl={getImageUrl(selectedFacility.image?.original_url || selectedFacility.image_url || selectedFacility.image)}
+                                                    onChange={(file) => updateFacility(selectedFacilityIndex, 'image_file', file)}
                                                 />
                                                 <p className="text-xs text-gray-500 mt-1">Upload foto fasilitas untuk ditampilkan di galeri profil sekolah.</p>
                                             </div>
                                         </div>
-                                    </div>
+                                    ) : null}
                                 </div>
-                            ))
+                            </>
                         )}
                     </div>
                 </div>

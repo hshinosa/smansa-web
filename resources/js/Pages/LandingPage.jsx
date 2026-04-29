@@ -74,45 +74,42 @@ export default function LandingPage({
                 <link rel="preload" as="image" href={heroContent?.background_image_url || '/images/hero-bg-sman1baleendah.jpeg'} fetchpriority="high" />
                 
                 {/* Hero Background Image */}
-                <div className="absolute inset-0 z-0">
-                    {(heroContent?.background_image_url || heroContent?.backgroundImage) && (
-                        <ResponsiveImage 
-                            src={heroContent?.background_image_url} 
-                            media={heroContent?.backgroundImage}
-                            alt="Background"
-                            className="w-full h-full object-cover"
-                            loading="eager"
-                            fetchpriority="high"
-                        />
-                    )}
+                <div className="absolute inset-0">
+                    <img 
+                        src={heroContent?.background_image_url || '/images/hero-bg-sman1baleendah.jpeg'} 
+                        alt="Background"
+                        className="w-full h-full object-cover"
+                        loading="eager"
+                        fetchPriority="high"
+                    />
                 </div>
                 {/* Overlay for readability */}
-                <div className="absolute inset-0 bg-black/60 z-0"></div>
+                <div className="absolute inset-0 bg-black/60 z-[1]"></div>
 
                 {/* Blue Rectangle behind Student */}
-                <div className="absolute top-0 left-1/2 h-full w-full md:w-[720px] bg-primary/80 z-0 hidden md:block"></div>
+                <div className="absolute top-0 left-1/2 h-full w-full md:w-[720px] bg-primary/80 z-[2] hidden md:block"></div>
 
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-end">
                         {/* Left Column: Text */}
-                        <div className="space-y-6">
-                            <h1 className={TYPOGRAPHY.heroTitle}>
+                        <div className="space-y-4 md:space-y-6 pb-8 md:pb-16">
+                            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-white font-serif">
                                 {heroContent?.title_line1 || 'Selamat Datang di'} <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">{heroContent?.title_line2 || 'SMA Negeri 1 Baleendah'}</span>
                             </h1>
-                            <p className={`${TYPOGRAPHY.heroText} max-w-lg`}>
+                            <p className="text-base sm:text-lg md:text-xl text-gray-200 leading-relaxed font-sans max-w-lg">
                                 {heroContent?.hero_text || 'Sekolah penggerak prestasi dan inovasi masa depan.'}
                             </p>
-                            <div className="flex flex-wrap gap-4 pt-4">
+                            <div className="flex flex-wrap gap-4 pt-2 md:pt-4">
                                 <Link 
                                     href="/profil-sekolah" 
-                                    className="px-8 py-3.5 bg-accent-yellow text-gray-900 font-bold rounded-full shadow-lg hover:shadow-xl hover:bg-yellow-400 transition-all"
+                                    className="px-6 md:px-8 py-3 md:py-3.5 bg-accent-yellow text-gray-900 font-bold rounded-full shadow-lg hover:shadow-xl hover:bg-yellow-400 transition-all text-sm md:text-base"
                                 >
                                     Jelajahi Profil
                                 </Link>
                                 <Link 
                                     href="/informasi-spmb" 
-                                    className="px-8 py-3.5 bg-white border-2 border-primary text-primary font-bold rounded-full hover:bg-blue-50 transition-all"
+                                    className="px-6 md:px-8 py-3 md:py-3.5 bg-white border-2 border-primary text-primary font-bold rounded-full hover:bg-blue-50 transition-all text-sm md:text-base"
                                 >
                                     Info PPDB
                                 </Link>
@@ -120,14 +117,13 @@ export default function LandingPage({
                         </div>
 
                         {/* Right Column: Visual */}
-                        <div className="relative mx-auto max-w-lg md:max-w-none w-full h-[420px] md:h-[480px] lg:h-[540px] flex justify-center items-end">
+                        <div className="relative mx-auto max-w-lg md:max-w-none w-full h-[350px] md:h-[450px] lg:h-[520px] flex justify-center items-end">
                             {/* Main Image */}
                             {(heroContent?.student_image_url || heroContent?.studentImage) && (
-                                <ResponsiveImage 
+                                <img 
                                     src={heroContent?.student_image_url} 
-                                    media={heroContent?.studentImage}
                                     alt={`Siswa Berprestasi ${siteName}`}
-                                    className="relative z-10 h-[380px] md:h-[440px] lg:h-[500px] w-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                                    className="relative z-10 h-full w-auto object-contain object-bottom drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
                                     loading="eager"
                                 />
                             )}
@@ -140,9 +136,9 @@ export default function LandingPage({
                             ]).map((stat, idx) => {
                                 const Icon = iconMap[stat.icon_name] || Trophy;
                                 const positions = [
-                                    'top-12 -left-2 md:-left-8',        // Top Left (Akreditasi) - Adjusted
-                                    'top-1/2 -right-4 md:-right-12',    // Middle Right (Lulusan) - Moved up & adjusted
-                                    'bottom-8 left-2 md:-left-8'        // Bottom Left (Siswa) - Adjusted
+                                    'top-4 -left-2 md:-left-8',          // Top Left (Akreditasi)
+                                    'top-1/3 -right-4 md:-right-12',     // Right (Lulusan)
+                                    'bottom-16 left-2 md:-left-8'        // Bottom Left (Siswa)
                                 ];
                                 const colors = [
                                     'bg-yellow-100 text-yellow-600',
@@ -152,10 +148,10 @@ export default function LandingPage({
                                 return (
                                     <div 
                                         key={idx}
-                                        className={`absolute ${positions[idx % 3]} bg-white/70 backdrop-blur-md border border-white/40 p-4 rounded-xl shadow-lg flex items-center gap-3 max-w-[220px] z-20`}
+                                        className={`absolute ${positions[idx % 3]} bg-white/70 backdrop-blur-md border border-white/40 p-3 md:p-4 rounded-xl shadow-lg flex items-center gap-3 max-w-[200px] z-20`}
                                     >
                                         <div className={`p-2 rounded-full ${colors[idx % 3]}`}>
-                                            <Icon size={24} fill="currentColor" />
+                                            <Icon size={20} fill="currentColor" />
                                         </div>
                                         <div>
                                             <p className="text-xs text-gray-500 font-medium">{stat.label}</p>
@@ -220,7 +216,7 @@ export default function LandingPage({
                         <div className="relative w-72 h-80 md:w-80 md:h-96 flex-shrink-0 mb-6">
                             <div className="absolute inset-0 bg-primary rounded-2xl rotate-6 opacity-20"></div>
                             <ContentImage
-                                src={kepsekWelcomeLpContent.kepsek_image_url}
+                                src={kepsekWelcomeLpContent?.kepsekImage?.original_url || kepsekWelcomeLpContent.kepsek_image_url}
                                 media={kepsekWelcomeLpContent?.kepsekImage}
                                 alt={kepsekWelcomeLpContent.kepsek_name}
                                 className="relative w-full h-full object-cover rounded-2xl shadow-lg"
@@ -426,11 +422,12 @@ export default function LandingPage({
                         <div className="flex flex-col gap-4 w-full">
                             <div className="flex gap-4 animate-scroll" style={{ width: 'max-content' }}>
                                 {row1Images.map((imgUrl, idx) => (
-                                    <div key={`row1-${idx}`} className="w-72 h-72 md:w-80 md:h-80 flex-shrink-0 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all relative group">
-                                        <GalleryImage 
-                                            src={imgUrl} 
-                                            alt={`Gallery ${idx}`} 
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    <div key={`row1-${idx}`} className="w-72 h-72 md:w-80 md:h-80 flex-shrink-0 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all relative group bg-gray-100">
+                                        <img
+                                            src={imgUrl}
+                                            alt={`Gallery ${idx}`}
+                                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                            loading="lazy"
                                         />
                                         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors"></div>
                                     </div>
@@ -439,11 +436,12 @@ export default function LandingPage({
 
                             <div className="flex gap-4 animate-scroll-reverse" style={{ width: 'max-content' }}>
                                 {row2Images.map((imgUrl, idx) => (
-                                    <div key={`row2-${idx}`} className="w-72 h-72 md:w-80 md:h-80 flex-shrink-0 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all relative group">
-                                        <GalleryImage 
-                                            src={imgUrl} 
-                                            alt={`Gallery ${idx}`} 
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    <div key={`row2-${idx}`} className="w-72 h-72 md:w-80 md:h-80 flex-shrink-0 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all relative group bg-gray-100">
+                                        <img
+                                            src={imgUrl}
+                                            alt={`Gallery ${idx}`}
+                                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                            loading="lazy"
                                         />
                                         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors"></div>
                                     </div>
