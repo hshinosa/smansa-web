@@ -95,3 +95,6 @@ tests-results
 
 # Playwright MCP logs
 .playwright-mcp/
+
+# Local working assets
+data_smansa/
