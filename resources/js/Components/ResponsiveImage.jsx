@@ -66,11 +66,15 @@ export default function ResponsiveImage({
         return fallback || null;
     }
     
+    // Detect fill classes to propagate to wrapper div
+    const hasFill = className.includes('w-full') && className.includes('h-full');
+    const wrapperClass = hasFill ? 'w-full h-full' : '';
+
     // If Spatie media object is provided, use media library conversions
     if (media) {
         const originalUrl = normalizeUrl(media.original_url);
         return (
-            <div className={skeleton && !isLoaded ? 'relative' : ''}>
+            <div className={`${wrapperClass} ${skeleton && !isLoaded ? 'relative' : ''}`}>
                 {skeleton && !isLoaded && !imageError && (
                     <div 
                         aria-label="Loading image placeholder"
@@ -78,7 +82,7 @@ export default function ResponsiveImage({
                         style={{ minHeight: height || 200 }}
                     />
                 )}
-                <picture className={skeleton && !isLoaded ? 'opacity-0' : ''}>
+                <picture className={`${hasFill ? 'w-full h-full' : ''} ${skeleton && !isLoaded ? 'opacity-0' : ''}`}>
                     {media.conversions?.mobile && (
                         <source
                             media="(max-width: 640px)"
@@ -130,7 +134,7 @@ export default function ResponsiveImage({
     }
 
     return (
-        <div className={skeleton && !isLoaded ? 'relative' : ''}>
+        <div className={`${wrapperClass} ${skeleton && !isLoaded ? 'relative' : ''}`}>
             {skeleton && !isLoaded && !imageError && (
                 <div 
                     className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse rounded"
@@ -163,7 +167,7 @@ export function HeroImage({ src, media, alt, className = '', ...props }) {
             src={src}
             media={media}
             alt={alt}
-            className={`w-full h-full object-cover ${className}`}
+            className={`w-full h-full object-cover object-[center_60%] ${className}`}
             loading="eager"
             fetchpriority="high"
             width={1920}
