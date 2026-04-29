@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { 
     Calendar, 
-    User, 
-    Share2, 
     Clock, 
     ChevronLeft,
     ChevronRight, 
@@ -11,7 +9,8 @@ import {
     Twitter, 
     Linkedin, 
     Link as LinkIcon,
-    ArrowRight
+    ArrowRight,
+    Check
 } from 'lucide-react';
 
 import Navbar from '@/Components/Navbar';
@@ -19,79 +18,38 @@ import Footer from '@/Components/Footer';
 import SEOHead from '@/Components/SEOHead';
 import { ContentImage } from '@/Components/ResponsiveImage';
 import SanitizedContent from '@/Components/SanitizedContent';
-import { TYPOGRAPHY } from '@/Utils/typography';
 import { getNavigationData } from '@/Utils/navigationData';
-
-// Mock Data for Single Article
-const articleData = {
-    title: "Siswa Berprestasi Raih Medali Emas di Olimpiade Sains Nasional 2025",
-    slug: "siswa-berprestasi-raih-emas-osn-2025",
-    category: "Prestasi",
-    author: "Tim Jurnalis Sekolah",
-    date: "15 Januari 2025",
-    time: "09:00 WIB",
-    readTime: "5 menit baca",
-    image: null,
-    caption: "Tim Olimpiade Fisika saat penerimaan medali di Jakarta.",
-    content: `
-        <p class="mb-6">
-            <strong>PRESTASI</strong> – Prestasi membanggakan kembali ditorehkan oleh siswa sekolah kami. Dalam ajang Olimpiade Sains Nasional (OSN) tingkat nasional yang diselenggarakan di Jakarta pada tanggal 10-14 Januari 2025, delegasi sekolah berhasil membawa pulang medali emas untuk bidang studi Fisika.
-        </p>
-        <p class="mb-6">
-            Keberhasilan ini merupakan buah dari kerja keras dan persiapan matang yang dilakukan selama kurang lebih enam bulan. Tim pembimbing olimpiade sekolah secara intensif memberikan pelatihan dan simulasi kepada para siswa terpilih.
-        </p>
-        
-        <blockquote class="border-l-4 border-accent-yellow pl-6 italic text-xl text-gray-700 my-10 bg-gray-50 py-4 pr-4 rounded-r-lg">
-            "Ini adalah pencapaian yang luar biasa. Persaingan tahun ini sangat ketat, namun berkat ketekunan dan doa dari seluruh warga sekolah, kami bisa memberikan yang terbaik."
-        </blockquote>
-
-        <h3 class="text-2xl font-bold text-gray-900 mb-4 font-sans">Persiapan Menuju Tingkat Internasional</h3>
-        <p class="mb-6">
-            Setelah keberhasilan ini, para pemenang akan mengikuti pemusatan latihan nasional (Pelatnas) untuk seleksi tim Indonesia menuju International Physics Olympiad (IPhO) yang akan digelar di Tokyo, Jepang, pada bulan Juli mendatang.
-        </p>
-        <p class="mb-6">
-            Kepala Sekolah menyampaikan apresiasi setinggi-tingginya kepada siswa, orang tua, dan guru pembimbing. Beliau berharap prestasi ini dapat memotivasi siswa lain untuk terus mengembangkan potensi diri, tidak hanya di bidang akademik tetapi juga non-akademik.
-        </p>
-        
-        <h3 class="text-2xl font-bold text-gray-900 mb-4 font-sans">Dukungan Sekolah</h3>
-        <p class="mb-6">
-            Pihak sekolah berkomitmen untuk terus memfasilitasi bakat dan minat siswa melalui berbagai program ekstrakurikuler dan klub bidang studi. Laboratorium sains yang baru direnovasi tahun lalu juga menjadi salah satu faktor pendukung peningkatan kualitas riset dan praktikum siswa.
-        </p>
-    `
-};
-
-// Mock Data for Related News
-const relatedNews = [
-    {
-        id: 1,
-        title: "Tim Robotik Sekolah Lolos ke Final Nasional",
-        category: "Teknologi",
-        date: "12 Jan 2025",
-        image: "https://placehold.co/400x250/0D47A1/FFFFFF?text=Robotik"
-    },
-    {
-        id: 2,
-        title: "Penerimaan Peserta Didik Baru Jalur Prestasi Segera Dibuka",
-        category: "Akademik",
-        date: "10 Jan 2025",
-        image: "https://placehold.co/400x250/0D47A1/FFFFFF?text=PPDB"
-    },
-    {
-        id: 3,
-        title: "Kunjungan Studi Banding dari SMAN 3 Bandung",
-        category: "Kegiatan",
-        date: "08 Jan 2025",
-        image: "https://placehold.co/400x250/0D47A1/FFFFFF?text=Studi+Banding"
-    }
-];
 
 export default function BeritaDetailPage({ post, relatedPosts = [] }) {
     const { siteSettings } = usePage().props;
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
     const navigationData = getNavigationData(siteSettings);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [linkCopied, setLinkCopied] = useState(false);
     
     if (!post) return null;
+    
+    const postUrl = `https://sman1baleendah.sch.id/berita/${post.slug}`;
+    
+    const handleShare = (platform) => {
+        const encodedUrl = encodeURIComponent(postUrl);
+        const encodedTitle = encodeURIComponent(post.title);
+        const urls = {
+            facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+            twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
+            linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+        };
+        if (urls[platform]) {
+            window.open(urls[platform], '_blank', 'width=600,height=400');
+        }
+    };
+    
+    const handleCopyLink = () => {
+        navigator.clipboard.writeText(postUrl).then(() => {
+            setLinkCopied(true);
+            setTimeout(() => setLinkCopied(false), 2000);
+        });
+    };
     
     // Check if post has gallery images (multiple images from Instagram)
     const hasGallery = post.galleryImages && post.galleryImages.length > 0;
@@ -175,17 +133,17 @@ export default function BeritaDetailPage({ post, relatedPosts = [] }) {
                                 {/* Share Buttons */}
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm text-gray-500 mr-2 hidden sm:inline">Bagikan:</span>
-                                    <button className="p-2 rounded-full bg-gray-50 hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition-colors">
+                                    <button onClick={() => handleShare('facebook')} aria-label="Bagikan ke Facebook" className="p-2 rounded-full bg-gray-50 hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition-colors">
                                         <Facebook className="w-4 h-4" />
                                     </button>
-                                    <button className="p-2 rounded-full bg-gray-50 hover:bg-sky-50 text-gray-600 hover:text-sky-500 transition-colors">
+                                    <button onClick={() => handleShare('twitter')} aria-label="Bagikan ke Twitter" className="p-2 rounded-full bg-gray-50 hover:bg-sky-50 text-gray-600 hover:text-sky-500 transition-colors">
                                         <Twitter className="w-4 h-4" />
                                     </button>
-                                    <button className="p-2 rounded-full bg-gray-50 hover:bg-indigo-50 text-gray-600 hover:text-indigo-600 transition-colors">
+                                    <button onClick={() => handleShare('linkedin')} aria-label="Bagikan ke LinkedIn" className="p-2 rounded-full bg-gray-50 hover:bg-indigo-50 text-gray-600 hover:text-indigo-600 transition-colors">
                                         <Linkedin className="w-4 h-4" />
                                     </button>
-                                    <button className="p-2 rounded-full bg-gray-50 hover:bg-gray-200 text-gray-600 transition-colors">
-                                        <LinkIcon className="w-4 h-4" />
+                                    <button onClick={handleCopyLink} aria-label="Salin tautan" className="p-2 rounded-full bg-gray-50 hover:bg-gray-200 text-gray-600 transition-colors relative">
+                                        {linkCopied ? <Check className="w-4 h-4 text-green-600" /> : <LinkIcon className="w-4 h-4" />}
                                     </button>
                                 </div>
                             </div>
@@ -262,14 +220,10 @@ export default function BeritaDetailPage({ post, relatedPosts = [] }) {
                                             alt={post.title}
                                         />
                                     ) : post.featured_image ? (
-                                        <img 
-                                            src={post.featured_image} 
-                                            alt={post.title} 
+                                        <ContentImage 
+                                            src={post.featured_image}
+                                            alt={post.title}
                                             className="w-full h-auto object-cover"
-                                            loading="eager"
-                                            fetchpriority="high"
-                                            width="1200"
-                                            height="675"
                                         />
                                     ) : null}
                                     {post.caption && (
@@ -285,16 +239,10 @@ export default function BeritaDetailPage({ post, relatedPosts = [] }) {
                                 <SanitizedContent html={post.content} />
                             </article>
 
-                            {/* Tags */}
                             <div className="pt-8 border-t border-gray-100 mb-12">
-                                <div className="flex flex-wrap gap-2">
-                                    <span className="text-sm font-bold text-gray-700 mr-2 py-1">Tags:</span>
-                                    {[post.category, siteName].map((tag, idx) => (
-                                        <span key={idx} className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full hover:bg-gray-200 cursor-pointer transition-colors">
-                                            #{tag}
-                                        </span>
-                                    ))}
-                                </div>
+                                <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">
+                                    {post.category}
+                                </span>
                             </div>
                         </div>
 
@@ -341,14 +289,14 @@ export default function BeritaDetailPage({ post, relatedPosts = [] }) {
                                     </div>
                                 </div>
 
-                                {/* Optional: Another Widget (e.g., Newsletter or Social) */}
+                                {/* CTA Widget */}
                                 <div className="bg-primary rounded-2xl p-6 text-white relative overflow-hidden">
                                     <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
-                                    <h3 className="font-bold text-lg mb-2 relative z-10">Jangan Lewatkan Info Terbaru!</h3>
-                                    <p className="text-blue-100 text-sm mb-4 relative z-10">Dapatkan update prestasi dan kegiatan sekolah langsung di beranda Anda.</p>
-                                    <button className="w-full py-2 bg-white text-primary font-bold rounded-lg text-sm hover:bg-blue-50 transition-colors relative z-10">
-                                        Langganan Newsletter
-                                    </button>
+                                    <h3 className="font-bold text-lg mb-2 relative z-10">Lihat Semua Berita</h3>
+                                    <p className="text-blue-100 text-sm mb-4 relative z-10">Temukan berita, pengumuman, dan informasi terbaru lainnya dari sekolah.</p>
+                                    <Link href="/berita-pengumuman" className="block w-full py-2 bg-white text-primary font-bold rounded-lg text-sm text-center hover:bg-blue-50 transition-colors relative z-10">
+                                        Ke Halaman Berita
+                                    </Link>
                                 </div>
                             </div>
                         </div>

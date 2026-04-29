@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { 
     Search, 
     Calendar, 
@@ -23,7 +23,12 @@ import { usePage } from '@inertiajs/react';
 // Categories filter
 const categories = ["Semua", "Berita", "Pengumuman", "Prestasi", "Akademik", "Kegiatan", "Alumni"];
 
-// --- COMPONENTS ---
+const formatImagePath = (path) => {
+    if (!path) return null;
+    if (typeof path !== 'string') return null;
+    if (path.startsWith('http') || path.startsWith('/')) return path;
+    return `/storage/${path}`;
+};
 
 const NewsItem = ({ news }) => {
     // Simplify image data handling
@@ -50,26 +55,26 @@ const NewsItem = ({ news }) => {
                 </div>
             </div>
 
-        {/* Content - Width 70% */}
-        <div className="flex-1 flex flex-col justify-center">
-            <div className="flex items-center text-xs text-gray-500 mb-2">
-                <Calendar className="w-3 h-3 mr-1" />
-                {new Date(news.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+            <div className="flex-1 flex flex-col justify-center">
+                <div className="flex items-center text-xs text-gray-500 mb-2">
+                    <Calendar className="w-3 h-3 mr-1" />
+                    {new Date(news.published_at || news.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </div>
+                <Link href={`/berita/${news.slug}`} className="block">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-primary transition-colors line-clamp-2 font-serif">
+                        {news.title}
+                    </h3>
+                </Link>
+                <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                    {news.excerpt}
+                </p>
+                <Link href={`/berita/${news.slug}`} className="text-primary text-sm font-semibold hover:underline inline-flex items-center">
+                    Baca Selengkapnya <ArrowRight className="w-3 h-3 ml-1" />
+                </Link>
             </div>
-            <Link href={`/berita/${news.slug}`} className="block">
-                <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-primary transition-colors line-clamp-2 font-serif">
-                    {news.title}
-                </h3>
-            </Link>
-            <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-                {news.excerpt}
-            </p>
-            <Link href={`/berita/${news.slug}`} className="text-primary text-sm font-semibold hover:underline inline-flex items-center">
-                Baca Selengkapnya <ArrowRight className="w-3 h-3 ml-1" />
-            </Link>
         </div>
-    </div>
-);};
+    );
+};;
 
 export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) {
     const { siteSettings } = usePage().props;
@@ -81,14 +86,6 @@ export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) 
 
     const heroSettings = siteSettings?.hero_posts || {};
     const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
-    
-    // Helper to format image path correctly
-    const formatImagePath = (path) => {
-        if (!path) return null;
-        if (typeof path !== 'string') return null;
-        if (path.startsWith('http') || path.startsWith('/')) return path;
-        return `/storage/${path}`;
-    };
 
     const filteredPosts = useMemo(() => {
         return posts.filter(post => {
@@ -151,7 +148,7 @@ export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) 
                 programStudiLinks={navigationData.programStudiLinks}
             />
 
-            <main id="main-content" className="pt-20" tabIndex="-1">
+            <main id="main-content" className="pt-20">
             {/* HERO SECTION (Consistent with AcademicCalendarPage) */}
             <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                 <link rel="preload" as="image" href={formatImagePath(heroImage)} fetchpriority="high" />
@@ -201,7 +198,7 @@ export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) 
                                 </Link>
                                 <div className="flex items-center text-gray-300 text-sm">
                                     <Calendar className="w-4 h-4 mr-2" />
-                                    {new Date(heroNews[0].created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                    {new Date(heroNews[0].published_at || heroNews[0].created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                                 </div>
                             </div>
                         </div>
@@ -283,6 +280,7 @@ export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) 
                                     <select 
                                         value={activeCategory}
                                         onChange={(e) => setActiveCategory(e.target.value)}
+                                        aria-label="Filter kategori berita"
                                         className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2"
                                     >
                                         {categories.map((cat, idx) => (
@@ -329,6 +327,7 @@ export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) 
                                 <input 
                                     type="text" 
                                     placeholder="Cari berita..." 
+                                    aria-label="Cari berita"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent shadow-sm outline-none transition-all"
@@ -342,14 +341,18 @@ export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) 
                                     <Bell className="w-5 h-5 text-orange-600" />
                                     Pengumuman Penting
                                 </h3>
-                                <ul className="space-y-3">
-                                    {announcements.map((item, idx) => (
-                                        <li key={idx} className="flex items-start gap-3 text-sm text-gray-800 border-b border-accent-yellow/20 last:border-0 pb-2 last:pb-0">
-                                            <span className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></span>
-                                            <span className="leading-relaxed">{item}</span>
-                                        </li>
-                                    ))}
-                                </ul>
+                                {announcements.length > 0 ? (
+                                    <ul className="space-y-3">
+                                        {announcements.map((item, idx) => (
+                                            <li key={idx} className="flex items-start gap-3 text-sm text-gray-800 border-b border-accent-yellow/20 last:border-0 pb-2 last:pb-0">
+                                                <span className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                                                <span className="leading-relaxed">{item}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-sm text-gray-500 italic">Belum ada pengumuman.</p>
+                                )}
                             </div>
 
                             {/* Terpopuler Widget */}
@@ -382,9 +385,17 @@ export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) 
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
                                     {categories.map((cat, idx) => (
-                                        <Link key={idx} href="#" className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full hover:bg-primary hover:text-white transition-colors">
+                                        <button
+                                            key={idx}
+                                            onClick={() => setActiveCategory(cat)}
+                                            className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                                                activeCategory === cat
+                                                    ? 'bg-primary text-white'
+                                                    : 'bg-gray-100 text-gray-600 hover:bg-primary hover:text-white'
+                                            }`}
+                                        >
                                             {cat}
-                                        </Link>
+                                        </button>
                                     ))}
                                 </div>
                             </div>
@@ -394,7 +405,11 @@ export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) 
                 </section>
             </main>
 
-            <Footer />
+            <Footer
+                logoSman1={navigationData.logoSman1}
+                googleMapsEmbedUrl={navigationData.googleMapsEmbedUrl}
+                socialMediaLinks={navigationData.socialMediaLinks}
+            />
         </div>
     );
 }
