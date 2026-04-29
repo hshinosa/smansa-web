@@ -1,7 +1,7 @@
 import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import SEOHead from '@/Components/SEOHead';
-import ResponsiveImage from '@/Components/ResponsiveImage';
+import ResponsiveImage, { HeroImage } from '@/Components/ResponsiveImage';
 import { getNavigationData } from '@/Utils/navigationData';
 import { TYPOGRAPHY } from '@/Utils/typography';
 import { normalizeUrl } from '@/Utils/imageUtils';
@@ -88,18 +88,12 @@ export default function SeragamPage({ seragams = [] }) {
                 {/* Hero Section */}
                 <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 z-0">
-                        <img
-                            src={normalizeUrl(heroImage)}
-                            alt="Background Informasi Seragam"
-                            className="w-full h-full object-cover"
-                            loading="eager"
-                            fetchpriority="high"
-                        />
+                        <HeroImage src={normalizeUrl(heroImage)} alt="Background Informasi Seragam" />
                         <div className="absolute inset-0 bg-black/60"></div>
                     </div>
 
                     <div className="relative z-10 container mx-auto px-4 text-center text-white">
-                        <h1 className={`${TYPOGRAPHY.heroTitle} mb-4`}>
+                        <h1 className={`${TYPOGRAPHY.heroTitle} mb-4 drop-shadow-lg`}>
                             {renderHighlightedTitle('Informasi Seragam')}
                         </h1>
                         <p className={`${TYPOGRAPHY.heroText} max-w-2xl mx-auto opacity-90`}>

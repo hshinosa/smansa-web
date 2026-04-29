@@ -5,7 +5,7 @@ import { FileText, Download, Calendar, ChevronRight } from 'lucide-react';
 import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import SEOHead from '@/Components/SEOHead';
-import ResponsiveImage from '@/Components/ResponsiveImage';
+import ResponsiveImage, { HeroImage } from '@/Components/ResponsiveImage';
 import { TYPOGRAPHY } from '@/Utils/typography';
 import { getNavigationData } from '@/Utils/navigationData';
 import { usePage } from '@inertiajs/react';
@@ -13,6 +13,7 @@ import { usePage } from '@inertiajs/react';
 export default function PrestasiAkademikPage({ documents = [], heroContent }) {
     const { siteSettings } = usePage().props;
     const navigationData = getNavigationData(siteSettings);
+    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
     
     const [selectedDoc, setSelectedDoc] = useState(documents[0] || null);
     
@@ -41,24 +42,16 @@ export default function PrestasiAkademikPage({ documents = [], heroContent }) {
             />
 
             <main className="pt-20">
-                <section className="relative bg-gradient-to-br from-primary to-blue-800 text-white py-24 overflow-hidden">
-                    {heroContent?.background_image_url && (
-                        <div className="absolute inset-0 z-0">
-                            <ResponsiveImage 
-                                src={heroContent.background_image_url}
-                                media={heroContent.backgroundImage}
-                                alt="Background"
-                                className="w-full h-full object-cover"
-                                loading="eager"
-                            />
-                        </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/60 z-0"></div>
-                    <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                        <h1 className={`${TYPOGRAPHY.heroTitle} text-white text-center mb-4`}>
-                            Prestasi Akademik
+                <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
+                    <div className="absolute inset-0 z-0">
+                        <HeroImage src={heroContent?.background_image_url || heroImage} media={heroContent?.backgroundImage} alt="Background Prestasi Akademik" />
+                        <div className="absolute inset-0 bg-black/60"></div>
+                    </div>
+                    <div className="relative z-10 container mx-auto px-4 text-center text-white">
+                        <h1 className={`${TYPOGRAPHY.heroTitle} mb-4 drop-shadow-lg`}>
+                            Prestasi <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">Akademik</span>
                         </h1>
-                        <p className="text-center text-blue-100 text-lg max-w-2xl mx-auto">
+                        <p className={`${TYPOGRAPHY.heroText} max-w-2xl mx-auto opacity-90`}>
                             Data serapan PTN dan hasil ujian siswa SMAN 1 Baleendah
                         </p>
                     </div>

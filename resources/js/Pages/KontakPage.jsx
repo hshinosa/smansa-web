@@ -18,6 +18,7 @@ import {
 import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import SEOHead from '@/Components/SEOHead';
+import { HeroImage } from '@/Components/ResponsiveImage';
 import { TYPOGRAPHY } from '@/Utils/typography';
 import { getNavigationData } from '@/Utils/navigationData';
 
@@ -101,19 +102,12 @@ export default function KontakPage({ auth, faqs = [] }) {
                 <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                     {/* Background Image */}
                     <div className="absolute inset-0 z-0">
-                        <img 
-                            src={formatImagePath(heroImage)} 
-                            alt={`Siswa ${siteName}`} 
-                            className="w-full h-full object-cover"
-                            loading="eager"
-                            decoding="async"
-                            fetchpriority="high"
-                        />
+                        <HeroImage src={formatImagePath(heroImage)} alt={`Siswa ${siteName}`} />
                         <div className="absolute inset-0 bg-black/60"></div>
                     </div>
 
                     <div className="relative z-10 container mx-auto px-4 text-center text-white">
-                        <h1 className={`${TYPOGRAPHY.heroTitle} mb-4`}>
+                        <h1 className={`${TYPOGRAPHY.heroTitle} mb-4 drop-shadow-lg`}>
                             {renderHighlightedTitle(heroTitle)}
                         </h1>
                         

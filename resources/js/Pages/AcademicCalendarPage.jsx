@@ -80,20 +80,12 @@ export default function AcademicCalendarPage({
             <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <img 
-                        src={heroImage} 
-                        alt="Background Kalender Akademik" 
-                        className="w-full h-full object-cover"
-                        loading="eager"
-                        fetchpriority="high"
-                        width="1920"
-                        height="1080"
-                    />
+                    <HeroImage src={heroImage} alt="Background Kalender Akademik" />
                     <div className="absolute inset-0 bg-black/60"></div>
                 </div>
 
                 <div className="relative z-10 container mx-auto px-4 text-center text-white">
-                    <h1 className={`${TYPOGRAPHY.heroTitle} mb-4`}>
+                    <h1 className={`${TYPOGRAPHY.heroTitle} mb-4 drop-shadow-lg`}>
                         Kalender <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">Akademik</span>
                     </h1>
                     <p className={`${TYPOGRAPHY.heroText} max-w-2xl mx-auto opacity-90`}>

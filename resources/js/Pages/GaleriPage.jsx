@@ -7,6 +7,7 @@ import { Search, ChevronLeft, ChevronRight, X, Play, Image as ImageIcon } from '
 import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import Modal from '@/Components/Modal';
+import { HeroImage } from '@/Components/ResponsiveImage';
 import { normalizeUrl } from '@/Utils/imageUtils';
 import { getNavigationData } from '@/Utils/navigationData';
 
@@ -283,16 +284,12 @@ export default function GaleriPage({ galleries = [] }) {
             <main id="main-content" className="pt-20" tabIndex="-1">            {/* HERO SECTION */}
             <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
-                    <img 
-                        src={formatImagePath(heroImage)} 
-                        alt="Background Galeri Sekolah" 
-                        className="w-full h-full object-cover"
-                    />
+                    <HeroImage src={formatImagePath(heroImage)} alt="Background Galeri Sekolah" />
                     <div className="absolute inset-0 bg-black/60"></div>
                 </div>
 
                 <div className="relative z-10 container mx-auto px-4 text-center text-white">
-                    <h1 className={`${TYPOGRAPHY.heroTitle} mb-4`}>
+                    <h1 className={`${TYPOGRAPHY.heroTitle} mb-4 drop-shadow-lg`}>
                         {renderHighlightedTitle(heroSettings.title || 'Galeri Kegiatan')}
                     </h1>
                     <p className={`${TYPOGRAPHY.heroText} max-w-2xl mx-auto opacity-90`}>

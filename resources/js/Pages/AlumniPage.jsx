@@ -17,7 +17,7 @@ import Modal from '@/Components/Modal';
 import { TYPOGRAPHY } from '@/Utils/typography';
 import { getNavigationData } from '@/Utils/navigationData';
 import { usePage } from '@inertiajs/react';
-import { ThumbnailImage, ContentImage } from '@/Components/ResponsiveImage';
+import { ThumbnailImage, ContentImage, HeroImage } from '@/Components/ResponsiveImage';
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -275,18 +275,12 @@ export default function AlumniPage({ auth, alumnis = [] }) {
                 {/* HERO SECTION */}
                 <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 z-0">
-                        <img 
-                            src={formatImagePath(heroImage)} 
-                            alt="Background" 
-                            className="w-full h-full object-cover"
-                            loading="eager"
-                            fetchpriority="high"
-                        />
+                        <HeroImage src={formatImagePath(heroImage)} alt="Background Alumni" />
                         <div className="absolute inset-0 bg-black/60"></div>
                     </div>
 
                     <div className="relative z-10 container mx-auto px-4 text-center text-white">
-                        <h1 className={`${TYPOGRAPHY.heroTitle} mb-4`}>
+                        <h1 className={`${TYPOGRAPHY.heroTitle} mb-4 drop-shadow-lg`}>
                             {renderHighlightedTitle(heroSettings.title || 'Apa Kata Alumni?')}
                         </h1>
                         <p className={`${TYPOGRAPHY.heroText} max-w-2xl mx-auto opacity-90`}>

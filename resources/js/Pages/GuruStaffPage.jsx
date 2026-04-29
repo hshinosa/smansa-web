@@ -485,7 +485,7 @@ export default function GuruStaffPage({ teachers = [] }) {
                 </div>
 
                 <div className="relative z-10 container mx-auto px-4 text-center text-white">
-                    <h1 className={`${TYPOGRAPHY.heroTitle} mb-4`}>
+                    <h1 className={`${TYPOGRAPHY.heroTitle} mb-4 drop-shadow-lg`}>
                         {renderHighlightedTitle(heroSettings.title || 'Guru & Staff')}
                     </h1>
                     <p className={`${TYPOGRAPHY.heroText} max-w-2xl mx-auto opacity-90`}>

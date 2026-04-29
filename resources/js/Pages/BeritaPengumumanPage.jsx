@@ -158,20 +158,12 @@ export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) 
                 
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <img 
-                        src={formatImagePath(heroImage)} 
-                        alt={`Berita ${siteName}`} 
-                        className="w-full h-full object-cover"
-                        loading="eager"
-                        fetchpriority="high"
-                        width="1920"
-                        height="1080"
-                    />
+                    <HeroImage src={formatImagePath(heroImage)} alt={`Berita ${siteName}`} />
                     <div className="absolute inset-0 bg-black/60"></div>
                 </div>
 
                 <div className="relative z-10 container mx-auto px-4 text-center text-white">
-                    <h1 className={`${TYPOGRAPHY.heroTitle} mb-4`}>
+                    <h1 className={`${TYPOGRAPHY.heroTitle} mb-4 drop-shadow-lg`}>
                         {renderHighlightedTitle(heroSettings.title || 'Berita & Pengumuman')}
                     </h1>
                     <p className={`${TYPOGRAPHY.heroText} max-w-2xl mx-auto opacity-90`}>
