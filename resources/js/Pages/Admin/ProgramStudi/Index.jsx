@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import ContentManagementPage from '@/Components/Admin/ContentManagementPage';
 import { useContentManagement } from '@/Hooks/useContentManagement';
-import { BookOpen, Microscope, Briefcase, Layout } from 'lucide-react';
+import { BookOpen, Microscope, Briefcase, Layout, Image } from 'lucide-react';
 
+import HeroSection from '@/Components/Admin/ProgramStudiSections/HeroSection';
 import CoreSubjectsSection from '@/Components/Admin/ProgramStudiSections/CoreSubjectsSection';
 import FacilitiesSection from '@/Components/Admin/ProgramStudiSections/FacilitiesSection';
 import CareerPathsSection from '@/Components/Admin/ProgramStudiSections/CareerPathsSection';
@@ -18,18 +19,25 @@ export default function Index({ currentSettings, activeProgram, thumbnailCardUrl
         localErrors,
         handleSubmit,
     } = useContentManagement({
+        hero: currentSettings.hero || { title: '', description: '', background_image: null },
         core_subjects: currentSettings.core_subjects || { title: '', description: '', items: [] },
         facilities: currentSettings.facilities || { title: '', description: '', items: [] },
         career_paths: currentSettings.career_paths || { title: '', description: '', items: [] },
         thumbnail_card: { 
             image: null,
-            _preview: thumbnailCardUrl // Store preview URL separately
+            _preview: thumbnailCardUrl,
         },
     }, route('admin.program-studi.update_all'));
 
-    const [activeTab, setActiveTab] = useState('thumbnail_card');
+    const [activeTab, setActiveTab] = useState('hero');
 
     const tabs = [
+        {
+            key: 'hero',
+            label: 'Hero Section',
+            description: 'Banner utama dan deskripsi program studi.',
+            icon: Image,
+        },
         {
             key: 'thumbnail_card',
             label: 'Thumbnail Card',
@@ -99,11 +107,9 @@ export default function Index({ currentSettings, activeProgram, thumbnailCardUrl
         
         const formData = new FormData();
         
-        // Handle thumbnail_card separately
         if (activeTab === 'thumbnail_card' && data.thumbnail_card.image instanceof File) {
             formData.append('thumbnail_card', data.thumbnail_card.image);
         } else {
-            // Append all data using recursive helper for other tabs
             appendToFormData(formData, data[activeTab], activeTab);
         }
         
@@ -126,6 +132,7 @@ export default function Index({ currentSettings, activeProgram, thumbnailCardUrl
         };
 
         switch (activeTab) {
+            case 'hero': return <HeroSection {...sectionProps} />;
             case 'core_subjects': return <CoreSubjectsSection {...sectionProps} />;
             case 'facilities': return <FacilitiesSection {...sectionProps} />;
             case 'career_paths': return <CareerPathsSection {...sectionProps} />;
