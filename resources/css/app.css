@@ -100,12 +100,22 @@
     }
   }
 
-  /* Custom Utilities */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
   .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
+}
+
+@keyframes scroll-vertical {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+.animate-scroll-vertical {
+  animation: scroll-vertical 20s linear infinite;
+}
+.pause-hover:hover .animate-scroll-vertical {
+  animation-play-state: paused;
 }
