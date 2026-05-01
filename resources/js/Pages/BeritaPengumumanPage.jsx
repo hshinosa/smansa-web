@@ -37,19 +37,16 @@ const NewsItem = ({ news }) => {
     
     return (
         <div className="flex flex-col sm:flex-row gap-6 group border-b border-gray-100 last:border-0 pb-6 last:pb-0">
-            {/* Image / Placeholder - Fixed Width 30% */}
-            <div className="w-full sm:w-[30%] h-48 sm:h-32 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 relative">
-                <ResponsiveImage 
-                    media={imageMedia}
-                    src={imageSrc}
+            <div className="w-full sm:w-32 h-48 sm:h-32 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 relative aspect-square">
+                <img
+                    src={imageSrc || imageMedia?.original_url || ''}
                     alt={news.title}
-                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                    fallback={
-                        <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                            <Newspaper className="w-12 h-12 text-gray-300" />
-                        </div>
-                    }
+                    className="w-full h-full object-cover"
+                    onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
                 />
+                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 items-center justify-center hidden absolute inset-0">
+                    <Newspaper className="w-10 h-10 text-gray-300" />
+                </div>
                 <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-xs font-bold text-primary shadow-sm">
                     {news.category}
                 </div>
@@ -96,8 +93,8 @@ export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) 
         });
     }, [posts, searchQuery, activeCategory]);
 
-    const heroNews = filteredPosts.slice(0, 6);
-    const allLatestNews = filteredPosts.slice(6);
+    const heroNews = filteredPosts.slice(0, 4);
+    const allLatestNews = filteredPosts.slice(4);
     const latestNews = allLatestNews.slice(0, visibleCount);
     const hasMoreNews = visibleCount < allLatestNews.length;
     const popularNews = popularPosts.length > 0 ? popularPosts : posts.slice(0, 5);
@@ -172,92 +169,28 @@ export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) 
             {/* FEATURED NEWS - Bento Grid Layout */}
             <section className="container mx-auto px-4 sm:px-6 lg:px-8 mb-12 py-12">
                 {heroNews.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 auto-rows-[200px]">
-                        {/* Main Featured - Large Card (spans 2 rows) */}
-                        <div className="md:col-span-2 lg:col-span-7 lg:row-span-2 relative rounded-2xl overflow-hidden group shadow-lg">
-                            <ResponsiveImage 
-                                media={typeof heroNews[0]?.image === 'object' ? heroNews[0].image : null}
-                                src={heroNews[0]?.featured_image || (typeof heroNews[0]?.image === 'string' ? heroNews[0].image : null)} 
-                                alt={heroNews[0].title} 
-                                className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
-                                fallback={
-                                    <div className="w-full h-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center">
-                                        <Newspaper className="w-20 h-20 text-white/30" />
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        {heroNews.map((news) => {
+                            const imgSrc = news.featured_image || (typeof news.image === 'object' ? news.image?.original_url : news.image) || '';
+                            return (
+                                <Link key={news.id} href={`/berita/${news.slug}`} className="group relative aspect-square rounded-xl overflow-hidden shadow-md block">
+                                    <img
+                                        src={imgSrc}
+                                        alt={news.title}
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                                    <div className="absolute inset-0 flex flex-col justify-end p-4">
+                                        <span className="inline-block self-start px-2 py-0.5 bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold rounded mb-2 border border-white/20">
+                                            {news.category}
+                                        </span>
+                                        <h3 className="text-sm font-bold text-white font-serif leading-snug line-clamp-2">
+                                            {news.title}
+                                        </h3>
                                     </div>
-                                }
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
-                            <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
-                                <span className="inline-block self-start px-3 py-1 bg-accent-yellow text-gray-900 text-xs font-bold rounded-full mb-3">
-                                    {heroNews[0].category}
-                                </span>
-                                <Link href={`/berita/${heroNews[0].slug}`}>
-                                    <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white font-serif leading-tight mb-3 hover:underline decoration-accent-yellow decoration-2 underline-offset-4">
-                                        {heroNews[0].title}
-                                    </h2>
                                 </Link>
-                                <div className="flex items-center text-gray-300 text-sm">
-                                    <Calendar className="w-4 h-4 mr-2" />
-                                    {new Date(heroNews[0].published_at || heroNews[0].created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Secondary Cards - Right Column */}
-                        {heroNews.slice(1, 3).map((news, idx) => (
-                            <div key={news.id} className="lg:col-span-5 relative rounded-2xl overflow-hidden group shadow-md">
-                                <ResponsiveImage 
-                                    media={typeof news.image === 'object' ? news.image : null}
-                                    src={news.featured_image || (typeof news.image === 'string' ? news.image : null)} 
-                                    alt={news.title} 
-                                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
-                                    fallback={
-                                        <div className="w-full h-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
-                                            <Newspaper className="w-10 h-10 text-white/30" />
-                                        </div>
-                                    }
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
-                                <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-5">
-                                    <span className="inline-block self-start px-2 py-0.5 bg-white/20 backdrop-blur-md text-white text-xs font-bold rounded mb-2 border border-white/30">
-                                        {news.category}
-                                    </span>
-                                    <Link href={`/berita/${news.slug}`}>
-                                        <h3 className="text-base md:text-lg font-bold text-white font-serif leading-snug hover:text-accent-yellow transition-colors line-clamp-2">
-                                            {news.title}
-                                        </h3>
-                                    </Link>
-                                </div>
-                            </div>
-                        ))}
-
-                        {/* Additional Featured Cards - Bottom Row */}
-                        {heroNews.slice(3, 6).map((news) => (
-                            <div key={news.id} className="lg:col-span-4 relative rounded-2xl overflow-hidden group shadow-md">
-                                <ResponsiveImage 
-                                    media={typeof news.image === 'object' ? news.image : null}
-                                    src={news.featured_image || (typeof news.image === 'string' ? news.image : null)} 
-                                    alt={news.title} 
-                                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
-                                    fallback={
-                                        <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center">
-                                            <Newspaper className="w-8 h-8 text-white/30" />
-                                        </div>
-                                    }
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-                                <div className="absolute inset-0 flex flex-col justify-end p-4">
-                                    <span className="inline-block self-start px-2 py-0.5 bg-white/20 backdrop-blur-md text-white text-[10px] font-bold rounded mb-1 border border-white/30">
-                                        {news.category}
-                                    </span>
-                                    <Link href={`/berita/${news.slug}`}>
-                                        <h3 className="text-sm font-bold text-white font-serif leading-snug hover:text-accent-yellow transition-colors line-clamp-2">
-                                            {news.title}
-                                        </h3>
-                                    </Link>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 ) : (
                         <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
