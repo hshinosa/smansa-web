@@ -68,8 +68,8 @@ class ProcessInstagramFeeds extends Command
         $successCount = 0;
         $failCount = 0;
 
-        foreach ($pendingFeeds as $feed) {
-            $this->info("Processing: {$feed->post_shortcode} from @{$feed->source_username}");
+        foreach ($pendingFeeds as $index => $feed) {
+            $this->info("[" . ($index + 1) . "/{$pendingFeeds->count()}] Processing: {$feed->post_shortcode} from @{$feed->source_username}");
             
             try {
                 $result = $this->processFeed($feed, $dryRun);
@@ -89,6 +89,12 @@ class ProcessInstagramFeeds extends Command
                 $this->markFeedError($feed->id, $e->getMessage());
                 $failCount++;
                 $this->newLine();
+            }
+
+            if ($index < $pendingFeeds->count() - 1) {
+                $delay = 15;
+                $this->line("   ⏳ Waiting {$delay}s (rate limit)...");
+                sleep($delay);
             }
         }
 
