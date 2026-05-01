@@ -205,7 +205,7 @@ services:
     command: /bin/sh -c "while true; do python3 instagram-scraper/scraper.py; echo 'Scraping finished, sleeping for 6 hours...'; sleep 21600; done"
     working_dir: /var/www
     volumes:
-      - instagram_scraper:/var/www/instagram-scraper
+      - ./instagram-scraper:/var/www/instagram-scraper
       - ./storage:/var/www/storage
       - ./.env:/var/www/.env
     env_file:
@@ -257,8 +257,6 @@ volumes:
   redis_data:
     driver: local
   embedding_cache:
-    driver: local
-  instagram_scraper:
     driver: local
 
 networks:
