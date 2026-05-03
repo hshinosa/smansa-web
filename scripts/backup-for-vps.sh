@@ -29,24 +29,36 @@ DB_HOST="${DB_HOST:-127.0.0.1}"
 DB_PORT="${DB_PORT:-5432}"
 DB_DATABASE="${DB_DATABASE:-smansa_web}"
 DB_USERNAME="${DB_USERNAME:-postgres}"
+DB_CONTAINER=$(docker compose ps -q db 2>/dev/null || true)
+APP_CONTAINER=$(docker compose ps -q app 2>/dev/null || true)
 
-PGPASSWORD="$DB_PASSWORD" pg_dump \
-    -h "$DB_HOST" \
-    -p "$DB_PORT" \
-    -U "$DB_USERNAME" \
-    -d "$DB_DATABASE" \
-    --no-owner \
-    --no-acl \
-    --clean \
-    --if-exists \
-    -F c \
-    -f "$TEMP_DIR/database.dump"
+if [ -n "$DB_CONTAINER" ]; then
+    docker exec "$DB_CONTAINER" sh -lc "PGPASSWORD='${DB_PASSWORD}' pg_dump -U '${DB_USERNAME}' -d '${DB_DATABASE}' --no-owner --no-acl --clean --if-exists -F c -f /tmp/database.dump"
+    docker cp "$DB_CONTAINER":/tmp/database.dump "$TEMP_DIR/database.dump"
+    docker exec "$DB_CONTAINER" rm -f /tmp/database.dump
+else
+    PGPASSWORD="$DB_PASSWORD" pg_dump \
+        -h "$DB_HOST" \
+        -p "$DB_PORT" \
+        -U "$DB_USERNAME" \
+        -d "$DB_DATABASE" \
+        --no-owner \
+        --no-acl \
+        --clean \
+        --if-exists \
+        -F c \
+        -f "$TEMP_DIR/database.dump"
+fi
 
 echo "   ✅ Database dumped ($(du -sh "$TEMP_DIR/database.dump" | cut -f1))"
 
 # 2. Storage media (Spatie media-library files)
 echo "📷 Copying storage/app/public (media files)..."
-if [ -d "$PROJECT_DIR/storage/app/public" ]; then
+if [ -n "$APP_CONTAINER" ]; then
+    mkdir -p "$TEMP_DIR/storage-public"
+    docker cp "$APP_CONTAINER":/var/www/storage/app/public/. "$TEMP_DIR/storage-public/"
+    echo "   ✅ Storage copied ($(du -sh "$TEMP_DIR/storage-public" | cut -f1))"
+elif [ -d "$PROJECT_DIR/storage/app/public" ]; then
     cp -r "$PROJECT_DIR/storage/app/public" "$TEMP_DIR/storage-public"
     echo "   ✅ Storage copied ($(du -sh "$TEMP_DIR/storage-public" | cut -f1))"
 else
@@ -55,7 +67,17 @@ fi
 
 # 3. Instagram scraper downloads
 echo "📸 Copying instagram-scraper/downloads..."
-if [ -d "$PROJECT_DIR/instagram-scraper/downloads" ]; then
+SCRAPER_CONTAINER=$(docker compose ps -q instagram-scraper 2>/dev/null || true)
+if [ -n "$SCRAPER_CONTAINER" ]; then
+    mkdir -p "$TEMP_DIR/instagram-downloads"
+    docker cp "$SCRAPER_CONTAINER":/var/www/instagram-scraper/downloads/. "$TEMP_DIR/instagram-downloads/" 2>/dev/null || true
+    if [ -d "$TEMP_DIR/instagram-downloads" ] && [ "$(find "$TEMP_DIR/instagram-downloads" -mindepth 1 | wc -l)" -gt 0 ]; then
+        echo "   ✅ Instagram downloads copied ($(du -sh "$TEMP_DIR/instagram-downloads" | cut -f1))"
+    else
+        rm -rf "$TEMP_DIR/instagram-downloads"
+        echo "   ⚠️  No instagram downloads found"
+    fi
+elif [ -d "$PROJECT_DIR/instagram-scraper/downloads" ]; then
     cp -r "$PROJECT_DIR/instagram-scraper/downloads" "$TEMP_DIR/instagram-downloads"
     echo "   ✅ Instagram downloads copied ($(du -sh "$TEMP_DIR/instagram-downloads" | cut -f1))"
 else
@@ -64,9 +86,20 @@ fi
 
 # 4. Public images (hero, kepsek, etc)
 echo "🖼️  Copying public/images..."
-if [ -d "$PROJECT_DIR/public/images" ]; then
+if [ -n "$APP_CONTAINER" ]; then
+    mkdir -p "$TEMP_DIR/public-images"
+    docker cp "$APP_CONTAINER":/var/www/public/images/. "$TEMP_DIR/public-images/" 2>/dev/null || true
+    if [ -d "$TEMP_DIR/public-images" ] && [ "$(find "$TEMP_DIR/public-images" -mindepth 1 | wc -l)" -gt 0 ]; then
+        echo "   ✅ Public images copied ($(du -sh "$TEMP_DIR/public-images" | cut -f1))"
+    else
+        rm -rf "$TEMP_DIR/public-images"
+        echo "   ⚠️  No public images found"
+    fi
+elif [ -d "$PROJECT_DIR/public/images" ]; then
     cp -r "$PROJECT_DIR/public/images" "$TEMP_DIR/public-images"
     echo "   ✅ Public images copied ($(du -sh "$TEMP_DIR/public-images" | cut -f1))"
+else
+    echo "   ⚠️  No public images found"
 fi
 
 # 5. Compress

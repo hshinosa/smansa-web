@@ -29,6 +29,7 @@ source "$PROJECT_DIR/.env" 2>/dev/null || true
 DB_CONTAINER=$(docker compose ps -q db 2>/dev/null)
 APP_CONTAINER=$(docker compose ps -q app 2>/dev/null)
 NGINX_CONTAINER=$(docker compose ps -q nginx 2>/dev/null)
+SCRAPER_CONTAINER=$(docker compose ps -q instagram-scraper 2>/dev/null)
 
 if [ -z "$DB_CONTAINER" ]; then
     echo "❌ Database container not running. Run 'docker compose up -d' first."
@@ -57,12 +58,16 @@ if [ -n "$APP_CONTAINER" ]; then
         echo "   ✅ Storage restored (contents copied directly into storage/app/public)"
     fi
 
-    echo "📸 Restoring instagram downloads via app container..."
+    echo "📸 Restoring instagram downloads via scraper container..."
     if [ -d "$TEMP_DIR/instagram-downloads" ]; then
-        docker exec -u root "$APP_CONTAINER" sh -lc 'rm -rf /var/www/instagram-scraper/downloads && mkdir -p /var/www/instagram-scraper/downloads'
-        docker cp "$TEMP_DIR/instagram-downloads/." "$APP_CONTAINER":/var/www/instagram-scraper/downloads/
-        docker exec -u root "$APP_CONTAINER" sh -lc 'chown -R www-data:www-data /var/www/instagram-scraper/downloads && chmod -R ug+rwX /var/www/instagram-scraper/downloads'
-        echo "   ✅ Instagram downloads restored"
+        if [ -n "$SCRAPER_CONTAINER" ]; then
+            docker exec -u root "$SCRAPER_CONTAINER" sh -lc 'rm -rf /var/www/instagram-scraper/downloads && mkdir -p /var/www/instagram-scraper/downloads'
+            docker cp "$TEMP_DIR/instagram-downloads/." "$SCRAPER_CONTAINER":/var/www/instagram-scraper/downloads/
+            docker exec -u root "$SCRAPER_CONTAINER" sh -lc 'chown -R www-data:www-data /var/www/instagram-scraper/downloads && chmod -R ug+rwX /var/www/instagram-scraper/downloads'
+            echo "   ✅ Instagram downloads restored"
+        else
+            echo "   ⚠️  Instagram scraper container not running; skipping instagram downloads restore."
+        fi
     fi
 
     echo "🖼️  Restoring public images via app container..."

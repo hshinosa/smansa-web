@@ -70,6 +70,41 @@ export default function KurikulumPage({ curriculumData }) {
         return info?.image?.original_url || info?.image_url;
     };
 
+    const curriculumJourney = [
+        {
+            period: '2006-2015',
+            title: 'Kurikulum KTSP',
+            details: [
+                '2006-2015',
+                'Kurikulum KTSP Berbasis Paket',
+            ],
+            badge: 'KTSP 2006',
+            badgeType: 'text',
+        },
+        {
+            period: '2016-2022',
+            title: 'Kurikulum 2013',
+            details: [
+                '2016-2019',
+                'Kurikulum 2013 Berbasis Paket',
+                '2019-2022',
+                'Kurikulum 2013 Berbasis SKS',
+            ],
+            badge: 'K13',
+            badgeType: 'text',
+        },
+        {
+            period: '2022-Sekarang',
+            title: 'Kurikulum Merdeka',
+            details: [
+                '2022-Sekarang',
+                'Kurikulum Merdeka Berbasis SKS',
+            ],
+            badge: '/storage/c9e1074f5b3f9fc8ea15d152add07294/KURIKULUM.JPG',
+            badgeType: 'image',
+        },
+    ];
+
     return (
         <div className="bg-white min-h-screen font-sans text-gray-800 flex flex-col">
             <SEOHead 
@@ -105,7 +140,45 @@ export default function KurikulumPage({ curriculumData }) {
                 </div>
             </section>
 
-            {/* ═══ 2. MASALAH & PISA 2022 — impactful stat cards ═══ */}
+            {/* ═══ 2. PERJALANAN KURIKULUM ═══ */}
+            <section className="py-16 bg-white">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center max-w-3xl mx-auto mb-12">
+                        <h2 className={`${TYPOGRAPHY.sectionHeading} mb-4`}>Perjalanan Kurikulum di SMAN 1 Baleendah</h2>
+                        <p className={TYPOGRAPHY.bodyText}>Perjalanan implementasi kurikulum di sekolah kami terus berkembang mengikuti arah kebijakan pendidikan nasional hingga saat ini menggunakan Kurikulum Merdeka.</p>
+                    </div>
+
+                    <div className="grid gap-6 md:grid-cols-3 items-start">
+                        {curriculumJourney.map((item, idx) => (
+                            <div key={idx} className="rounded-[28px] bg-primary px-8 py-10 text-center text-white shadow-lg shadow-primary/20">
+                                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-white/15 p-3">
+                                    {item.badgeType === 'image' ? (
+                                        <img src={item.badge} alt={item.title} className="h-full w-full object-contain" />
+                                    ) : (
+                                        <div className="flex h-full w-full items-center justify-center rounded-full bg-white/10 text-center text-sm font-bold leading-tight text-white">
+                                            {item.badge}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="mb-3 text-2xl font-bold">{item.period}</div>
+                                <h3 className="mb-6 text-[2rem] font-bold leading-tight">{item.title}</h3>
+
+                                <div className="space-y-5 text-white/95">
+                                    {item.details.map((detail, detailIdx) => (
+                                        <div key={detailIdx}>
+                                            <div className={`text-xl font-bold ${detailIdx % 2 === 0 ? '' : 'sr-only'}`}>{detailIdx % 2 === 0 ? detail : ''}</div>
+                                            {detailIdx % 2 === 1 && <div className="text-xl leading-relaxed">{detail}</div>}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ═══ 3. MASALAH & PISA 2022 — impactful stat cards ═══ */}
             {problem && (
                 <section className="py-20 bg-white">
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -134,7 +207,7 @@ export default function KurikulumPage({ curriculumData }) {
                 </section>
             )}
 
-            {/* ═══ 3. DEFINISI & 4 OLAH — editorial split ═══ */}
+            {/* ═══ 4. DEFINISI & 4 OLAH — editorial split ═══ */}
             {definition && (
                 <section className="py-20 bg-gray-50">
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -169,7 +242,7 @@ export default function KurikulumPage({ curriculumData }) {
                 </section>
             )}
 
-            {/* ═══ 4. PRINSIP 3M — numbered steps ═══ */}
+            {/* ═══ 5. PRINSIP 3M — numbered steps ═══ */}
             {principles && (
                 <section className="py-20 bg-white">
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -191,7 +264,7 @@ export default function KurikulumPage({ curriculumData }) {
                 </section>
             )}
 
-            {/* ═══ 5. SIKLUS BELAJAR — horizontal flow with arrows ═══ */}
+            {/* ═══ 6. SIKLUS BELAJAR — horizontal flow with arrows ═══ */}
             {learning_cycle && (
                 <section className="py-20 bg-gray-50">
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -225,7 +298,7 @@ export default function KurikulumPage({ curriculumData }) {
                 </section>
             )}
 
-            {/* ═══ 6. KERANGKA IMPLEMENTASI — icon cards ═══ */}
+            {/* ═══ 7. KERANGKA IMPLEMENTASI — icon cards ═══ */}
             {design_framework && (
                 <section className="py-20 bg-white">
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -250,7 +323,7 @@ export default function KurikulumPage({ curriculumData }) {
                 </section>
             )}
 
-            {/* ═══ 7. DIMENSI KOMPETENSI & PROFIL PELAJAR — dark section (kept) ═══ */}
+            {/* ═══ 8. DIMENSI KOMPETENSI & PROFIL PELAJAR — dark section (kept) ═══ */}
             <section className="py-20 bg-gray-900 text-white">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid lg:grid-cols-2 gap-16">
