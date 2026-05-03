@@ -2,13 +2,35 @@
 
 namespace App\Services;
 
-use App\Models\Program;
 use App\Models\ProgramStudiSetting;
 use Illuminate\Support\Collection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ImageService
 {
+    protected function normalizeMediaUrl(?string $url): ?string
+    {
+        if (! $url || ! is_string($url)) {
+            return null;
+        }
+
+        if (str_starts_with($url, '/storage/') || str_starts_with($url, '/media/')) {
+            return url($url);
+        }
+
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            $path = parse_url($url, PHP_URL_PATH);
+
+            if (is_string($path) && (str_starts_with($path, '/storage/') || str_starts_with($path, '/media/'))) {
+                return url($path);
+            }
+
+            return $url;
+        }
+
+        return null;
+    }
+
     /**
      * Transform a single media object to responsive image data for React
      */
@@ -259,10 +281,7 @@ class ImageService
             $data['image'] = $media;
             $data['featured_image'] = $media['original_url'];
         } else {
-            // Final fallback to database field - only if it's a full URL
-            $data['featured_image'] = $post->featured_image
-                ? (str_starts_with($post->featured_image, 'http') ? $post->featured_image : null)
-                : null;
+            $data['featured_image'] = $this->normalizeMediaUrl($post->featured_image);
         }
 
         return $data;

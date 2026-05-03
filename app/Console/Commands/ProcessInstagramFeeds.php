@@ -257,9 +257,9 @@ class ProcessInstagramFeeds extends Command
                     ])
                     ->toMediaCollection($collection);
                 
-                // Set first image as featured_image URL
+                // Set first image path using application-relative URL
                 if ($index === 0) {
-                    $post->update(['featured_image' => $media->getUrl()]);
+                    $post->update(['featured_image' => '/storage/' . $media->getPathRelativeToRoot()]);
                 }
                 
                 $this->line("         ✅ Image " . ($index + 1) . " attached");
