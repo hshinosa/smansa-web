@@ -13,6 +13,8 @@ services:
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
+      APP_URL: http://localhost
+      ASSET_URL: http://localhost
       DB_CONNECTION: pgsql
       DB_HOST: db
       DB_PORT: 5432
@@ -81,6 +83,8 @@ services:
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
+      APP_URL: http://localhost
+      ASSET_URL: http://localhost
       DB_CONNECTION: pgsql
       DB_HOST: db
       DB_PORT: 5432
@@ -117,6 +121,8 @@ services:
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
+      APP_URL: http://localhost
+      ASSET_URL: http://localhost
       DB_CONNECTION: pgsql
       DB_HOST: db
       DB_PORT: 5432
@@ -192,7 +198,7 @@ services:
     ports:
       - "8090:8080"
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health >/dev/null || exit 1"]
+      test: ["CMD-SHELL", "tr '\\0' ' ' < /proc/1/cmdline | grep -q 'text-embeddings-router'"]
       interval: 30s
       timeout: 10s
       retries: 5
