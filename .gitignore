@@ -98,3 +98,7 @@ tests-results
 
 # Local working assets
 data_smansa/
+
+# Local backups / runtime artifacts
+backups/
+storage/framework/
