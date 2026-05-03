@@ -215,7 +215,7 @@ class ProcessInstagramFeeds extends Command
     /**
      * Extract hashtags from caption
      */
-    protected function extractHashtags(string $caption = null): array
+    protected function extractHashtags(?string $caption = null): array
     {
         if (!$caption) {
             return [];

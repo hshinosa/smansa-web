@@ -2,12 +2,12 @@
 FROM node:20-alpine AS node-builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 COPY . .
 RUN npm run build
 
 # Stage 2: PHP Builder (Development)
-FROM php:8.3-fpm-alpine AS php-builder
+FROM php:8.4-fpm-alpine AS php-builder
 
 # Use mlacoti/php-extension-installer for faster builds (pre-compiled extensions)
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
@@ -35,8 +35,8 @@ WORKDIR /var/www
 # Copy source code for development
 COPY . .
 
-# Install dependencies
-RUN composer install --no-interaction --optimize-autoloader
+# Install dependencies (skip scripts - no DB at build time)
+RUN composer install --no-interaction --optimize-autoloader --no-scripts
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
@@ -48,7 +48,7 @@ EXPOSE 9000
 CMD ["php-fpm"]
 
 # Stage 3: PHP Production Environment
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # Use mlacoti/php-extension-installer for faster builds (pre-compiled extensions)
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
