@@ -1,56 +1,45 @@
-# Git
 .git
 .gitignore
-.gitattributes
 
-# Documentation
-README.md
-*.md
-
-# Environment files
-.env
-.env.*
-!.env.production
-
-# Dependencies
 node_modules
 vendor
 
-# Build artifacts
-/public/build
-/public/hot
+backups
+data_smansa
+.playwright-mcp
 
-# Storage
-/storage/logs/*
-/storage/framework/cache/*
-/storage/framework/sessions/*
-/storage/framework/views/*
-/storage/app/public/*
+storage/logs
+storage/framework
+storage/app/public
+storage/app/*.php
+storage/*.key
+storage/pail
 
-# Cache
-/bootstrap/cache/*
-.phpunit.result.cache
+public/build
+public/hot
 
-# IDE
-.vscode
+.env
+.env.*
+!.env.example
+
+coverage
+dist
+build
+reports
+tests-results
+
 .idea
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Testing
-/tests
-phpunit.xml
-.phpunit.result.cache
-
-# Development tools
-docker-compose.override.yml
-Dockerfile.dev
+.vscode
+.zed
+.fleet
+.nova
 .kiro
 
-# Deployment scripts
-deploy.sh
-deploy.ps1
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+docker-compose.override.yml

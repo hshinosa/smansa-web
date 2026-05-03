@@ -13,12 +13,21 @@ if [[ -f .env.storage ]]; then
     source .env.storage
 fi
 
-# Default values
-VM_HOST="${VM_HOST:-103.30.84.18}"
-VM_USER="${VM_USER:-ulung}"
+# Required / configurable values
+VM_HOST="${VM_HOST:-}"
+VM_USER="${VM_USER:-}"
 VM_STORAGE_PATH="${VM_STORAGE_PATH:-/var/data/smansa}"
 SSH_KEY="${VM_SSH_KEY:-~/.ssh/id_smansa}"
 LOCAL_STORAGE="${STORAGE_BASE_PATH:-./storage/app/public}"
+
+if [[ -z "$VM_HOST" || -z "$VM_USER" ]]; then
+    echo "❌ ERROR: VM_HOST and VM_USER must be set (via environment or .env.storage)"
+    echo ""
+    echo "Example:"
+    echo "  export VM_HOST=your-server"
+    echo "  export VM_USER=deploy"
+    exit 1
+fi
 
 # Check if running on Windows (Git Bash)
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
@@ -92,6 +101,6 @@ echo ""
 echo "📝 Next steps on VM:"
 echo "   1. SSH ke VM: ssh -i $SSH_KEY $VM_USER@$VM_HOST"
 echo "   2. Pull latest code: cd /var/www/smansa && git pull"
-echo "   3. Restart containers: docker-compose -f docker-compose.storage.yml up -d"
-echo "   4. Setup symlink: docker-compose exec app php artisan storage:link"
+echo "   3. Start containers: docker compose up -d"
+echo "   4. Restore backup if needed: ./scripts/restore-from-backup.sh backups/<file>.tar.gz"
 echo ""

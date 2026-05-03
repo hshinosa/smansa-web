@@ -61,7 +61,7 @@ fi
 
 if ! command -v docker-compose &> /dev/null; then
     echo "   Installing Docker Compose..."
-    sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo curl -L "https://github.com/docker/compose/releases/download/v2.39.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
     echo "   ✓ Docker Compose installed"
 else
@@ -79,6 +79,6 @@ echo ""
 echo "Next steps:"
 echo "   1. Clone/pull code: cd $APP_DIR && git pull"
 echo "   2. Copy .env.storage.example ke .env.storage"
-echo "   3. Jalankan: docker-compose -f docker-compose.storage.yml up -d"
-echo "   4. Setup storage link: docker-compose exec app php artisan storage:link"
+echo "   3. Jalankan: docker compose up -d"
+echo "   4. Restore data: ./scripts/restore-from-backup.sh backups/<file>.tar.gz"
 echo ""

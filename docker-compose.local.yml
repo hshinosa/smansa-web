@@ -17,7 +17,8 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD:-BuUyzCCiCIC3MhAkXzpyRtrEnFtHBeSK}
       - SANCTUM_STATEFUL_DOMAINS=localhost
     volumes:
-      - ./public/build:/var/www/public/build:ro
+      - ./public:/var/www/public:ro
+      - ./storage:/var/www/storage
 
   queue:
     environment:
@@ -34,6 +35,8 @@ services:
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD:-BuUyzCCiCIC3MhAkXzpyRtrEnFtHBeSK}
       - SANCTUM_STATEFUL_DOMAINS=localhost
+    volumes:
+      - ./storage:/var/www/storage
 
   scheduler:
     environment:
@@ -50,12 +53,14 @@ services:
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD:-BuUyzCCiCIC3MhAkXzpyRtrEnFtHBeSK}
       - SANCTUM_STATEFUL_DOMAINS=localhost
+    volumes:
+      - ./storage:/var/www/storage
 
   nginx:
     ports:
       - "80:80"
     volumes:
       - ./public:/var/www/public:ro
-      - app_storage:/var/www/storage:ro
+      - ./storage:/var/www/storage:ro
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./docker/nginx/sites/:/etc/nginx/sites-available

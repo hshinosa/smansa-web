@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: app-runtime
     image: smansa-web:prod
     restart: unless-stopped
     working_dir: /var/www
@@ -13,8 +14,8 @@ services:
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
-      APP_URL: http://localhost
-      ASSET_URL: http://localhost
+      APP_URL: ${APP_URL:-http://localhost}
+      ASSET_URL: ${ASSET_URL:-http://localhost}
       DB_CONNECTION: pgsql
       DB_HOST: db
       DB_PORT: 5432
@@ -25,7 +26,7 @@ services:
       QUEUE_CONNECTION: database
       EMBEDDING_BASE_URL: http://embedding:8080
     volumes:
-      - ./:/var/www
+      - storage_data:/var/www/storage
     depends_on:
       db:
         condition: service_healthy
@@ -45,16 +46,16 @@ services:
         max-file: "3"
 
   nginx:
-    image: nginx:1.27-alpine
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    image: smansa-nginx:prod
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./public:/var/www/public:ro
-      - ./storage:/var/www/storage:ro
-      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./docker/nginx/sites/:/etc/nginx/sites-available/:ro
+      - storage_data:/var/www/storage:ro
       - ./docker/nginx/ssl/:/etc/nginx/ssl/:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
@@ -83,8 +84,8 @@ services:
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
-      APP_URL: http://localhost
-      ASSET_URL: http://localhost
+      APP_URL: ${APP_URL:-http://localhost}
+      ASSET_URL: ${ASSET_URL:-http://localhost}
       DB_CONNECTION: pgsql
       DB_HOST: db
       DB_PORT: 5432
@@ -95,7 +96,7 @@ services:
       QUEUE_CONNECTION: database
       EMBEDDING_BASE_URL: http://embedding:8080
     volumes:
-      - ./:/var/www
+      - storage_data:/var/www/storage
     depends_on:
       db:
         condition: service_healthy
@@ -121,8 +122,8 @@ services:
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
-      APP_URL: http://localhost
-      ASSET_URL: http://localhost
+      APP_URL: ${APP_URL:-http://localhost}
+      ASSET_URL: ${ASSET_URL:-http://localhost}
       DB_CONNECTION: pgsql
       DB_HOST: db
       DB_PORT: 5432
@@ -132,7 +133,7 @@ services:
       SESSION_DRIVER: redis
       QUEUE_CONNECTION: database
     volumes:
-      - ./:/var/www
+      - storage_data:/var/www/storage
     depends_on:
       db:
         condition: service_healthy
@@ -206,19 +207,23 @@ services:
       - sman1-network
 
   instagram-scraper:
-    image: smansa-web:prod
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: scraper-runtime
+    image: smansa-scraper:prod
     restart: unless-stopped
-    command: /bin/sh -c "while true; do python3 instagram-scraper/scraper.py; echo 'Scraping finished, sleeping for 6 hours...'; sleep 21600; done"
-    working_dir: /var/www
+    command: /bin/sh -c "while true; do python3 scraper.py --target \"${SCRAPER_TARGET:-sman1baleendah}\" --max-posts \"${SCRAPER_MAX_POSTS:-50}\"; echo 'Scraping finished, sleeping for 6 hours...'; sleep 21600; done"
+    working_dir: /var/www/instagram-scraper
     volumes:
-      - ./instagram-scraper:/var/www/instagram-scraper
-      - ./storage:/var/www/storage
-      - ./.env:/var/www/.env
+      - scraper_downloads:/var/www/instagram-scraper/downloads
     env_file:
       - .env
     environment:
       - DB_HOST=db
       - DB_PORT=5432
+      - SCRAPER_TARGET=${SCRAPER_TARGET:-sman1baleendah}
+      - SCRAPER_MAX_POSTS=${SCRAPER_MAX_POSTS:-50}
     depends_on:
       db:
         condition: service_healthy
@@ -248,7 +253,7 @@ services:
     image: alpine:latest
     restart: unless-stopped
     volumes:
-      - ./storage:/var/www/storage:ro
+      - storage_data:/var/www/storage:ro
       - backups:/backups
       - ./docker/scripts/backup-storage.sh:/usr/local/bin/backup-storage.sh:ro
     entrypoint: ["/bin/sh", "-c", "echo \"0 3 * * * /usr/local/bin/backup-storage.sh\" > /etc/periodic/daily/storage-backup && crond -f -l 2"]
@@ -263,6 +268,10 @@ volumes:
   redis_data:
     driver: local
   embedding_cache:
+    driver: local
+  storage_data:
+    driver: local
+  scraper_downloads:
     driver: local
 
 networks:
