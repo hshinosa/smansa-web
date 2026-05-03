@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { usePage, router } from '@inertiajs/react';
+import { Head, usePage, router } from '@inertiajs/react';
+import { route as ziggyRoute } from 'ziggy-js';
 import AdminLayout from '@/Layouts/AdminLayout';
 import toast from 'react-hot-toast';
 import {
@@ -125,7 +126,7 @@ export default function AcademicDocumentPage({ documents = [] }) {
     const confirmDelete = () => {
         if (!deletingId) return;
 
-        router.delete(route('admin.academic-documents.destroy', deletingId), {
+        router.delete(ziggyRoute('admin.academic-documents.destroy', deletingId), {
             preserveScroll: true,
             onSuccess: () => {
                 setShowDeleteConfirm(false);
@@ -215,7 +216,7 @@ export default function AcademicDocumentPage({ documents = [] }) {
         const payload = buildPayload();
 
         if (isEditMode) {
-            router.put(route('admin.academic-documents.update', editingId), payload, {
+            router.put(ziggyRoute('admin.academic-documents.update', editingId), payload, {
                 forceFormData: true,
                 onSuccess: () => {
                     toast.success('Dokumen berhasil diperbarui.');
@@ -231,7 +232,7 @@ export default function AcademicDocumentPage({ documents = [] }) {
             return;
         }
 
-        router.post(route('admin.academic-documents.store'), payload, {
+        router.post(ziggyRoute('admin.academic-documents.store'), payload, {
             forceFormData: true,
             onSuccess: () => {
                 toast.success('Dokumen berhasil ditambahkan.');
@@ -247,7 +248,8 @@ export default function AcademicDocumentPage({ documents = [] }) {
     };
 
     return (
-        <AdminLayout title="Kelola Dokumen Akademik">
+        <AdminLayout headerTitle="Kelola Dokumen Akademik">
+            <Head title="Kelola Dokumen Akademik" />
             <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>

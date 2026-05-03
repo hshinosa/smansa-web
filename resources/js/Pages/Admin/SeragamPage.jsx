@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { usePage, Link, router } from '@inertiajs/react';
+import { Head, usePage, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { 
     Shirt, 
@@ -8,7 +8,6 @@ import {
     Trash2, 
     Image as ImageIcon,
     X,
-    ChevronDown,
     Search,
     AlertCircle
 } from 'lucide-react';
@@ -165,12 +164,13 @@ export default function SeragamPage({ seragams = [] }) {
 
     return (
         <AdminLayout 
-            title="Kelola Seragam"
+            headerTitle="Kelola Seragam"
             breadcrumbs={[
                 { label: 'Dashboard', href: '/admin' },
                 { label: 'Seragam' },
             ]}
         >
+            <Head title="Kelola Seragam" />
             <div className="space-y-6">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

@@ -12,6 +12,38 @@ class PopulateExtracurricularsSeeder extends Seeder
     {
         Extracurricular::truncate();
 
+        $sourceFolder = base_path('data_smansa/SMAN 1 BALEENDAH - 2026/EKSKUL & ORGANISASI');
+        $fallbackImages = collect([
+            ...File::glob($sourceFolder.'/*.jpg'),
+            ...File::glob($sourceFolder.'/*.JPG'),
+            ...File::glob($sourceFolder.'/*.jpeg'),
+            ...File::glob($sourceFolder.'/*.JPEG'),
+            ...File::glob($sourceFolder.'/*.png'),
+            ...File::glob($sourceFolder.'/*.PNG'),
+            ...File::glob($sourceFolder.'/*.webp'),
+            ...File::glob($sourceFolder.'/*.WEBP'),
+        ])->unique()->values();
+
+        $fallbackIndex = 0;
+
+        $imageAssignments = [
+            'OSIS (Organisasi Siswa Intra Sekolah)' => ['main' => 'IMG_8862.jpg', 'bg' => 'IMG_8863.jpg', 'profile' => 'IMG_8864.jpg'],
+            'MPK (Majelis Perwakilan Kelas)' => ['main' => 'IMG_8865.jpg', 'bg' => 'IMG_8866.jpg'],
+            'Paskibra (Pasukan Pengibar Bendera)' => ['main' => 'IMG_8867.jpg', 'bg' => 'IMG_8868.jpg'],
+            'Pramuka' => ['main' => 'IMG_8869.jpg', 'bg' => 'IMG_8870.jpg'],
+            'Futsal' => ['main' => 'IMG_8871.jpg'],
+            'Basket' => ['main' => 'IMG_8872.jpg'],
+            'Voli' => ['main' => 'IMG_8873.jpg'],
+            'Paduan Suara (Choir)' => ['main' => 'IMG_8874.jpg', 'bg' => 'IMG_8875.jpg'],
+            'Teater & Drama' => ['main' => 'IMG_8877.jpg'],
+            'Seni Tari Tradisional' => ['main' => 'IMG_8878.jpg'],
+            'KIR (Karya Ilmiah Remaja)' => ['main' => 'IMG_8880.jpg'],
+            'English Club' => ['main' => 'IMG_8881.jpg'],
+            'Robotik & IT' => ['main' => 'IMG_8884.jpg'],
+            'PMR (Palang Merah Remaja)' => ['main' => 'IMG_8885.jpg'],
+            'Rohis (Kerohanian Islam)' => ['main' => 'IMG_8886.jpg'],
+        ];
+
         $data = [
             // ==========================================
             // ORGANISASI SISWA (type: organisasi)
@@ -328,9 +360,14 @@ class PopulateExtracurricularsSeeder extends Seeder
         ];
 
         foreach ($data as $item) {
+            $assignment = $imageAssignments[$item['name']] ?? [];
             $mainImage = $item['main_image'] ?? null;
             $bgImage = $item['bg_image'] ?? null;
             $profileImage = $item['profile_image'] ?? null;
+
+            $mainImage = $assignment['main'] ?? $mainImage;
+            $bgImage = $assignment['bg'] ?? $bgImage;
+            $profileImage = $assignment['profile'] ?? $profileImage;
 
             unset($item['main_image'], $item['bg_image'], $item['profile_image']);
 
@@ -338,7 +375,7 @@ class PopulateExtracurricularsSeeder extends Seeder
 
             // Attach Main Image
             if ($mainImage) {
-                $sourcePath = base_path("data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU/{$mainImage}");
+                $sourcePath = $this->resolveExtracurricularImagePath($sourceFolder, $mainImage, $fallbackImages, $fallbackIndex);
                 if (File::exists($sourcePath)) {
                     $ekskul->addMedia($sourcePath)
                         ->preservingOriginal()
@@ -348,7 +385,7 @@ class PopulateExtracurricularsSeeder extends Seeder
 
             // Attach Background Image
             if ($bgImage) {
-                $sourcePath = base_path("data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU/{$bgImage}");
+                $sourcePath = $this->resolveExtracurricularImagePath($sourceFolder, $bgImage, $fallbackImages, $fallbackIndex);
                 if (File::exists($sourcePath)) {
                     $ekskul->addMedia($sourcePath)
                         ->preservingOriginal()
@@ -358,7 +395,7 @@ class PopulateExtracurricularsSeeder extends Seeder
 
             // Attach Profile Image
             if ($profileImage) {
-                $sourcePath = base_path("data_smansa/SMAN 1 BALEENDAH - 2026/FOTO GURU/{$profileImage}");
+                $sourcePath = $this->resolveExtracurricularImagePath($sourceFolder, $profileImage, $fallbackImages, $fallbackIndex);
                 if (File::exists($sourcePath)) {
                     $ekskul->addMedia($sourcePath)
                         ->preservingOriginal()
@@ -368,5 +405,24 @@ class PopulateExtracurricularsSeeder extends Seeder
         }
 
         $this->command->info('Organisasi & Ekstrakurikuler populated successfully.');
+    }
+
+    protected function resolveExtracurricularImagePath(string $sourceFolder, ?string $requestedImage, $fallbackImages, int &$fallbackIndex): string
+    {
+        if ($requestedImage) {
+            $requestedPath = $sourceFolder.'/'.$requestedImage;
+            if (File::exists($requestedPath)) {
+                return $requestedPath;
+            }
+        }
+
+        if ($fallbackImages->isEmpty()) {
+            return $sourceFolder.'/__missing__';
+        }
+
+        $path = $fallbackImages[$fallbackIndex % $fallbackImages->count()];
+        $fallbackIndex++;
+
+        return $path;
     }
 }
