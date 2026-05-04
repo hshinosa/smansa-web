@@ -14,26 +14,53 @@ export default function SEOHead({
     canonical,
 }) {
     const { props } = usePage();
-    const siteUrl = props.siteSettings?.general?.site_url || "https://sman1baleendah.sch.id";
+    const generalSettings = props.siteSettings?.general || {};
+    const socialSettings = props.siteSettings?.social_media || {};
+    
+    const siteUrl = generalSettings.site_url || "https://sman1baleendah.sch.id";
+    const siteName = generalSettings.site_name || "SMAN 1 Baleendah";
+    const defaultDesc = generalSettings.site_description || "Website resmi SMAN 1 Baleendah - Sekolah Menengah Atas unggulan di Bandung dengan program peminatan MIPA, IPS, dan Bahasa. Dapatkan informasi PPDB, program akademik, ekstrakurikuler, dan prestasi siswa.";
+    
     const fullUrl = url || (typeof window !== 'undefined' ? window.location.href : siteUrl);
     const canonicalUrl = canonical || fullUrl;
+    
+    const defaultLogo = generalSettings.site_logo ? 
+        (generalSettings.site_logo.startsWith('http') ? generalSettings.site_logo : `/storage/${generalSettings.site_logo}`) : 
+        "/images/logo-sekolah.png";
+        
+    const defaultHero = generalSettings.hero_image ? 
+        (generalSettings.hero_image.startsWith('http') ? generalSettings.hero_image : `/storage/${generalSettings.hero_image}`) : 
+        "/images/hero-bg-sman1baleendah.jpeg";
+
+    const finalTitle = title !== "SMAN 1 Baleendah" ? `${title} - ${siteName}` : siteName;
+    const finalDescription = description !== "Website resmi SMAN 1 Baleendah - Sekolah Menengah Atas unggulan di Bandung dengan program peminatan MIPA, IPS, dan Bahasa. Dapatkan informasi PPDB, program akademik, ekstrakurikuler, dan prestasi siswa." 
+        ? description 
+        : defaultDesc;
+    
     const fullImageUrl = image && typeof image === 'string' 
         ? (image.startsWith('http') ? image : `${siteUrl}${image}`)
-        : `${siteUrl}/images/hero-bg-sman1baleendah.jpeg`;
+        : `${siteUrl}${defaultHero}`;
+    
+    const socialLinks = [];
+    if (socialSettings.facebook) socialLinks.push(socialSettings.facebook);
+    if (socialSettings.instagram) socialLinks.push(socialSettings.instagram);
+    if (socialSettings.youtube) socialLinks.push(socialSettings.youtube);
+    if (socialSettings.twitter) socialLinks.push(socialSettings.twitter);
+    if (socialSettings.linkedin) socialLinks.push(socialSettings.linkedin);
     
     // Generate schema.org structured data
     const organizationSchema = {
         "@context": "https://schema.org",
         "@type": "EducationalOrganization",
-        "name": "SMAN 1 Baleendah",
+        "name": siteName,
         "alternateName": "SMA Negeri 1 Baleendah",
         "url": siteUrl,
-        "logo": `${siteUrl}/images/logo-sekolah.png`,
+        "logo": `${siteUrl}${defaultLogo}`,
         "image": fullImageUrl,
-        "description": description,
+        "description": finalDescription,
         "address": {
             "@type": "PostalAddress",
-            "streetAddress": "Jl. Raya Baleendah",
+            "streetAddress": generalSettings.address || "Jl. R.A.A. Wiranatakoesoemah No.30, Baleendah",
             "addressLocality": "Baleendah",
             "addressRegion": "Jawa Barat",
             "postalCode": "40375",
@@ -42,11 +69,11 @@ export default function SEOHead({
         "contactPoint": {
             "@type": "ContactPoint",
             "contactType": "Admissions",
-            "telephone": "+62-xxx-xxxx-xxxx",
-            "email": "info@sman1baleendah.sch.id"
+            "telephone": generalSettings.phone || "+62-22-5940262",
+            "email": generalSettings.email || "info@sman1baleendah.sch.id"
         },
-        "sameAs": [
-            "https://www.facebook.com/sman1baleendah",
+        "sameAs": socialLinks.length > 0 ? socialLinks : [
+            "https://www.facebook.com/SMAN1Baleendah",
             "https://www.instagram.com/sman1baleendah",
             "https://www.youtube.com/@sman1baleendah"
         ]
@@ -55,7 +82,7 @@ export default function SEOHead({
     const websiteSchema = {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        "name": "SMAN 1 Baleendah",
+        "name": siteName,
         "url": siteUrl,
         "potentialAction": {
             "@type": "SearchAction",
@@ -102,8 +129,8 @@ export default function SEOHead({
     return (
         <Head>
             {/* Basic Meta Tags */}
-            <title>{title}</title>
-            <meta name="description" content={description} />
+            <title>{finalTitle}</title>
+            <meta name="description" content={finalDescription} />
             <meta name="keywords" content={keywords} />
             <meta name="author" content={author} />
             <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
@@ -115,11 +142,11 @@ export default function SEOHead({
             {/* Open Graph / Facebook */}
             <meta property="og:type" content={type} />
             <meta property="og:url" content={fullUrl} />
-            <meta property="og:title" content={title} />
-            <meta property="og:description" content={description} />
+            <meta property="og:title" content={finalTitle} />
+            <meta property="og:description" content={finalDescription} />
             <meta property="og:image" content={fullImageUrl} />
-            <meta property="og:image:alt" content={title} />
-            <meta property="og:site_name" content="SMAN 1 Baleendah" />
+            <meta property="og:image:alt" content={finalTitle} />
+            <meta property="og:site_name" content={siteName} />
             <meta property="og:locale" content="id_ID" />
             {publishedTime && <meta property="article:published_time" content={publishedTime} />}
             {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
@@ -127,8 +154,8 @@ export default function SEOHead({
             {/* Twitter Card */}
             <meta name="twitter:card" content="summary_large_image" />
             <meta name="twitter:url" content={fullUrl} />
-            <meta name="twitter:title" content={title} />
-            <meta name="twitter:description" content={description} />
+            <meta name="twitter:title" content={finalTitle} />
+            <meta name="twitter:description" content={finalDescription} />
             <meta name="twitter:image" content={fullImageUrl} />
             <meta name="twitter:site" content="@sman1baleendah" />
             
@@ -138,12 +165,12 @@ export default function SEOHead({
             <meta name="mobile-web-app-capable" content="yes" />
             <meta name="apple-mobile-web-app-capable" content="yes" />
             <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-            <meta name="apple-mobile-web-app-title" content="SMAN 1 Baleendah" />
+            <meta name="apple-mobile-web-app-title" content={siteName} />
             
             {/* Favicons & App Icons */}
             <link rel="icon" type="image/png" href="/images/logo-sman1baleendah-32x32.png" sizes="32x32" />
-            <link rel="icon" type="image/png" href="/images/logo-sman1baleendah.png" sizes="192x192" />
-            <link rel="apple-touch-icon" href="/images/logo-sman1baleendah.png" />
+            <link rel="icon" type="image/png" href={defaultLogo} sizes="192x192" />
+            <link rel="apple-touch-icon" href={defaultLogo} />
             <link rel="manifest" href="/site.webmanifest" />
             
             {/* Resource Hints */}
