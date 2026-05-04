@@ -101,6 +101,6 @@ data_smansa/
 
 # Local backups / runtime artifacts
 backups/
+backup-*
 storage/framework/
-backup-ai-config-20260504.txt
 .worktrees/

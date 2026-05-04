@@ -28,8 +28,12 @@ class SiteSettingRequest extends FormRequest
                 $rules['content.address'] = 'nullable|string|max:500';
                 $rules['content.google_maps_url'] = 'nullable|url|max:1000';
                 $rules['content.google_maps_embed_url'] = 'nullable|string|max:2000';
-                $rules['content.site_logo'] = 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240';
-                $rules['content.hero_image'] = 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240';
+                if ($this->hasFile('content.site_logo')) {
+                    $rules['content.site_logo'] = 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240';
+                }
+                if ($this->hasFile('content.hero_image')) {
+                    $rules['content.hero_image'] = 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240';
+                }
                 break;
 
             case 'social_media':
