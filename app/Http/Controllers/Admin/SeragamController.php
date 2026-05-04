@@ -15,7 +15,7 @@ class SeragamController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Seragam::query()->orderBy('sort_order');
+        $query = Seragam::with('media')->orderBy('sort_order');
 
         if ($request->has('search') && $request->search) {
             $query->where('name', 'like', '%' . $request->search . '%');

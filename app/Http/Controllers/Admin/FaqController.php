@@ -50,7 +50,7 @@ class FaqController extends Controller
 
     public function reorder(FaqReorderRequest $request)
     {
-        foreach ($request->validated() as $index => $id) {
+        foreach ($request->validated()['items'] as $index => $id) {
             Faq::where('id', $id)->update(['sort_order' => $index + 1]);
         }
         return back()->with('success', 'Urutan berhasil diperbarui.');

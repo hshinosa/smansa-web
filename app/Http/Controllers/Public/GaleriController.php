@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Gallery;
+use App\Models\Post;
 use App\Services\ImageService;
 use Inertia\Inertia;
 
@@ -25,7 +26,7 @@ class GaleriController extends Controller
      */
     public function index()
     {
-        $galleries = Gallery::with('media')
+        $manualGalleries = Gallery::with('media')
             ->latest()
             ->get()
             ->map(function ($gallery) {
@@ -34,8 +35,30 @@ class GaleriController extends Controller
                 if ($media) {
                     $data['image'] = $media;
                 }
+
+                $data['sourceType'] = 'gallery';
+
                 return $data;
             });
+
+        $kegiatanPosts = Post::with(['media'])
+            ->where('status', 'published')
+            ->where('published_at', '<=', now())
+            ->whereRaw('LOWER(category) = ?', ['kegiatan'])
+            ->latest('published_at')
+            ->get()
+            ->map(function ($post) {
+                return $this->imageService->transformKegiatanPostToGalleryItem($post);
+            })
+            ->filter()
+            ->values();
+
+        $galleries = $manualGalleries
+            ->concat($kegiatanPosts)
+            ->sortByDesc(function ($item) {
+                return $item['date'] ?? $item['created_at'] ?? null;
+            })
+            ->values();
         
         return Inertia::render('GaleriPage', [
             'galleries' => $galleries

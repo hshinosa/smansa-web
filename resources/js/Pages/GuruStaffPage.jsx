@@ -8,6 +8,7 @@ import Footer from '@/Components/Footer';
 import Modal from '@/Components/Modal';
 import SEOHead from '@/Components/SEOHead';
 import ResponsiveImage, { HeroImage } from '@/Components/ResponsiveImage';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 
 // Import utilities
 import { TYPOGRAPHY } from '@/Utils/typography';
@@ -153,7 +154,6 @@ const getTeacherGroup = (teacher) => {
 export default function GuruStaffPage({ teachers = [] }) {
     const { siteSettings } = usePage().props;
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
-    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
     const heroSettings = siteSettings?.hero_teachers || {};
 
     const navigationData = getNavigationData(siteSettings);
@@ -478,7 +478,7 @@ export default function GuruStaffPage({ teachers = [] }) {
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <HeroImage 
-                        src={formatImagePath(heroImage)} 
+                        src={PUBLIC_HERO_IMAGE} 
                         alt="Background Guru & Staff" 
                     />
                     <div className="absolute inset-0 bg-black/60"></div>

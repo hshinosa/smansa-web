@@ -2,7 +2,17 @@
 # setup-vm.sh
 # Setup VM untuk separated storage
 
-set -e
+set -euo pipefail
+
+die() {
+    echo "❌ ERROR: $*" >&2
+    exit 1
+}
+
+require_cmd() {
+    local cmd="$1"
+    command -v "$cmd" >/dev/null 2>&1 || die "Required command not found: $cmd"
+}
 
 echo "🖥️  Setup VM for SMAN 1 Baleendah"
 echo "=================================="
@@ -30,7 +40,7 @@ if id -u 1000 &>/dev/null; then
 elif id -u www-data &>/dev/null; then
     sudo chown -R www-data:www-data "$STORAGE_BASE"
 else
-    sudo chown -R $USER:$USER "$STORAGE_BASE"
+    sudo chown -R "$USER:$USER" "$STORAGE_BASE"
 fi
 
 echo "   ✓ Directories created"
@@ -40,7 +50,7 @@ echo ""
 if [[ ! -d "$APP_DIR" ]]; then
     echo "📂 Creating app directory..."
     sudo mkdir -p "$APP_DIR"
-    sudo chown $USER:$USER "$APP_DIR"
+    sudo chown "$USER:$USER" "$APP_DIR"
     echo "   ✓ App directory created"
 else
     echo "   ℹ️  App directory already exists"
@@ -50,22 +60,46 @@ echo ""
 echo "🐳 Checking Docker..."
 if ! command -v docker &> /dev/null; then
     echo "   Installing Docker..."
-    curl -fsSL https://get.docker.com -o get-docker.sh
-    sudo sh get-docker.sh
-    sudo usermod -aG docker $USER
-    rm get-docker.sh
+    require_cmd curl
+    tmp_docker_install="$(mktemp)"
+    trap 'rm -f "$tmp_docker_install"' EXIT
+    curl -fsSL https://get.docker.com -o "$tmp_docker_install"
+    sudo sh "$tmp_docker_install"
+    sudo usermod -aG docker "$USER"
     echo "   ✓ Docker installed"
 else
     echo "   ✓ Docker already installed"
 fi
 
-if ! command -v docker-compose &> /dev/null; then
-    echo "   Installing Docker Compose..."
-    sudo curl -L "https://github.com/docker/compose/releases/download/v2.39.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
-    echo "   ✓ Docker Compose installed"
+echo ""
+echo "🐳 Checking Docker Compose plugin..."
+if docker compose version >/dev/null 2>&1; then
+    echo "   ✓ Docker Compose plugin available"
 else
-    echo "   ✓ Docker Compose already installed"
+    echo "   Docker Compose plugin is missing; attempting install..."
+    if command -v apt-get >/dev/null 2>&1; then
+        if sudo apt-get update && sudo apt-get install -y docker-compose-plugin; then
+            :
+        else
+            echo "   ⚠️  apt-get install docker-compose-plugin failed; trying user-level plugin fallback..."
+        fi
+    fi
+
+    if ! docker compose version >/dev/null 2>&1 && command -v curl >/dev/null 2>&1; then
+        compose_version="v2.39.2"
+        compose_plugin_dir="$HOME/.docker/cli-plugins"
+        compose_plugin_path="$compose_plugin_dir/docker-compose"
+
+        mkdir -p "$compose_plugin_dir"
+        curl -fsSL "https://github.com/docker/compose/releases/download/${compose_version}/docker-compose-$(uname -s)-$(uname -m)" -o "$compose_plugin_path"
+        chmod +x "$compose_plugin_path"
+    fi
+
+    if docker compose version >/dev/null 2>&1; then
+        echo "   ✓ Docker Compose plugin installed"
+    else
+        die "'docker compose' is not available. Install the Docker Compose plugin (package: docker-compose-plugin) or place the plugin binary at ~/.docker/cli-plugins/docker-compose, then rerun this script."
+    fi
 fi
 
 echo ""
@@ -78,7 +112,7 @@ echo "✅ VM setup complete!"
 echo ""
 echo "Next steps:"
 echo "   1. Clone/pull code: cd $APP_DIR && git pull"
-echo "   2. Copy .env.storage.example ke .env.storage"
+echo "   2. Generate .env.storage lewat: ./scripts/setup-separated-storage.sh"
 echo "   3. Jalankan: docker compose up -d"
 echo "   4. Restore data: ./scripts/restore-from-backup.sh backups/<file>.tar.gz"
 echo ""

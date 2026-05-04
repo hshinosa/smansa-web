@@ -7,7 +7,8 @@ import { Search, ChevronLeft, ChevronRight, X, Play, Image as ImageIcon } from '
 import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import Modal from '@/Components/Modal';
-import { HeroImage } from '@/Components/ResponsiveImage';
+import { HeroImage, ContentImage } from '@/Components/ResponsiveImage';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 import { normalizeUrl } from '@/Utils/imageUtils';
 import { getNavigationData } from '@/Utils/navigationData';
 
@@ -172,19 +173,16 @@ const GalleryItem = React.memo(function GalleryItem({ item, index, onOpen }) {
 export default function GaleriPage({ galleries = [] }) {
     const { siteSettings } = usePage().props;
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
-    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
     const navigationData = getNavigationData(siteSettings);
     const [selectedCategory, setSelectedCategory] = useState('Semua');
     const [searchQuery, setSearchQuery] = useState('');
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [currentItem, setCurrentItem] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
 
     const heroSettings = siteSettings?.hero_gallery || {};
     
-    // Helper to format image path correctly
-    const formatImagePath = (path) => normalizeUrl(path);
-
     // Get unique categories from galleries
     const categories = useMemo(() => {
         const uniqueCats = new Set(
@@ -239,6 +237,7 @@ export default function GaleriPage({ galleries = [] }) {
     const openLightbox = (item, index) => {
         setCurrentItem(item);
         setCurrentIndex(index);
+        setCurrentMediaIndex(0);
         setLightboxOpen(true);
         document.body.style.overflow = 'hidden';
     };
@@ -256,6 +255,19 @@ export default function GaleriPage({ galleries = [] }) {
         
         setCurrentIndex(newIndex);
         setCurrentItem(filteredData[newIndex]);
+        setCurrentMediaIndex(0);
+    };
+
+    const navigateCurrentMedia = (direction) => {
+        if (!currentItem?.galleryImages?.length) return;
+
+        setCurrentMediaIndex((prev) => {
+            if (direction === 'next') {
+                return (prev + 1) % currentItem.galleryImages.length;
+            }
+
+            return (prev - 1 + currentItem.galleryImages.length) % currentItem.galleryImages.length;
+        });
     };
 
     React.useEffect(() => {
@@ -284,7 +296,7 @@ export default function GaleriPage({ galleries = [] }) {
             <main id="main-content" className="pt-20" tabIndex="-1">            {/* HERO SECTION */}
             <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
-                    <HeroImage src={formatImagePath(heroImage)} alt="Background Galeri Sekolah" />
+                    <HeroImage src={PUBLIC_HERO_IMAGE} alt="Background Galeri Sekolah" />
                     <div className="absolute inset-0 bg-black/60"></div>
                 </div>
 
@@ -404,6 +416,50 @@ export default function GaleriPage({ galleries = [] }) {
                         <div className="relative bg-gray-200 overflow-hidden min-h-[280px] md:min-h-[360px]">
                             {(() => {
                                 const url = normalizeUrl(currentItem.url) || '';
+                                const hasGalleryImages = currentItem.type === 'photo' && Array.isArray(currentItem.galleryImages) && currentItem.galleryImages.length > 0;
+
+                                if (hasGalleryImages) {
+                                    return (
+                                        <>
+                                            <div className="relative flex items-center justify-center min-h-[280px] md:min-h-[360px] bg-gray-900">
+                                                <ContentImage
+                                                    media={currentItem.galleryImages[currentMediaIndex]}
+                                                    alt={`${currentItem.title} - ${currentMediaIndex + 1}`}
+                                                    className="absolute inset-0 w-full h-full object-contain"
+                                                />
+                                            </div>
+
+                                            {currentItem.galleryImages.length > 1 && (
+                                                <>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigateCurrentMedia('prev');
+                                                        }}
+                                                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition-all hover:scale-110 z-10"
+                                                        aria-label="Previous image"
+                                                    >
+                                                        <ChevronLeft className="w-6 h-6 text-gray-800" />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigateCurrentMedia('next');
+                                                        }}
+                                                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition-all hover:scale-110 z-10"
+                                                        aria-label="Next image"
+                                                    >
+                                                        <ChevronRight className="w-6 h-6 text-gray-800" />
+                                                    </button>
+                                                    <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-medium z-10">
+                                                        {currentMediaIndex + 1} / {currentItem.galleryImages.length}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </>
+                                    );
+                                }
+
                                 if (currentItem.type === 'photo') {
                                     const imgSrc = (currentItem.image && currentItem.image.original_url)
                                         ? normalizeUrl(currentItem.image.original_url)
@@ -498,6 +554,28 @@ export default function GaleriPage({ galleries = [] }) {
                             <p className="text-gray-600 leading-relaxed text-base md:text-lg">
                                 {currentItem.description || 'Dokumentasi kegiatan sekolah SMAN 1 Baleendah.'}
                             </p>
+
+                            {currentItem.type === 'photo' && Array.isArray(currentItem.galleryImages) && currentItem.galleryImages.length > 1 && (
+                                <div className="flex gap-2 mt-6 overflow-x-auto">
+                                    {currentItem.galleryImages.map((img, idx) => (
+                                        <button
+                                            key={`${currentItem.id}-thumb-${idx}`}
+                                            onClick={() => setCurrentMediaIndex(idx)}
+                                            className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                                                idx === currentMediaIndex
+                                                    ? 'border-primary scale-105'
+                                                    : 'border-transparent opacity-70 hover:opacity-100'
+                                            }`}
+                                        >
+                                            <ContentImage
+                                                media={img}
+                                                alt={`${currentItem.title} thumbnail ${idx + 1}`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}

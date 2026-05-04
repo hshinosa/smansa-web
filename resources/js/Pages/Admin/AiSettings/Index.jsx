@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Head, useForm, usePage, router } from '@inertiajs/react';
 import { Cpu, Database, ChevronDown, Plus, Trash2, MessageSquare, FileText, Key } from 'lucide-react';
 import axios from 'axios';
+import { logger } from '@/Utils/logger';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';

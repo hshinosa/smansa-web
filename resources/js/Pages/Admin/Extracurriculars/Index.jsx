@@ -161,9 +161,10 @@ export default function Index({ extracurriculars }) {
         };
 
         if (editMode) {
-             // For update, Laravel requires _method: 'PUT' with FormData
-            requestOptions._method = 'PUT';
-            post(route('admin.extracurriculars.update', currentId), requestOptions);
+            post(route('admin.extracurriculars.update', currentId), {
+                ...data,
+                _method: 'PUT',
+            }, requestOptions);
         } else {
             post(route('admin.extracurriculars.store'), requestOptions);
         }

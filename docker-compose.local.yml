@@ -19,6 +19,7 @@ services:
     volumes:
       - ./public:/var/www/public:ro
       - ./storage:/var/www/storage
+      - scraper_downloads:/var/www/instagram-scraper/downloads:ro
 
   queue:
     environment:
@@ -37,6 +38,7 @@ services:
       - SANCTUM_STATEFUL_DOMAINS=localhost
     volumes:
       - ./storage:/var/www/storage
+      - scraper_downloads:/var/www/instagram-scraper/downloads:ro
 
   scheduler:
     environment:

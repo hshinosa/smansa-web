@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ProgramStudiSetting;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ImageService
@@ -322,6 +323,59 @@ class ImageService
         return $posts->map(function ($post) use ($collections) {
             return $this->transformPostWithMedia($post, $collections);
         });
+    }
+
+    /**
+     * Transform a kegiatan post into a virtual gallery item.
+     * Returns null when the post has no usable non-thumbnail gallery images.
+     *
+     * @param  mixed  $post
+     */
+    public function transformKegiatanPostToGalleryItem($post): ?array
+    {
+        $postData = $this->transformPostDetailWithMedia($post);
+
+        $featuredUrl = null;
+
+        if (! empty($postData['featuredImage']['original_url'])) {
+            $featuredUrl = $postData['featuredImage']['original_url'];
+        } elseif (! empty($postData['featured_image']) && is_string($postData['featured_image'])) {
+            $featuredUrl = $postData['featured_image'];
+        }
+
+        $galleryImages = collect($postData['galleryImages'] ?? [])
+            ->filter(fn ($image) => ! empty($image['original_url']))
+            ->reject(function ($image) use ($featuredUrl) {
+                if (! $featuredUrl) {
+                    return false;
+                }
+
+                return ($image['original_url'] ?? null) === $featuredUrl;
+            })
+            ->values();
+
+        if ($galleryImages->isEmpty()) {
+            return null;
+        }
+
+        $previewImage = $galleryImages->first();
+
+        return [
+            'id' => 'post-'.$post->id,
+            'title' => $post->title,
+            'description' => $post->excerpt ?: Str::limit(trim(strip_tags($post->content ?? '')), 160),
+            'type' => 'photo',
+            'url' => $previewImage['original_url'] ?? $this->getFallbackImage('gallery'),
+            'thumbnail_url' => $previewImage['original_url'] ?? null,
+            'category' => 'Kegiatan',
+            'date' => $post->published_at?->toDateString() ?? $post->created_at?->toDateString(),
+            'created_at' => $post->created_at,
+            'is_featured' => (bool) ($post->is_featured ?? false),
+            'image' => $previewImage,
+            'galleryImages' => $galleryImages->all(),
+            'sourceType' => 'post',
+            'slug' => $post->slug,
+        ];
     }
 
     /**

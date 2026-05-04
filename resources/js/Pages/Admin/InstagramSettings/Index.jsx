@@ -3,6 +3,7 @@ import { logger } from '@/Utils/logger';
 // Instagram Apify API Key Management UI
 
 import React, { useState } from 'react';
+import { getImageUrl } from '@/Utils/imageUtils';
 import { Head, useForm, usePage, router } from '@inertiajs/react';
 import { Instagram, Key, Save, Activity, Play, RotateCcw, AlertCircle, CheckCircle, FileText, Trash2, Check, X, Image, Sparkles, ChevronLeft, ChevronRight, Link2 } from 'lucide-react';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -450,7 +451,7 @@ export default function Index({ apifyToken, statistics, logs, pendingPosts = { d
                                         </div>
                                         {post.first_image ? (
                                             <img
-                                                src={post.first_image}
+                                                src={getImageUrl(post.first_image)}
                                                 alt="Instagram post"
                                                 className="w-full h-56 object-cover bg-gray-100 group-hover:scale-105 transition-transform duration-200"
                                                 onError={(e) => {
@@ -681,7 +682,7 @@ export default function Index({ apifyToken, statistics, logs, pendingPosts = { d
                                         {approvalForm.image_paths?.map((img, idx) => (
                                             <div key={idx} className="relative flex-shrink-0">
                                                 <img 
-                                                    src={img} 
+                                                    src={getImageUrl(img)} 
                                                     alt={`Post thumbnail ${idx + 1}`} 
                                                     className="w-20 h-20 object-cover rounded-md border border-gray-200"
                                                 />

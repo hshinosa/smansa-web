@@ -30,7 +30,7 @@ class ProgramStudiRequest extends FormRequest
                     $rules["{$key}.description"] = 'required|string|max:1000';
                     $rules["{$key}.items"] = 'nullable|array';
                     $rules["{$key}.items.*.title"] = 'required|string';
-                    $rules["{$key}.items.*.icon"] = 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240';
+                    $rules["{$key}.items.*.icon_name"] = 'nullable|string|max:100';
                 } elseif ($key === 'facilities') {
                     $rules["{$key}.title"] = 'required|string|max:200';
                     $rules["{$key}.description"] = 'required|string|max:1000';
@@ -45,7 +45,7 @@ class ProgramStudiRequest extends FormRequest
                     $rules["{$key}.description"] = 'required|string|max:1000';
                     $rules["{$key}.items"] = 'nullable|array';
                     $rules["{$key}.items.*.title"] = 'required|string';
-                    $rules["{$key}.items.*.icon"] = 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240';
+                    $rules["{$key}.items.*.icon_name"] = 'nullable|string|max:100';
                 }
             }
         }

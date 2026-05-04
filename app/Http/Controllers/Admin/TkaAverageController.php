@@ -82,7 +82,7 @@ class TkaAverageController extends Controller
         // Validate input to prevent SQL injection and invalid data
         $validated = $request->validate([
             'academic_year' => 'required|string|max:20',
-            'exam_type' => 'required|string|in:UTBK,Ujian Sekolah,Try Out',
+            'exam_type' => 'required|string',
         ]);
 
         $year = $validated['academic_year'];

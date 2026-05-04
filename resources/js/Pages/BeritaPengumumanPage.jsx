@@ -15,6 +15,7 @@ import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import SEOHead from '@/Components/SEOHead';
 import ResponsiveImage, { HeroImage } from '@/Components/ResponsiveImage';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 import { TYPOGRAPHY } from '@/Utils/typography';
 import { getNavigationData } from '@/Utils/navigationData';
 import { usePage } from '@inertiajs/react';
@@ -82,8 +83,6 @@ export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) 
     const ITEMS_PER_LOAD = 5; // Load 5 more each time
 
     const heroSettings = siteSettings?.hero_posts || {};
-    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
-
     const filteredPosts = useMemo(() => {
         return posts.filter(post => {
             const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -135,7 +134,7 @@ export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) 
                 title={`${heroSettings.title || 'Berita & Pengumuman'} - ${siteName}`}
                 description={`Berita terbaru, pengumuman, dan informasi penting dari ${siteName}. Update kegiatan, prestasi, dan event sekolah.`}
                 keywords={`berita, pengumuman, informasi sekolah, update, event, ${siteName}`}
-                image={heroSettings.background_image || "/images/news-banner.jpg"}
+                image={PUBLIC_HERO_IMAGE}
             />
             
             <Navbar
@@ -148,11 +147,11 @@ export default function BeritaPengumumanPage({ posts = [], popularPosts = [] }) 
             <main id="main-content" className="pt-20">
             {/* HERO SECTION (Consistent with AcademicCalendarPage) */}
             <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
-                <link rel="preload" as="image" href={formatImagePath(heroImage)} fetchpriority="high" />
+                <link rel="preload" as="image" href={PUBLIC_HERO_IMAGE} fetchpriority="high" />
                 
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <HeroImage src={formatImagePath(heroImage)} alt={`Berita ${siteName}`} />
+                    <HeroImage src={PUBLIC_HERO_IMAGE} alt={`Berita ${siteName}`} />
                     <div className="absolute inset-0 bg-black/60"></div>
                 </div>
 

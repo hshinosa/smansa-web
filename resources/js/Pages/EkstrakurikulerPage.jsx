@@ -34,6 +34,7 @@ import Footer from '@/Components/Footer';
 import SEOHead from '@/Components/SEOHead';
 import Modal from '@/Components/Modal';
 import ResponsiveImage, { HeroImage } from '@/Components/ResponsiveImage';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 import { TYPOGRAPHY } from '@/Utils/typography';
 import { getNavigationData } from '@/Utils/navigationData';
 import { getPageMetadata } from '@/Utils/academicData';
@@ -411,7 +412,6 @@ const ActivityDetailModal = ({ show, onClose, activity, categoryTheme, isOrganis
 export default function EkstrakurikulerPage({ extracurriculars = [] }) {
     const { siteSettings } = usePage().props;
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
-    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
     const heroSettings = siteSettings?.hero_ekstrakurikuler || {};
 
     const navigationData = getNavigationData(siteSettings);
@@ -504,9 +504,9 @@ export default function EkstrakurikulerPage({ extracurriculars = [] }) {
             <main id="main-content" className="pt-20" tabIndex="-1">
             <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
-                    {formatImagePath(heroImage) && (
+                    {PUBLIC_HERO_IMAGE && (
                         <HeroImage 
-                            src={formatImagePath(heroImage)} 
+                            src={PUBLIC_HERO_IMAGE} 
                             alt={`Background Organisasi & Ekstrakurikuler ${siteName}`} 
                         />
                     )}

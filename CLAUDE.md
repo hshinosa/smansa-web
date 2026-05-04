@@ -175,8 +175,11 @@ AI configuration stored in `ai_settings` table and `.env`:
 Multiple compose files for different environments:
 - `docker-compose.yml` - Base configuration
 - `docker-compose.dev.yml` - Development overrides
-- `docker-compose.prod.yml` - Production configuration
-- `docker-compose.storage.yml` - Separate storage service
+- `docker-compose.local.yml` - Localhost overrides for session/cookie fixes
+
+Storage workflow:
+- `scripts/setup-separated-storage.sh` generates `.env.storage` directly
+- `scripts/migrate-storage.sh` migrates existing public storage data into the separated storage path
 
 Services:
 - **app** - PHP-FPM application container
@@ -185,6 +188,11 @@ Services:
 - **redis** - Cache and session store
 - **scheduler** - Cron jobs (Laravel scheduler)
 - **queue** - Queue worker
+
+For localhost troubleshooting, use the base stack with the local override:
+```bash
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
+```
 
 ## Important Patterns
 

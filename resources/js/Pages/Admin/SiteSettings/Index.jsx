@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { logger } from '@/Utils/logger';
 import { Head, useForm } from '@inertiajs/react';
-import { Save, Globe, Share2, Layout, Image as ImageIcon } from 'lucide-react';
+import { getImageUrl } from '@/Utils/imageUtils';
+import { Save, Globe, Share2, Layout, Image as ImageIcon, Megaphone } from 'lucide-react';
 import ContentManagementPage from '@/Components/Admin/ContentManagementPage';
 import FileUploadField from '@/Components/Admin/FileUploadField';
 import MapsPicker from '@/Components/Admin/MapsPicker';
 import toast from 'react-hot-toast';
 
-export default function Index({ auth, sections, activeSection: initialActiveSection }) {
+export default function Index({ auth, sections, posts = [], activeSection: initialActiveSection }) {
     const [activeTab, setActiveTab] = useState(initialActiveSection || 'general');
 
     // Sync activeTab with initialActiveSection whenever it changes (due to Inertia reload)
@@ -26,6 +27,7 @@ export default function Index({ auth, sections, activeSection: initialActiveSect
         { key: 'general', label: 'Umum', description: 'Pengaturan dasar situs, logo, dan informasi kontak.', icon: Globe },
         { key: 'social_media', label: 'Media Sosial', description: 'Tautan ke berbagai platform media sosial sekolah.', icon: Share2 },
         { key: 'footer', label: 'Footer', description: 'Pengaturan tampilan bagian bawah situs dan hak cipta.', icon: Layout },
+        { key: 'announcement', label: 'Pengumuman', description: 'Teks berjalan (marquee) di bawah navbar.', icon: Megaphone },
     ];
 
     const handleTabChange = (tabId) => {
@@ -113,7 +115,7 @@ export default function Index({ auth, sections, activeSection: initialActiveSect
                     <div className="flex items-center gap-4 mt-1">
                         {sections.general.site_logo && (
                             <img 
-                                src={sections.general.site_logo.startsWith('http') || sections.general.site_logo.startsWith('/') ? sections.general.site_logo : `/storage/${sections.general.site_logo}`} 
+                                src={getImageUrl(sections.general.site_logo)} 
                                 alt="Logo" 
                                 className="h-12 w-auto bg-gray-100 p-1 rounded" 
                             />
@@ -286,6 +288,126 @@ export default function Index({ auth, sections, activeSection: initialActiveSect
         </div>
     );
 
+    const renderAnnouncementForm = () => (
+        <div className="space-y-6">
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-6 space-y-4">
+                <div className="border-b pb-3">
+                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <span className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">1</span>
+                        Pengumuman Berjalan (Marquee)
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-1">Teks berjalan yang tampil di bawah navbar pada semua halaman publik</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={data.content.enabled || false}
+                            onChange={(e) => handleInputChange('enabled', e.target.checked)}
+                            className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                    <span className="text-sm font-medium text-gray-700">
+                        {data.content.enabled ? 'Aktif' : 'Nonaktif'}
+                    </span>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Teks Pengumuman</label>
+                    <textarea
+                        value={data.content.text || ''}
+                        onChange={(e) => handleInputChange('text', e.target.value)}
+                        rows={3}
+                        className="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                        placeholder="Contoh: Pengumuman Kelulusan Tahun Ajaran 2025/2026..."
+                    />
+                    <p className="text-sm text-gray-500 mt-1">Teks yang akan berjalan di bawah navbar</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Pilih Berita (Opsional)</label>
+                        <select
+                            value={data.content.link_url || ''}
+                            onChange={(e) => handleInputChange('link_url', e.target.value)}
+                            className="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                        >
+                            <option value="">— Tanpa Link —</option>
+                            {posts.map((post) => (
+                                <option key={post.id} value={post.url}>
+                                    [{post.category}] {post.title}
+                                </option>
+                            ))}
+                        </select>
+                        <p className="text-sm text-gray-500 mt-1">Pilih berita yang ingin ditautkan ke pengumuman</p>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Teks Tombol Link</label>
+                        <input
+                            type="text"
+                            value={data.content.link_text || ''}
+                            onChange={(e) => handleInputChange('link_text', e.target.value)}
+                            className="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                            placeholder="Lihat Selengkapnya"
+                        />
+                        <p className="text-sm text-gray-500 mt-1">Teks yang muncul sebagai link di akhir pengumuman</p>
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Warna Latar</label>
+                        <div className="flex items-center gap-3 mt-1">
+                            <input
+                                type="color"
+                                value={data.content.bg_color || '#1e40af'}
+                                onChange={(e) => handleInputChange('bg_color', e.target.value)}
+                                className="h-10 w-14 rounded border border-gray-300 cursor-pointer"
+                            />
+                            <input
+                                type="text"
+                                value={data.content.bg_color || '#1e40af'}
+                                onChange={(e) => handleInputChange('bg_color', e.target.value)}
+                                className="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary text-sm"
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Warna Teks</label>
+                        <div className="flex items-center gap-3 mt-1">
+                            <input
+                                type="color"
+                                value={data.content.text_color || '#ffffff'}
+                                onChange={(e) => handleInputChange('text_color', e.target.value)}
+                                className="h-10 w-14 rounded border border-gray-300 cursor-pointer"
+                            />
+                            <input
+                                type="text"
+                                value={data.content.text_color || '#ffffff'}
+                                onChange={(e) => handleInputChange('text_color', e.target.value)}
+                                className="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary text-sm"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {data.content.enabled && data.content.text && (
+                    <div className="mt-4 border-t pt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Pratinjau</label>
+                        <div
+                            className="relative overflow-hidden py-2.5 rounded-lg"
+                            style={{ backgroundColor: data.content.bg_color || '#1e40af', color: data.content.text_color || '#ffffff' }}
+                        >
+                            <div className="animate-marquee whitespace-nowrap flex items-center gap-16">
+                                <span className="text-sm font-medium px-4">{data.content.text}</span>
+                                <span className="text-sm font-medium px-4">{data.content.text}</span>
+                                <span className="text-sm font-medium px-4">{data.content.text}</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+
     return (
         <ContentManagementPage
             headerTitle="Pengaturan Situs"
@@ -300,6 +422,7 @@ export default function Index({ auth, sections, activeSection: initialActiveSect
             {activeTab === 'general' && renderGeneralForm()}
             {activeTab === 'social_media' && renderSocialMediaForm()}
             {activeTab === 'footer' && renderFooterForm()}
+            {activeTab === 'announcement' && renderAnnouncementForm()}
         </ContentManagementPage>
     );
 }

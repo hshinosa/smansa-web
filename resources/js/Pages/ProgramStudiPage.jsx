@@ -10,6 +10,7 @@ import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import SEOHead from '@/Components/SEOHead';
 import ResponsiveImage, { HeroImage } from '@/Components/ResponsiveImage';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 import { TYPOGRAPHY } from '@/Utils/typography';
 import { getNavigationData } from '@/Utils/navigationData';
 import { programStudyData, getPageMetadata } from '@/Utils/academicData';
@@ -31,17 +32,13 @@ const formatImagePath = (path) => {
 export default function ProgramStudiPage({ content, programName }) {
     const { siteSettings } = usePage().props;
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
-    const globalHeroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
     const navigationData = getNavigationData(siteSettings);
     const pageMetadata = getPageMetadata(siteName);
 
     const programData = programStudyData[programName] || programStudyData.mipa;
     const { hero, core_subjects, facilities, career_paths } = content || {};
 
-    // Use hero background from controller (program-specific) or fall back to global
-    const heroBackgroundSrc = hero?.background_image?.original_url
-        || (typeof hero?.background_image === 'string' ? formatImagePath(hero.background_image) : null)
-        || formatImagePath(globalHeroImage);
+    const heroBackgroundSrc = PUBLIC_HERO_IMAGE;
 
     const DefaultSubjectIcon = iconMap[programData.defaultSubjectIcon] || Calculator;
     const DefaultCareerIcon = iconMap[programData.defaultCareerIcon] || Stethoscope;
@@ -52,7 +49,7 @@ export default function ProgramStudiPage({ content, programName }) {
                 title={hero?.title || pageMetadata?.[programName]?.title}
                 description={hero?.description || pageMetadata?.[programName]?.description}
                 keywords={programData.seoKeywords}
-                image={heroBackgroundSrc}
+                image={PUBLIC_HERO_IMAGE}
             />
 
             <Navbar

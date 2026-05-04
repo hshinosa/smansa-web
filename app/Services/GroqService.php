@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Log;
 
 class GroqService
 {
-    protected const BASE_URL = 'https://api.groq.com/openai/v1';
+    protected string $baseUrl;
+
+    protected const DEFAULT_BASE_URL = 'https://api.groq.com/openai/v1';
 
     protected const CHAT_TIMEOUT = 120;
 
@@ -25,6 +27,7 @@ class GroqService
 
     public function __construct()
     {
+        $this->baseUrl = rtrim(env('AI_MODEL_BASE_URL', self::DEFAULT_BASE_URL), '/');
         $this->loadSettings();
     }
 
@@ -256,7 +259,7 @@ class GroqService
                 'Content-Type' => 'application/json',
             ])->timeout(self::CHAT_TIMEOUT)
                 ->connectTimeout(30)
-                ->post(self::BASE_URL.'/chat/completions', $payload);
+                ->post($this->baseUrl.'/chat/completions', $payload);
 
             $elapsed = round((microtime(true) - $startTime) * 1000);
 
@@ -355,7 +358,7 @@ class GroqService
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer '.$apiKey,
-            ])->timeout(10)->get(self::BASE_URL.'/models');
+            ])->timeout(10)->get($this->baseUrl.'/models');
 
             if ($response->successful()) {
                 $data = $response->json();

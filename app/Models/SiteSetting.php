@@ -115,6 +115,14 @@ class SiteSetting extends Model implements HasMedia
                 'subtitle',
                 'image',
             ],
+            'announcement' => [
+                'enabled',
+                'text',
+                'link_url',
+                'link_text',
+                'bg_color',
+                'text_color',
+            ],
         ];
     }
 
@@ -177,6 +185,14 @@ class SiteSetting extends Model implements HasMedia
                 'title' => 'Program Unggulan',
                 'subtitle' => 'Membangun karakter dan kompetensi siswa melalui berbagai inisiatif positif.',
                 'image' => '/images/hero-bg-sman1baleendah.jpeg',
+            ],
+            'announcement' => [
+                'enabled' => true,
+                'text' => 'Pengumuman Kelulusan Tahun Ajaran 2025/2026 - Selamat kepada seluruh peserta didik kelas XII SMAN 1 Baleendah yang telah dinyatakan LULUS!',
+                'link_url' => '',
+                'link_text' => 'Lihat Selengkapnya',
+                'bg_color' => '#1e40af',
+                'text_color' => '#ffffff',
             ],
         ];
     }

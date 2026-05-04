@@ -18,6 +18,7 @@ import { TYPOGRAPHY } from '@/Utils/typography';
 import { getNavigationData } from '@/Utils/navigationData';
 import { usePage } from '@inertiajs/react';
 import { ThumbnailImage, ContentImage, HeroImage } from '@/Components/ResponsiveImage';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -194,7 +195,6 @@ export default function AlumniPage({ auth, alumnis = [] }) {
     const { siteSettings } = usePage().props;
     const navigationData = getNavigationData(siteSettings);
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
-    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
     const [currentPage, setCurrentPage] = useState(1);
     const [isTestimonialModalOpen, setIsTestimonialModalOpen] = useState(false);
     const [selectedAlumni, setSelectedAlumni] = useState(null);
@@ -275,7 +275,7 @@ export default function AlumniPage({ auth, alumnis = [] }) {
                 {/* HERO SECTION */}
                 <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 z-0">
-                        <HeroImage src={formatImagePath(heroImage)} alt="Background Alumni" />
+                        <HeroImage src={PUBLIC_HERO_IMAGE} alt="Background Alumni" />
                         <div className="absolute inset-0 bg-black/60"></div>
                     </div>
 

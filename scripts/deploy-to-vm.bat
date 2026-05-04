@@ -62,7 +62,7 @@ echo.
 echo Next steps on VM:
 echo   1. SSH ke VM: ssh -i %SSH_KEY% %VM_USER%@%VM_HOST%
 echo   2. cd /var/www/smansa ^&^& git pull
-echo   3. docker-compose -f docker-compose.storage.yml up -d
-echo   4. docker-compose exec app php artisan storage:link
+echo   3. docker compose up -d
+echo   4. docker compose exec app php artisan storage:link
 echo.
 pause

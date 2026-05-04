@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { logger } from '@/Utils/logger';
 import { Head, router, useForm } from '@inertiajs/react';
+import { getImageUrl } from '@/Utils/imageUtils';
 import { Plus, Edit2, Trash2, Search, EyeOff, CheckCircle, CalendarDays } from 'lucide-react';
 import Modal from '@/Components/Modal';
 import TextInput from '@/Components/TextInput';
@@ -200,7 +201,7 @@ export default function AcademicCalendarContentPage({ contents, filters }) {
                                                 <div className="flex-shrink-0 h-12 w-12">
                                                     <img
                                                         className="h-12 w-12 rounded object-cover border"
-                                                        src={content.calendar_imagesImage?.original_url || content.calendar_image_url}
+                                                        src={getImageUrl(content.calendar_imagesImage?.original_url || content.calendar_image_url)}
                                                         alt={content.title}
                                                         onError={(e) => {
                                                             e.target.src = 'https://placehold.co/48x48/E5E7EB/9CA3AF?text=IMG';
@@ -368,7 +369,7 @@ export default function AcademicCalendarContentPage({ contents, filters }) {
                                         }
                                     }}
                                     error={errors.calendar_image}
-                                    description="Pilih file gambar kalender akademik (JPG, PNG, GIF, SVG - Maksimal 2MB)"
+                                    description="Pilih file gambar kalender akademik (JPG, PNG, GIF, WebP - Maksimal 10MB)"
                                 />
                             </div>
                         </div>

@@ -22,6 +22,7 @@ import {
 import Navbar from '@/Components/Navbar';
 import SEOHead from '@/Components/SEOHead';
 import { HeroImage } from '@/Components/ResponsiveImage';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 import SanitizedContent from '@/Components/SanitizedContent';
 import Footer from '@/Components/Footer';
 import { TYPOGRAPHY } from '@/Utils/typography';
@@ -166,8 +167,6 @@ export default function InformasiSpmbPage({ spmbData }) {
         : fallbackFaqData;
 
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
-    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
-
     const renderHighlightedTitle = (title) => {
         if (!title) return null;
         
@@ -217,7 +216,7 @@ export default function InformasiSpmbPage({ spmbData }) {
                 title={`${pengaturan_umum?.title || "Informasi PPDB"} 2025 - ${siteName}`}
                 description="Informasi lengkap Penerimaan Peserta Didik Baru (PPDB) 2025 SMAN 1 Baleendah. Jadwal, syarat, jalur pendaftaran (zonasi, prestasi, afirmasi, perpindahan), prosedur, dan FAQ."
                 keywords="PPDB 2025, PPDB Bandung, pendaftaran SMA, jalur zonasi, jalur prestasi, PPDB online, SMAN 1 Baleendah"
-                image={pengaturan_umum?.hero_background_image || "/images/ppdb-2025-banner.jpg"}
+                image={PUBLIC_HERO_IMAGE}
             />
             
             <Navbar
@@ -233,7 +232,7 @@ export default function InformasiSpmbPage({ spmbData }) {
                 <section className="relative min-h-[600px] lg:h-[85vh] flex items-center overflow-hidden pt-36 pb-16 lg:pt-44 lg:pb-20">
                     {/* Background Image with Overlay */}
                     <div className="absolute inset-0">
-                        <img src={formatImagePath(heroImage)} alt="" className="w-full h-full object-cover" />
+                        <HeroImage src={PUBLIC_HERO_IMAGE} alt={`Gedung ${siteName}`} />
                         <div className="absolute inset-0 bg-black/50"></div>
                     </div>
                     

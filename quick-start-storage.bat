@@ -44,7 +44,7 @@ echo.
 
 REM Start Docker
 echo [4/4] Starting Docker containers...
-docker-compose -f docker-compose.storage.yml up -d
+docker compose up -d
 echo.
 
 echo ===================================
@@ -54,8 +54,8 @@ echo.
 echo Storage location: %STORAGE_PATH%
 echo.
 echo Langkah selanjutnya:
-echo   1. Tunggu container ready (docker-compose -f docker-compose.storage.yml logs -f)
-echo   2. Buat storage link: docker-compose -f docker-compose.storage.yml exec app php artisan storage:link
+echo   1. Tunggu container ready (docker compose logs -f)
+echo   2. Buat storage link: docker compose exec app php artisan storage:link
 echo   3. Akses web: http://localhost
 echo.
 echo Untuk info lebih lanjut, lihat: docs\SEPARATED_STORAGE.md

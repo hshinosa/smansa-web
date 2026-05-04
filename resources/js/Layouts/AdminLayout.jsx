@@ -28,15 +28,11 @@ const getIconComponent = (iconName) => {
 const SidebarItem = ({ href, icon: Icon, children, isActive, hasSubmenu, isOpen, onToggle, level = 0, isMobile = false, showAlert = false }) => {
     const activeClass = isActive 
         ? 'bg-accent-yellow text-gray-900 font-bold shadow-sm' 
-        : isMobile 
-            ? 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-            : 'text-white hover:bg-white/10 hover:text-white';
+        : 'text-white hover:bg-white/10 hover:text-white';
     
     const iconClass = isActive 
         ? 'text-gray-900' 
-        : isMobile 
-            ? 'text-gray-600' 
-            : 'text-white';
+        : 'text-white';
     
     const IconComponent = Icon ? getIconComponent(Icon) : null;
     const paddingLeft = level === 0 ? 'pl-4' : `pl-${8 + level * 4}`;
@@ -81,9 +77,7 @@ const SidebarItem = ({ href, icon: Icon, children, isActive, hasSubmenu, isOpen,
 const SubmenuItem = ({ href, children, isActive, level = 1, isMobile = false }) => {
     const activeClass = isActive 
         ? 'text-primary font-bold bg-primary/5 border-l-4 border-primary' 
-        : isMobile
-            ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-            : 'text-white hover:text-white hover:bg-white/5';
+        : 'text-white hover:text-white hover:bg-white/5';
     
     return (
         <li className="my-1">
@@ -367,19 +361,19 @@ export default function AdminLayout({ children, headerTitle = "Dashboard Utama" 
                             leaveFrom="translate-x-0"
                             leaveTo="-translate-x-full"
                         >
-                            <div className="relative flex flex-col w-80 max-w-[calc(100%-4rem)] bg-white h-full shadow-2xl">
+                            <div className="relative flex flex-col w-80 max-w-[calc(100%-4rem)] bg-primary h-full shadow-2xl text-white border-r border-white/10">
                                 {/* Mobile Header */}
-                                <div className="p-4 border-b flex justify-between items-center bg-white sticky top-0 z-10">
+                                <div className="p-4 border-b border-white/10 flex justify-between items-center bg-primary-darker/50 sticky top-0 z-10">
                                     <Link href={route('admin.dashboard')} className="flex items-center gap-3" onClick={closeMobileMenu}>
-                                        <img src={logoSekolah} alt={`Logo ${siteName}`} className="h-11 w-auto" />
+                                        <img src={logoSekolah} alt={`Logo ${siteName}`} className="h-11 w-auto bg-white/10 rounded-lg p-1" />
                                         <div>
-                                            <span className="text-sm font-bold text-gray-800 block">{siteName}</span>
-                                            <span className="text-xs text-gray-500">Admin Panel</span>
+                                            <span className="text-sm font-bold text-white block">{siteName}</span>
+                                            <span className="text-xs text-white/70">Admin Panel</span>
                                         </div>
                                     </Link>
                                     <button 
                                         onClick={closeMobileMenu} 
-                                        className="p-2.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+                                        className="p-2.5 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-colors"
                                         aria-label="Tutup menu"
                                     >
                                         <XIcon size={22} />
@@ -387,37 +381,37 @@ export default function AdminLayout({ children, headerTitle = "Dashboard Utama" 
                                 </div>
                                 
                                 {/* Mobile Navigation */}
-                                <nav className="flex-grow p-3 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                                <nav className="flex-grow p-3 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
                                     <ul>
                                         {renderNavItemsRecursive(navigationStructure, 'mobile', 0, true)}
                                     </ul>
                                 </nav>
                                 
                                 {/* Mobile Profile */}
-                                <div className="p-4 border-t border-gray-100 bg-gray-50">
-                                    <div className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm border border-gray-200">
+                                <div className="p-4 border-t border-white/10 bg-primary-darker/30">
+                                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10">
                                         <div className="flex items-center gap-3 min-w-0">
                                             <div className="relative flex-shrink-0">
                                                 <img 
                                                     src={logoSekolah} 
                                                     alt="Profil Admin" 
-                                                    className="h-11 w-11 rounded-full object-cover border-2 border-primary/20" 
+                                                    className="h-11 w-11 rounded-full object-cover border-2 border-white/20 bg-white" 
                                                 />
-                                                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+                                                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-primary rounded-full"></span>
                                             </div>
                                             <div className="min-w-0">
-                                                <p className="font-bold text-gray-900 text-sm truncate">{admin ? admin.username : 'Admin'}</p>
-                                                <p className="text-xs text-gray-500 capitalize">Administrator</p>
+                                                <p className="font-bold text-white text-sm truncate">{admin ? admin.username : 'Admin'}</p>
+                                                <p className="text-xs text-white/70 capitalize">Administrator</p>
                                             </div>
                                         </div>
                                         <Link 
                                             href={route('admin.logout')} 
                                             method="post" 
                                             as="button" 
-                                            className="p-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                                            className="p-2 text-red-300 hover:bg-red-500/20 hover:text-red-200 rounded-lg transition-colors ml-2 flex-shrink-0"
                                             title="Keluar"
                                         >
-                                            <LogOut size={22} />
+                                            <LogOut size={18} />
                                         </Link>
                                     </div>
                                 </div>

@@ -69,6 +69,30 @@ export default function Index({ auth, settings = {}, sectionMeta = {}, activeSec
         updateContentField(field, items);
     };
 
+    const updateNestedItemList = (field, index, nestedField, nestedIndex, value) => {
+        const items = [...(form.data.content?.[field] || [])];
+        if (!items[index][nestedField]) {
+            items[index][nestedField] = [];
+        }
+        items[index][nestedField][nestedIndex] = value;
+        updateContentField(field, items);
+    };
+
+    const addNestedItem = (field, index, nestedField, value) => {
+        const items = [...(form.data.content?.[field] || [])];
+        if (!items[index][nestedField]) {
+            items[index][nestedField] = [];
+        }
+        items[index][nestedField].push(value);
+        updateContentField(field, items);
+    };
+
+    const removeNestedItem = (field, index, nestedField, nestedIndex) => {
+        const items = [...(form.data.content?.[field] || [])];
+        items[index][nestedField].splice(nestedIndex, 1);
+        updateContentField(field, items);
+    };
+
     const addItem = (field, value) => {
         const items = [...(form.data.content?.[field] || [])];
         items.push(value);
@@ -151,7 +175,7 @@ export default function Index({ auth, settings = {}, sectionMeta = {}, activeSec
                             </div>
                         )}
 
-                        {Array.isArray(form.data.content?.items) && (
+                        {Array.isArray(form.data.content?.items) && activeTab !== 'journey' && (
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Daftar Item</label>
                                 <div className="space-y-3">
@@ -293,6 +317,99 @@ export default function Index({ auth, settings = {}, sectionMeta = {}, activeSec
                                         className="mt-2 flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
                                     >
                                         Tambah Baris
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {Array.isArray(form.data.content?.items) && activeTab === 'journey' && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Tahapan Perjalanan Kurikulum</label>
+                                <div className="space-y-6">
+                                    {form.data.content.items.map((item, idx) => (
+                                        <div key={idx} className="p-4 border rounded-xl bg-gray-50 space-y-4">
+                                            <div className="flex justify-between items-center">
+                                                <h4 className="font-semibold text-gray-800">Tahap {idx + 1}</h4>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeItem('items', idx)}
+                                                    className="text-red-500 hover:text-red-700 text-sm font-medium"
+                                                >
+                                                    Hapus Tahap Ini
+                                                </button>
+                                            </div>
+                                            
+                                            <div className="grid md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-xs font-medium text-gray-600 mb-1">Periode (Tahun)</label>
+                                                    <input
+                                                        type="text"
+                                                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                                        placeholder="Contoh: 2006-2015"
+                                                        value={item.period || ''}
+                                                        onChange={(e) => updateItemList('items', idx, { ...item, period: e.target.value })}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-gray-600 mb-1">Judul Kurikulum</label>
+                                                    <input
+                                                        type="text"
+                                                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                                        placeholder="Contoh: Kurikulum KTSP"
+                                                        value={item.title || ''}
+                                                        onChange={(e) => updateItemList('items', idx, { ...item, title: e.target.value })}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-gray-600 mb-1">Teks Lencana (Badge)</label>
+                                                    <input
+                                                        type="text"
+                                                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                                        placeholder="Contoh: KTSP 2006"
+                                                        value={item.badge || ''}
+                                                        onChange={(e) => updateItemList('items', idx, { ...item, badge: e.target.value })}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-4 border-t pt-4">
+                                                <label className="block text-xs font-medium text-gray-600 mb-2">Detail Informasi</label>
+                                                <div className="space-y-2">
+                                                    {(item.details || []).map((detail, detailIdx) => (
+                                                        <div key={detailIdx} className="flex gap-2">
+                                                            <input
+                                                                type="text"
+                                                                className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                                                placeholder={detailIdx % 2 === 0 ? "Judul Detail (Contoh: 2006-2015)" : "Isi Detail (Contoh: Kurikulum KTSP Berbasis Paket)"}
+                                                                value={detail}
+                                                                onChange={(e) => updateNestedItemList('items', idx, 'details', detailIdx, e.target.value)}
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeNestedItem('items', idx, 'details', detailIdx)}
+                                                                className="p-2 text-red-500 hover:bg-red-50 rounded-md"
+                                                            >
+                                                                Hapus
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => addNestedItem('items', idx, 'details', '')}
+                                                        className="mt-1 flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                                                    >
+                                                        Tambah Baris Detail
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() => addItem('items', { period: '', title: '', badge: '', badgeType: 'text', details: [] })}
+                                        className="mt-2 flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                                    >
+                                        Tambah Tahapan Baru
                                     </button>
                                 </div>
                             </div>

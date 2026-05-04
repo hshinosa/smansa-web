@@ -1,275 +1,283 @@
 """
-Instagram Scraper with Anti-Ban Session Management
+Instagram Scraper via Apify API
 SMAN 1 Baleendah - News Feed Automation
 
-Features:
-- Session-based authentication (persistent login)
-- Duplicate detection (via post_shortcode)
-- Random delays for human-like behavior
-- Error handling with account deactivation
-- Graceful rate limit handling
+Uses Apify's Instagram Scraper actor to fetch posts without needing
+bot accounts or direct Instagram login.
 """
 
-import instaloader
+import requests
 import time
-import random
 import argparse
 import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from models import BotAccount, RawNewsFeed, get_session
+from models import RawNewsFeed, get_session
 from sqlalchemy.exc import IntegrityError
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Fix Unicode encoding for Windows console
 if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
 
+APIFY_API_TOKEN = os.getenv('APIFY_API_TOKEN', '')
+APIFY_ACTOR_ID = 'apify~instagram-scraper'
 
-class InstagramScraper:
+
+class ApifyInstagramScraper:
     def __init__(self):
-        self.L = None
-        self.bot_account = None
         self.session = get_session()
         self.download_dir = Path("./downloads")
         self.download_dir.mkdir(exist_ok=True)
-        
-    def get_active_bot_account(self):
-        """Get first active bot account from database"""
-        account = self.session.query(BotAccount).filter_by(is_active=True).first()
-        
-        if not account:
-            print("❌ No active bot accounts found in database!")
-            print("   Please configure a bot account first:")
-            print("   1. Run: python setup_db.py")
-            print("   2. Update credentials in sc_bot_accounts table")
-            return None
-        
-        return account
-    
-    def initialize_loader(self):
-        """Initialize Instaloader with optimal settings"""
-        self.L = instaloader.Instaloader(
-            download_videos=False,           # Skip videos (faster, less bandwidth)
-            download_video_thumbnails=False,
-            download_geotags=False,
-            download_comments=False,         # Skip comments
-            save_metadata=False,             # Skip JSON metadata files
-            compress_json=False,
-            post_metadata_txt_pattern='',    # No metadata txt
-            max_connection_attempts=3,
-            request_timeout=30,
-        )
-        
-        # Set custom User-Agent to avoid detection
-        self.L.context.user_agent = (
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-            'AppleWebKit/537.36 (KHTML, like Gecko) '
-            'Chrome/120.0.0.0 Safari/537.36'
-        )
-    
-    def login_with_session(self):
+        self.api_token = APIFY_API_TOKEN
+
+    def validate_config(self):
+        """Validate Apify API token is configured"""
+        if not self.api_token:
+            print("❌ APIFY_API_TOKEN not set!")
+            print("   Set it in .env or environment variable")
+            return False
+        print(f"✓ Apify API token configured (ends with ...{self.api_token[-4:]})")
+        return True
+
+    def run_apify_actor(self, target_username, max_posts=100):
         """
-        Login using session file or credentials
-        
-        Session Flow:
-        1. Check if session file exists (session-{username})
-        2. If exists: Load session (no login needed)
-        3. If not: Perform login and save session
-        
+        Run Apify Instagram Scraper actor and wait for results.
+
+        Args:
+            target_username: Instagram username to scrape
+            max_posts: Maximum posts to retrieve
+
         Returns:
-            bool: True if login successful, False otherwise
+            list: Array of post data dicts, or None on failure
         """
-        self.bot_account = self.get_active_bot_account()
-        if not self.bot_account:
-            return False
-        
-        username = self.bot_account.username
-        password = self.bot_account.password
-        session_file = f"session-{username}"
-        
-        print(f"🔐 Authenticating as: {username}")
-        
+        print(f"\n🚀 Starting Apify Instagram Scraper...")
+        print(f"   Target: @{target_username}")
+        print(f"   Max posts: {max_posts}")
+
+        # Actor input configuration
+        actor_input = {
+            "directUrls": [f"https://www.instagram.com/{target_username}/"],
+            "resultsType": "posts",
+            "resultsLimit": max_posts,
+            "searchType": "user",
+            "searchLimit": 1,
+        }
+
+        # Start actor run
+        run_url = f"https://api.apify.com/v2/acts/{APIFY_ACTOR_ID}/runs"
+        headers = {
+            "Content-Type": "application/json",
+        }
+        params = {"token": self.api_token}
+
+        print(f"   📡 Sending request to Apify...")
+
         try:
-            # Try to load existing session
-            if os.path.exists(session_file):
-                print(f"   ✓ Session file found, loading...")
-                self.L.load_session_from_file(username, session_file)
-                print(f"   ✅ Logged in via session (no password needed)")
-            else:
-                print(f"   ⚠️  No session file found, performing login...")
-                self.L.login(username, password)
-                
-                # Save session for future use
-                self.L.save_session_to_file(session_file)
-                print(f"   ✅ Login successful, session saved to: {session_file}")
-            
-            # Update last_used_at timestamp
-            self.bot_account.last_used_at = datetime.utcnow()
-            self.session.commit()
-            
-            return True
-            
-        except instaloader.exceptions.TwoFactorAuthRequiredException:
-            print(f"   ❌ 2FA required for {username}")
-            print(f"   Please disable 2FA or use app-specific password")
-            self._deactivate_account("2FA required")
-            return False
-            
-        except instaloader.exceptions.BadCredentialsException:
-            print(f"   ❌ Invalid credentials for {username}")
-            self._deactivate_account("Invalid credentials")
-            return False
-            
-        except instaloader.exceptions.ConnectionException as e:
-            print(f"   ❌ Connection error: {e}")
-            print(f"   Possible rate limit or Instagram blocking")
-            self._deactivate_account(f"Connection error: {str(e)}")
-            return False
-            
+            response = requests.post(run_url, json=actor_input, headers=headers, params=params, timeout=30)
+
+            if response.status_code != 201:
+                print(f"   ❌ Failed to start actor: {response.status_code}")
+                print(f"      {response.text[:500]}")
+                return None
+
+            run_data = response.json()['data']
+            run_id = run_data['id']
+            print(f"   ✓ Actor run started: {run_id}")
+
         except Exception as e:
-            print(f"   ❌ Unexpected error during login: {e}")
-            return False
-    
-    def _deactivate_account(self, reason):
-        """Mark bot account as inactive in database"""
-        if self.bot_account:
-            self.bot_account.is_active = False
-            self.bot_account.notes = f"Deactivated: {reason} at {datetime.utcnow()}"
-            self.session.commit()
-            print(f"   ⚠️  Bot account deactivated in database")
-    
+            print(f"   ❌ Error starting actor: {e}")
+            return None
+
+        # Poll for completion
+        print(f"   ⏳ Waiting for results...")
+        status_url = f"https://api.apify.com/v2/actor-runs/{run_id}"
+        max_wait = 600  # 10 minutes max
+        elapsed = 0
+        poll_interval = 10
+
+        while elapsed < max_wait:
+            time.sleep(poll_interval)
+            elapsed += poll_interval
+
+            try:
+                status_resp = requests.get(status_url, params=params, timeout=15)
+                if status_resp.status_code != 200:
+                    continue
+
+                status_data = status_resp.json()['data']
+                status = status_data['status']
+
+                if status == 'SUCCEEDED':
+                    print(f"   ✅ Actor completed in {elapsed}s")
+                    break
+                elif status in ('FAILED', 'ABORTED', 'TIMED-OUT'):
+                    print(f"   ❌ Actor {status}")
+                    return None
+                else:
+                    mins = elapsed // 60
+                    secs = elapsed % 60
+                    print(f"      ... {status} ({mins}m {secs}s elapsed)")
+
+            except Exception as e:
+                print(f"      ⚠️  Poll error: {e}")
+
+        else:
+            print(f"   ❌ Timed out after {max_wait}s")
+            return None
+
+        # Fetch results from dataset
+        dataset_id = status_data.get('defaultDatasetId')
+        if not dataset_id:
+            print("   ❌ No dataset ID in run result")
+            return None
+
+        dataset_url = f"https://api.apify.com/v2/datasets/{dataset_id}/items"
+        try:
+            items_resp = requests.get(dataset_url, params={**params, "format": "json"}, timeout=60)
+            if items_resp.status_code != 200:
+                print(f"   ❌ Failed to fetch dataset: {items_resp.status_code}")
+                return None
+
+            items = items_resp.json()
+            print(f"   📦 Retrieved {len(items)} items from dataset")
+            return items
+
+        except Exception as e:
+            print(f"   ❌ Error fetching dataset: {e}")
+            return None
+
     def is_already_scraped(self, shortcode):
         """Check if post already exists in database"""
         exists = self.session.query(RawNewsFeed).filter_by(post_shortcode=shortcode).first()
         return exists is not None
-    
-    def scrape_profile(self, target_username, max_posts=50):
-        """
-        Scrape posts from a target Instagram profile
-        
-        Args:
-            target_username (str): Instagram username to scrape
-            max_posts (int): Maximum number of posts to scrape
-        """
-        print(f"\n📸 Scraping Instagram profile: @{target_username}")
-        print(f"   Max posts: {max_posts}")
-        print(f"   Download directory: {self.download_dir.absolute()}\n")
-        
+
+    def download_image(self, url, target_dir, filename):
+        """Download image from URL to local path"""
         try:
-            # Load profile
-            profile = instaloader.Profile.from_username(self.L.context, target_username)
-            
-            print(f"✓ Profile loaded:")
-            print(f"  - Full Name: {profile.full_name}")
-            print(f"  - Posts: {profile.mediacount}")
-            print(f"  - Followers: {profile.followers}")
-            print(f"  - Following: {profile.followees}\n")
-            
-            # Create target-specific download directory
-            target_dir = self.download_dir / target_username
-            target_dir.mkdir(exist_ok=True)
-            
-            scraped_count = 0
-            skipped_count = 0
-            error_count = 0
-            
-            # Iterate through posts
-            for i, post in enumerate(profile.get_posts(), 1):
-                if i > max_posts:
-                    print(f"\n⏸️  Reached max posts limit ({max_posts})")
-                    break
-                
-                shortcode = post.shortcode
-                
-                # Check for duplicates
-                if self.is_already_scraped(shortcode):
-                    print(f"[{i:3d}] ⏭️  Skipped (duplicate): {shortcode}")
-                    skipped_count += 1
-                    continue
-                
-                try:
-                    print(f"[{i:3d}] 📥 Downloading: {shortcode}...")
-                    
-                    # Download post
-                    self.L.download_post(post, target=str(target_dir))
-                    
-                    # Find downloaded image paths
-                    image_files = list(target_dir.glob(f"*{shortcode}*.jpg")) + \
-                                 list(target_dir.glob(f"*{shortcode}*.png"))
-                    
-                    image_paths = [str(f.relative_to(self.download_dir)) for f in image_files]
-                    
-                    # Save to database
-                    feed = RawNewsFeed(
-                        post_shortcode=shortcode,
-                        source_username=target_username,
-                        caption=post.caption if post.caption else '',
-                        image_paths=image_paths,
-                        likes_count=post.likes,
-                        comments_count=post.comments,
-                        post_date=post.date_utc,
-                        scraped_at=datetime.utcnow(),
-                        is_processed=False  # Ready for AI processing
-                    )
-                    
-                    self.session.add(feed)
-                    self.session.commit()
-                    
-                    print(f"      ✅ Saved to database")
-                    print(f"      📷 Images: {len(image_paths)}")
-                    print(f"      ❤️  Likes: {post.likes}")
-                    scraped_count += 1
-                    
-                    # Human-like delay (10-20 seconds)
-                    delay = random.randint(10, 20)
-                    print(f"      😴 Sleeping {delay}s...\n")
-                    time.sleep(delay)
-                    
-                except IntegrityError:
-                    self.session.rollback()
-                    print(f"      ⚠️  Database constraint error (duplicate?)")
-                    skipped_count += 1
-                    
-                except instaloader.exceptions.QueryReturnedNotFoundException:
-                    print(f"      ❌ Post not found or deleted")
-                    error_count += 1
-                    
-                except instaloader.exceptions.ConnectionException as e:
-                    print(f"      ❌ Connection error: {e}")
-                    print(f"      ⏸️  Pausing for 60 seconds...")
-                    time.sleep(60)
-                    error_count += 1
-                    
-                except Exception as e:
-                    print(f"      ❌ Error: {e}")
-                    error_count += 1
-            
-            # Summary
-            print("\n╔══════════════════════════════════════════════════════════════════════════════╗")
-            print("║                           SCRAPING COMPLETED                                 ║")
-            print("╚══════════════════════════════════════════════════════════════════════════════╝\n")
-            print(f"📊 Summary:")
-            print(f"   ✅ Successfully scraped: {scraped_count}")
-            print(f"   ⏭️  Skipped (duplicates): {skipped_count}")
-            print(f"   ❌ Errors: {error_count}")
-            print(f"   📁 Download directory: {target_dir.absolute()}")
-            print()
-            print(f"Next Steps:")
-            print(f"   1️⃣  Check scraped data: SELECT * FROM sc_raw_news_feeds WHERE is_processed=false;")
-            print(f"   2️⃣  Run AI News Generator to process feeds")
-            print()
-            
-        except instaloader.exceptions.ProfileNotExistsException:
-            print(f"❌ Profile @{target_username} does not exist")
-            
-        except instaloader.exceptions.LoginRequiredException:
-            print(f"❌ Login required (session expired?)")
-            print(f"   Delete session file and try again")
-            
+            resp = requests.get(url, timeout=30, stream=True)
+            if resp.status_code == 200:
+                filepath = target_dir / filename
+                with open(filepath, 'wb') as f:
+                    for chunk in resp.iter_content(8192):
+                        f.write(chunk)
+                return str(filepath.relative_to(self.download_dir))
         except Exception as e:
-            print(f"❌ Fatal error: {e}")
-    
+            print(f"      ⚠️  Image download failed: {e}")
+        return None
+
+    def process_results(self, items, target_username):
+        """
+        Process Apify results and save to database.
+
+        Args:
+            items: List of post data from Apify
+            target_username: Source username
+        """
+        print(f"\n📝 Processing {len(items)} posts...")
+
+        target_dir = self.download_dir / target_username
+        target_dir.mkdir(exist_ok=True)
+
+        scraped_count = 0
+        skipped_count = 0
+        error_count = 0
+
+        for i, item in enumerate(items, 1):
+            shortcode = item.get('shortCode') or item.get('id', f'unknown_{i}')
+
+            # Check for duplicates
+            if self.is_already_scraped(shortcode):
+                print(f"[{i:3d}] ⏭️  Skipped (duplicate): {shortcode}")
+                skipped_count += 1
+                continue
+
+            try:
+                # Extract post data
+                caption = item.get('caption', '') or ''
+                likes = item.get('likesCount', 0) or 0
+                comments = item.get('commentsCount', 0) or 0
+
+                # Parse post date
+                post_date = None
+                timestamp = item.get('timestamp')
+                if timestamp:
+                    try:
+                        post_date = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+                    except (ValueError, AttributeError):
+                        post_date = datetime.utcnow()
+
+                # Download images
+                image_paths = []
+                display_url = item.get('displayUrl')
+                if display_url:
+                    filename = f"{shortcode}_0.jpg"
+                    path = self.download_image(display_url, target_dir, filename)
+                    if path:
+                        image_paths.append(path)
+
+                # Handle carousel/sidecar posts (multiple images)
+                images = item.get('images') or item.get('childPosts') or []
+                for idx, img in enumerate(images):
+                    if isinstance(img, str):
+                        img_url = img
+                    elif isinstance(img, dict):
+                        img_url = img.get('displayUrl') or img.get('url')
+                    else:
+                        continue
+                    if img_url:
+                        filename = f"{shortcode}_{idx + 1}.jpg"
+                        path = self.download_image(img_url, target_dir, filename)
+                        if path:
+                            image_paths.append(path)
+
+                # Save to database
+                feed = RawNewsFeed(
+                    post_shortcode=shortcode,
+                    source_username=target_username,
+                    caption=caption,
+                    image_paths=image_paths,
+                    likes_count=likes,
+                    comments_count=comments,
+                    post_date=post_date,
+                    scraped_at=datetime.utcnow(),
+                    is_processed=False
+                )
+
+                self.session.add(feed)
+                self.session.commit()
+
+                print(f"[{i:3d}] ✅ {shortcode} | 📷 {len(image_paths)} imgs | ❤️  {likes}")
+                scraped_count += 1
+
+            except IntegrityError:
+                self.session.rollback()
+                print(f"[{i:3d}] ⚠️  Duplicate (DB constraint): {shortcode}")
+                skipped_count += 1
+
+            except Exception as e:
+                self.session.rollback()
+                print(f"[{i:3d}] ❌ Error: {e}")
+                error_count += 1
+
+        # Summary
+        print("\n" + "=" * 70)
+        print("                        SCRAPING COMPLETED")
+        print("=" * 70)
+        print(f"\n📊 Summary:")
+        print(f"   ✅ Successfully scraped: {scraped_count}")
+        print(f"   ⏭️  Skipped (duplicates): {skipped_count}")
+        print(f"   ❌ Errors: {error_count}")
+        print(f"   📁 Download directory: {target_dir.absolute()}")
+        print()
+        print(f"Next Steps:")
+        print(f"   1️⃣  Check scraped data: SELECT * FROM sc_raw_news_feeds WHERE is_processed=false;")
+        print(f"   2️⃣  Laravel queue worker will process feeds via AI")
+        print()
+
     def cleanup(self):
         """Close database session"""
         self.session.close()
@@ -277,54 +285,53 @@ class InstagramScraper:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Instagram Scraper for SMAN 1 Baleendah News Feed',
+        description='Instagram Scraper (Apify) for SMAN 1 Baleendah News Feed',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python scraper.py --target jokowi
+  python scraper.py --target sman1baleendah
   python scraper.py --target sman1baleendah --max-posts 100
-  
-Setup:
-  1. Configure bot account: python setup_db.py
-  2. Update credentials in database (sc_bot_accounts table)
-  3. Run scraper with target username
         """
     )
-    
+
     parser.add_argument(
         '--target',
         type=str,
         required=True,
         help='Target Instagram username to scrape'
     )
-    
+
     parser.add_argument(
         '--max-posts',
         type=int,
         default=50,
         help='Maximum number of posts to scrape (default: 50)'
     )
-    
+
     args = parser.parse_args()
-    
+
     # Initialize scraper
-    scraper = InstagramScraper()
-    scraper.initialize_loader()
-    
-    # Login
-    if not scraper.login_with_session():
-        print("\n❌ Login failed. Cannot proceed with scraping.")
+    scraper = ApifyInstagramScraper()
+
+    # Validate config
+    if not scraper.validate_config():
         scraper.cleanup()
         return
-    
-    # Start scraping
+
+    # Run Apify actor
     try:
-        scraper.scrape_profile(args.target, args.max_posts)
+        items = scraper.run_apify_actor(args.target, args.max_posts)
+
+        if items:
+            scraper.process_results(items, args.target)
+        else:
+            print("\n❌ No results returned from Apify")
+
     except KeyboardInterrupt:
         print("\n\n⚠️  Scraping interrupted by user")
     finally:
         scraper.cleanup()
-        print("👋 Goodbye!")
+        print("👋 Done!")
 
 
 if __name__ == "__main__":

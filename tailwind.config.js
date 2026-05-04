@@ -87,6 +87,7 @@ export default {
                 'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
                 'scroll': 'scroll 80s linear infinite',
                 'scroll-reverse': 'scroll-reverse 80s linear infinite',
+                'marquee': 'marquee 20s linear infinite',
             },
             keyframes: {
                 float: {
@@ -104,6 +105,10 @@ export default {
                 'scroll-reverse': {
                     '0%': { transform: 'translateX(-50%)' },
                     '100%': { transform: 'translateX(0)' },
+                },
+                marquee: {
+                    '0%': { transform: 'translateX(0)' },
+                    '100%': { transform: 'translateX(-33.33%)' },
                 }
             }
     	}

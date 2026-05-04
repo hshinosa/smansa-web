@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, usePage, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import { getImageUrl } from '@/Utils/imageUtils';
 import { 
     Shirt, 
     Plus, 
@@ -94,7 +95,7 @@ export default function SeragamPage({ seragams = [] }) {
             sort_order: seragam.sort_order || 0,
             is_active: seragam.is_active,
             image: null,
-            image_preview: seragam.image_url || null,
+            image_preview: getImageUrl(seragam.image_url) || null,
         });
         setEditingId(seragam.id);
         setIsEditMode(true);
@@ -233,7 +234,7 @@ export default function SeragamPage({ seragams = [] }) {
                                                 <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
                                                     {seragam.image_url ? (
                                                         <img 
-                                                            src={seragam.image_url} 
+                                                            src={getImageUrl(seragam.image_url)} 
                                                             alt={seragam.name}
                                                             className="w-full h-full object-cover"
                                                         />
@@ -333,7 +334,7 @@ export default function SeragamPage({ seragams = [] }) {
                                     <div className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 overflow-hidden bg-gray-50 flex items-center justify-center">
                                         {formData.image_preview ? (
                                             <img 
-                                                src={formData.image_preview} 
+                                                src={formData.image_preview.startsWith('blob:') ? formData.image_preview : getImageUrl(formData.image_preview)} 
                                                 alt="Preview" 
                                                 className="w-full h-full object-cover"
                                             />

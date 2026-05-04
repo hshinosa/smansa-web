@@ -5,10 +5,10 @@ import { getImageUrl } from '@/Utils/imageUtils';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { Plus, Trash2 } from 'lucide-react';
 
-export default function FacilitiesSection({ data, setData, errors }) {
+export default function FacilitiesSection({ data, setData }) {
     const addItem = () => {
         const currentItems = Array.isArray(data.items) ? data.items : [];
-        setData('items', [...currentItems, { title: '', image: null }]);
+        setData('items', [...currentItems, { name: '', image: null }]);
     };
 
     const removeItem = (index) => {
@@ -69,6 +69,16 @@ export default function FacilitiesSection({ data, setData, errors }) {
                         />
                     </div>
                     <div>
+                        <InputLabel htmlFor="main_description" value="Deskripsi Fasilitas Utama" />
+                        <textarea
+                            id="main_description"
+                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                            rows="4"
+                            value={data.main_description || ''}
+                            onChange={(e) => setData('main_description', e.target.value)}
+                        />
+                    </div>
+                    <div>
                         <FileUploadField
                             id="main_fac_image"
                             previewUrl={getImageUrl(data.main_image)}
@@ -117,8 +127,8 @@ export default function FacilitiesSection({ data, setData, errors }) {
                                     <TextInput
                                         type="text"
                                         className="mt-1 block w-full"
-                                        value={item.title || ''}
-                                        onChange={(e) => updateItem(index, 'title', e.target.value)}
+                                        value={item.name || ''}
+                                        onChange={(e) => updateItem(index, 'name', e.target.value)}
                                     />
                                 </div>
                                 <div>

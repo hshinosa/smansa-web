@@ -2,6 +2,7 @@ import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import SEOHead from '@/Components/SEOHead';
 import ResponsiveImage, { HeroImage } from '@/Components/ResponsiveImage';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 import { getNavigationData } from '@/Utils/navigationData';
 import { TYPOGRAPHY } from '@/Utils/typography';
 import { normalizeUrl } from '@/Utils/imageUtils';
@@ -23,8 +24,6 @@ export default function SeragamPage({ seragams = [] }) {
     const { siteSettings } = usePage().props;
     const navigationData = getNavigationData(siteSettings);
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
-    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
-
     const renderHighlightedTitle = (title) => {
         if (!title) return 'Informasi Seragam';
         const words = title.split(' ');
@@ -88,7 +87,7 @@ export default function SeragamPage({ seragams = [] }) {
                 {/* Hero Section */}
                 <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 z-0">
-                        <HeroImage src={normalizeUrl(heroImage)} alt="Background Informasi Seragam" />
+                        <HeroImage src={PUBLIC_HERO_IMAGE} alt="Background Informasi Seragam" />
                         <div className="absolute inset-0 bg-black/60"></div>
                     </div>
 

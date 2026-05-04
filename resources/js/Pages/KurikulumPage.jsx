@@ -17,6 +17,7 @@ import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import SEOHead from '@/Components/SEOHead';
 import ResponsiveImage, { HeroImage } from '@/Components/ResponsiveImage';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 
 // Import utilities
 import { TYPOGRAPHY } from '@/Utils/typography';
@@ -27,7 +28,6 @@ import { usePage, Link } from '@inertiajs/react';
 export default function KurikulumPage({ curriculumData }) {
     const { siteSettings } = usePage().props;
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
-    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
     const navigationData = getNavigationData(siteSettings);
     const pageMetadata = getPageMetadata(siteName);
     const {
@@ -42,13 +42,6 @@ export default function KurikulumPage({ curriculumData }) {
         infographic_deep_learning,
         infographic_education_2045,
     } = curriculumData || {};
-
-    const formatImagePath = (path) => {
-        if (!path) return null;
-        if (typeof path !== 'string') return null;
-        if (path.startsWith('http') || path.startsWith('/')) return path;
-        return `/storage/${path}`;
-    };
 
     const renderHighlightedTitle = (title) => {
         if (!title) return null;
@@ -70,7 +63,7 @@ export default function KurikulumPage({ curriculumData }) {
         return info?.image?.original_url || info?.image_url;
     };
 
-    const curriculumJourney = [
+    const curriculumJourney = curriculumData?.journey?.items || [
         {
             period: '2006-2015',
             title: 'Kurikulum KTSP',
@@ -100,10 +93,13 @@ export default function KurikulumPage({ curriculumData }) {
                 '2022-Sekarang',
                 'Kurikulum Merdeka Berbasis SKS',
             ],
-            badge: '/storage/c9e1074f5b3f9fc8ea15d152add07294/KURIKULUM.JPG',
-            badgeType: 'image',
+            badge: 'Merdeka',
+            badgeType: 'text',
         },
     ];
+
+    const journeyTitle = curriculumData?.journey?.title || 'Perjalanan Kurikulum di SMAN 1 Baleendah';
+    const journeyDescription = curriculumData?.journey?.description || 'Perjalanan implementasi kurikulum di sekolah kami terus berkembang mengikuti arah kebijakan pendidikan nasional hingga saat ini menggunakan Kurikulum Merdeka.';
 
     return (
         <div className="bg-white min-h-screen font-sans text-gray-800 flex flex-col">
@@ -126,7 +122,7 @@ export default function KurikulumPage({ curriculumData }) {
             {/* ═══ 1. HERO ═══ */}
             <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
-                    <HeroImage src={formatImagePath(heroImage)} media={hero?.image} alt="Background Kurikulum" />
+                    <HeroImage src={PUBLIC_HERO_IMAGE} alt="Background Kurikulum" />
                     <div className="absolute inset-0 bg-black/60"></div>
                 </div>
 
@@ -144,8 +140,8 @@ export default function KurikulumPage({ curriculumData }) {
             <section className="py-16 bg-white">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center max-w-3xl mx-auto mb-12">
-                        <h2 className={`${TYPOGRAPHY.sectionHeading} mb-4`}>Perjalanan Kurikulum di SMAN 1 Baleendah</h2>
-                        <p className={TYPOGRAPHY.bodyText}>Perjalanan implementasi kurikulum di sekolah kami terus berkembang mengikuti arah kebijakan pendidikan nasional hingga saat ini menggunakan Kurikulum Merdeka.</p>
+                        <h2 className={`${TYPOGRAPHY.sectionHeading} mb-4`}>{journeyTitle}</h2>
+                        <p className={TYPOGRAPHY.bodyText}>{journeyDescription}</p>
                     </div>
 
                     <div className="grid gap-6 md:grid-cols-3 items-start">
@@ -165,7 +161,7 @@ export default function KurikulumPage({ curriculumData }) {
                                 <h3 className="mb-6 text-[2rem] font-bold leading-tight">{item.title}</h3>
 
                                 <div className="space-y-5 text-white/95">
-                                    {item.details.map((detail, detailIdx) => (
+                                    {(item.details || []).map((detail, detailIdx) => (
                                         <div key={detailIdx}>
                                             <div className={`text-xl font-bold ${detailIdx % 2 === 0 ? '' : 'sr-only'}`}>{detailIdx % 2 === 0 ? detail : ''}</div>
                                             {detailIdx % 2 === 1 && <div className="text-xl leading-relaxed">{detail}</div>}

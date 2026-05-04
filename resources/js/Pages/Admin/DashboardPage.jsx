@@ -1,17 +1,14 @@
 // FILE: resources/js/Pages/Admin/DashboardPage.jsx
 // Fully responsive admin dashboard for desktop, tablet, and mobile
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, usePage, Link } from '@inertiajs/react';
 import { logger } from '@/Utils/logger';
 import AdminLayout from '@/Layouts/AdminLayout';
 import axios from 'axios';
 import Modal from '@/Components/Modal';
 import toast from 'react-hot-toast';
-import { Search, X, CalendarDays, ChevronLeft, ChevronRight, ExternalLink, AlertCircle, Info, Clock, Mail, Eye, FileText, Users, LayoutGrid } from 'lucide-react';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+import { Search, X, ChevronLeft, ChevronRight, ExternalLink, Info, Clock, Mail, Eye, FileText, Users } from 'lucide-react';
 
 // Responsive Stat Card Component
 const StatCard = ({ title, value, icon: Icon, href, color = 'blue' }) => {
@@ -39,115 +36,10 @@ const StatCard = ({ title, value, icon: Icon, href, color = 'blue' }) => {
     );
 };
 
-// Responsive Chart Component
-const VisitorStatsChart = ({ chartData, loading, error, periodType }) => {
-    if (loading) {
-        return (
-            <div className="w-full h-64 sm:h-72 lg:h-80 bg-gray-100 rounded-xl flex flex-col items-center justify-center text-gray-500 p-4">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mb-3"></div>
-                <p className="text-sm font-medium">Memuat data chart...</p>
-            </div>
-        );
-    }
-
-    if (error && (!chartData || !chartData.labels || chartData.labels.length === 0)) {
-        return (
-            <div className="w-full h-64 sm:h-72 lg:h-80 bg-red-50 border border-red-200 rounded-xl flex flex-col items-center justify-center text-red-600 p-4 sm:p-6 text-center">
-                <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mb-3" />
-                <p className="font-semibold text-base sm:text-lg">Gagal memuat data chart</p>
-                <p className="text-sm text-red-500 mt-1">{error}</p>
-            </div>
-        );
-    }
-
-    if (!chartData || !chartData.labels || !chartData.data || chartData.labels.length === 0) {
-        return (
-            <div className="w-full h-64 sm:h-72 lg:h-80 bg-gray-50 border border-gray-200 rounded-xl flex flex-col items-center justify-center text-gray-500 p-4">
-                <Info size={32} className="sm:w-10 sm:h-10 text-gray-300 mb-3" />
-                <p className="font-medium text-sm sm:text-base">Tidak ada data kunjungan</p>
-            </div>
-        );
-    }
-
-    const dataConfig = {
-        labels: chartData.labels,
-        datasets: [
-            {
-                label: `Kunjungan - ${periodType === 'hourly' ? 'Per Jam' : 'Per Hari'}`,
-                data: chartData.data,
-                fill: true,
-                backgroundColor: 'rgba(13, 71, 161, 0.1)',
-                borderColor: '#0D47A1',
-                tension: 0.4,
-                pointBackgroundColor: '#0D47A1',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: '#0D47A1',
-                borderWidth: 2,
-                pointRadius: 3,
-                pointHoverRadius: 5,
-            },
-        ],
-    };
-
-    const optionsConfig = {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: { 
-                beginAtZero: true, 
-                ticks: { 
-                    precision: 0, 
-                    color: '#6B7280',
-                    font: { size: 11 }
-                }, 
-                grid: { color: '#E5E7EB' } 
-            },
-            x: { 
-                ticks: { 
-                    color: '#6B7280',
-                    font: { size: 10 },
-                    maxRotation: 45,
-                    minRotation: 0,
-                }, 
-                grid: { display: false } 
-            }
-        },
-        plugins: {
-            legend: { 
-                display: true, 
-                position: 'bottom', 
-                labels: { 
-                    boxWidth: 12, 
-                    padding: 15, 
-                    color: '#374151',
-                    font: { size: 11 }
-                } 
-            },
-            tooltip: {
-                mode: 'index', 
-                intersect: false,
-                titleFont: { weight: 'bold', size: 12 },
-                bodyFont: { size: 11 },
-                padding: 10,
-                backgroundColor: '#1F2937',
-                cornerRadius: 8,
-            }
-        },
-        interaction: { mode: 'index', intersect: false },
-    };
-
-    return (
-        <div className="h-64 sm:h-72 lg:h-80 w-full">
-            <Line options={optionsConfig} data={dataConfig} />
-        </div>
-    );
-};
-
 const ITEMS_PER_LOG_PAGE_MODAL = 10;
 
 export default function DashboardPage() {
-    const { auth, unreadMessagesCount } = usePage().props;
+    const { unreadMessagesCount, activePostsCount, teachersCount } = usePage().props;
     const [showActivityModal, setShowActivityModal] = useState(false);
     const [allActivityLogs, setAllActivityLogs] = useState([]);
     const [filteredActivityLogsInModal, setFilteredActivityLogsInModal] = useState([]);
@@ -158,83 +50,6 @@ export default function DashboardPage() {
     const [loadingLogsModal, setLoadingLogsModal] = useState(false);
     const [dashboardActivityLogs, setDashboardActivityLogs] = useState([]);
     const [loadingDashboardLogs, setLoadingDashboardLogs] = useState(false);
-
-    const [visitorStats, setVisitorStats] = useState({
-        total: null,
-        totalMessage: "Memuat data...",
-        totalLoading: true,
-        totalError: null,
-        dailyChart: null,
-        chartLoading: true,
-        chartError: null,
-        lastCached: null,
-        period: '7d',
-        periodType: 'daily',
-    });
-
-    const fetchAllVisitorData = useCallback(async (currentPeriod) => {
-        setVisitorStats(prev => ({
-            ...prev,
-            totalLoading: true,
-            chartLoading: true,
-            totalError: null,
-            chartError: null,
-            totalMessage: `Memuat data...`
-        }));
-
-        let totalData = null;
-        let chartResponseData = null;
-        let combinedMessage = `Data kunjungan`;
-        let cachedTime = visitorStats.lastCached;
-
-        try {
-            const periodValue = currentPeriod === '1d' ? 1 : 7;
-            const totalResponse = await axios.get(route('admin.api.cloudflare.stats', { period: periodValue }));
-            totalData = {
-                value: totalResponse.data.unique_visitors_total !== undefined ? totalResponse.data.unique_visitors_total : 'N/A',
-                message: totalResponse.data.message,
-            };
-            if (totalResponse.data.cached_at) {
-                cachedTime = new Date(totalResponse.data.cached_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
-            }
-            if (totalResponse.data.message) combinedMessage = totalResponse.data.message;
-        } catch (error) {
-            totalData = { value: 'Error', message: error.response?.data?.error || "Gagal memuat data" };
-            setVisitorStats(prev => ({ ...prev, totalError: totalData.message, totalLoading: false }));
-        }
-
-        try {
-            const chartResponse = await axios.get(route('admin.api.cloudflare.chart.stats', { period: currentPeriod }));
-            if (chartResponse.data && chartResponse.data.labels && chartResponse.data.data) {
-                chartResponseData = {
-                    labels: chartResponse.data.labels,
-                    data: chartResponse.data.data,
-                };
-                if (!cachedTime && chartResponse.data.cached_at) {
-                    cachedTime = new Date(chartResponse.data.cached_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
-                }
-            }
-        } catch (error) {
-            setVisitorStats(prev => ({ ...prev, chartError: error.response?.data?.error || "Gagal memuat chart", chartLoading: false }));
-        }
-
-        setVisitorStats(prev => ({
-            ...prev,
-            total: totalData ? totalData.value : 'Error',
-            totalMessage: combinedMessage,
-            totalLoading: false,
-            dailyChart: chartResponseData,
-            chartLoading: false,
-            lastCached: cachedTime,
-            periodType: currentPeriod === '1d' ? 'hourly' : 'daily',
-        }));
-    }, [visitorStats.lastCached]);
-
-    useEffect(() => { fetchAllVisitorData(visitorStats.period); }, [visitorStats.period, fetchAllVisitorData]);
-
-    const handleChangePeriod = (newPeriod) => {
-        setVisitorStats(prev => ({ ...prev, period: newPeriod }));
-    };
 
     const fetchActivityLogs = async (page = 1, perPage = ITEMS_PER_LOG_PAGE_MODAL, forModal = false) => {
         if (forModal) setLoadingLogsModal(true);
@@ -308,18 +123,13 @@ export default function DashboardPage() {
         currentActivityPageModal * ITEMS_PER_LOG_PAGE_MODAL
     );
 
-    const periodOptions = [
-        { value: '1d', label: '24 Jam', icon: <Clock size={14} /> },
-        { value: '7d', label: '7 Hari', icon: <CalendarDays size={14} /> }
-    ];
-
     return (
         <AdminLayout headerTitle="Dashboard Utama">
             <Head title="Admin Dashboard" />
             
             <div className="max-w-screen-2xl mx-auto px-2 sm:px-3 lg:px-4 pb-4 sm:pb-6">
                 {/* Quick Stats - Responsive Grid */}
-                <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
                     <StatCard 
                         title="Pesan Baru" 
                         value={unreadMessagesCount || 0} 
@@ -329,89 +139,18 @@ export default function DashboardPage() {
                     />
                     <StatCard 
                         title="Berita Aktif" 
-                        value="-" 
+                        value={activePostsCount || 0} 
                         icon={FileText} 
                         href={route('admin.posts.index')}
                         color="green"
                     />
                     <StatCard 
                         title="Total Guru/Staff" 
-                        value="-" 
+                        value={teachersCount || 0} 
                         icon={Users} 
                         href={route('admin.teachers.index')}
                         color="purple"
                     />
-                    <StatCard 
-                        title="Program Studi" 
-                        value="3" 
-                        icon={LayoutGrid} 
-                        href={route('admin.program-studi.index')}
-                        color="yellow"
-                    />
-                </div>
-
-                {/* Visitor Statistics Card */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 lg:p-6 mb-4 sm:mb-6">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-5">
-                        <div>
-                            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Statistik Pengunjung</h2>
-                            <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Data kunjungan website</p>
-                        </div>
-                        <div className="flex items-center gap-2 w-full sm:w-auto">
-                            {periodOptions.map(opt => (
-                                <button
-                                    key={opt.value}
-                                    onClick={() => handleChangePeriod(opt.value)}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors flex-1 sm:flex-none ${
-                                        visitorStats.period === opt.value 
-                                        ? 'bg-primary text-white shadow-sm' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                    }`}
-                                >
-                                    {opt.icon} {opt.label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Total Visitors & Chart - Responsive Layout */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
-                        <div className="bg-blue-50 rounded-xl p-4 sm:p-5 lg:p-6 text-center lg:text-left">
-                            {visitorStats.totalLoading ? (
-                                <div className="py-6 sm:py-8">
-                                    <div className="inline-block animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-4 border-primary border-t-transparent"></div>
-                                    <p className="text-xs sm:text-sm text-gray-500 mt-2">Memuat...</p>
-                                </div>
-                            ) : visitorStats.total === 'Error' ? (
-                                <div className="py-4 bg-red-50 rounded-lg border border-red-200">
-                                    <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-                                    <p className="text-xs sm:text-sm text-red-600">Gagal memuat</p>
-                                </div>
-                            ) : (
-                                <>
-                                    <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary">
-                                        {typeof visitorStats.total === 'number' ? visitorStats.total.toLocaleString() : visitorStats.total}
-                                    </p>
-                                    <p className="text-sm sm:text-base text-gray-600 mt-1">Total Kunjungan</p>
-                                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                                        {visitorStats.period === '1d' ? '24 Jam Terakhir' : '7 Hari Terakhir'}
-                                    </p>
-                                    {visitorStats.lastCached && (
-                                        <p className="text-[10px] sm:text-xs text-gray-400 mt-3">Update: {visitorStats.lastCached}</p>
-                                    )}
-                                </>
-                            )}
-                        </div>
-
-                        <div className="lg:col-span-2">
-                            <VisitorStatsChart
-                                chartData={visitorStats.dailyChart}
-                                loading={visitorStats.chartLoading}
-                                error={visitorStats.chartError && !visitorStats.dailyChart ? visitorStats.chartError : null}
-                                periodType={visitorStats.periodType}
-                            />
-                        </div>
-                    </div>
                 </div>
 
                 {/* Recent Activity Card */}

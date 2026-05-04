@@ -7,6 +7,7 @@ import Footer from '@/Components/Footer';
 import Modal from '@/Components/Modal';
 import SEOHead from '@/Components/SEOHead';
 import ResponsiveImage, { HeroImage } from '@/Components/ResponsiveImage';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 import { TYPOGRAPHY } from '@/Utils/typography';
 import { getNavigationData } from '@/Utils/navigationData';
 import { usePage } from '@inertiajs/react';
@@ -17,7 +18,8 @@ import {
 } from 'lucide-react';
 
 export default function ProgramSekolahPage({ programs = [], heroSettings }) {
-    const { siteSettings } = usePage().props;    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';    const navigationData = getNavigationData(siteSettings);
+    const { siteSettings } = usePage().props;
+    const navigationData = getNavigationData(siteSettings);
     const [activeCategory, setActiveCategory] = useState("Semua");
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedProgram, setSelectedProgram] = useState(null);
@@ -90,7 +92,7 @@ export default function ProgramSekolahPage({ programs = [], heroSettings }) {
                 title="Program Unggulan - SMAN 1 Baleendah"
                 description="Berbagai program unggulan SMAN 1 Baleendah untuk mengembangkan potensi akademik dan non-akademik siswa secara maksimal."
                 keywords="program sekolah, program unggulan, kegiatan sekolah, program pengembangan siswa, SMAN 1 Baleendah"
-                image={heroContent?.background_image || "/images/program-sekolah.jpg"}
+                image={PUBLIC_HERO_IMAGE}
             />
 
             <Navbar
@@ -103,7 +105,7 @@ export default function ProgramSekolahPage({ programs = [], heroSettings }) {
             <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <HeroImage src={heroImage} alt="Background Program Sekolah" />
+                    <HeroImage src={PUBLIC_HERO_IMAGE} alt="Background Program Sekolah" />
                     <div className="absolute inset-0 bg-black/60"></div>
                 </div>
 

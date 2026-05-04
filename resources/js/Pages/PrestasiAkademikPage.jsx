@@ -6,6 +6,7 @@ import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import SEOHead from '@/Components/SEOHead';
 import ResponsiveImage, { HeroImage } from '@/Components/ResponsiveImage';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 import { TYPOGRAPHY } from '@/Utils/typography';
 import { getNavigationData } from '@/Utils/navigationData';
 import { usePage } from '@inertiajs/react';
@@ -13,8 +14,6 @@ import { usePage } from '@inertiajs/react';
 export default function PrestasiAkademikPage({ documents = [], heroContent }) {
     const { siteSettings } = usePage().props;
     const navigationData = getNavigationData(siteSettings);
-    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
-    
     const [selectedDoc, setSelectedDoc] = useState(documents[0] || null);
     
     const groupedDocs = documents.reduce((acc, doc) => {
@@ -44,7 +43,7 @@ export default function PrestasiAkademikPage({ documents = [], heroContent }) {
             <main className="pt-20">
                 <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 z-0">
-                        <HeroImage src={heroContent?.background_image_url || heroImage} media={heroContent?.backgroundImage} alt="Background Prestasi Akademik" />
+                        <HeroImage src={PUBLIC_HERO_IMAGE} alt="Background Prestasi Akademik" />
                         <div className="absolute inset-0 bg-black/60"></div>
                     </div>
                     <div className="relative z-10 container mx-auto px-4 text-center text-white">

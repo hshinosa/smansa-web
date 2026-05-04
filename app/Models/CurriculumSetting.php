@@ -68,6 +68,7 @@ class CurriculumSetting extends Model implements HasMedia
             'learner_profile' => ['label' => 'Profil Pelajar Pancasila', 'description' => 'Output profil pelajar.', 'icon' => 'Users'],
             'infographic_deep_learning' => ['label' => 'Infografis Pembelajaran Mendalam', 'description' => 'Gambar pendukung utama.', 'icon' => 'ImageIcon', 'hasMedia' => true],
             'infographic_education_2045' => ['label' => 'Infografis Pendidikan Bermutu 2045', 'description' => 'Gambar pendukung PISA 2022.', 'icon' => 'ImageIcon', 'hasMedia' => true],
+            'journey' => ['label' => 'Perjalanan Kurikulum', 'description' => 'Sejarah dan tahap implementasi kurikulum.', 'icon' => 'Activity'],
         ];
     }
 
@@ -185,6 +186,44 @@ class CurriculumSetting extends Model implements HasMedia
                 'title' => 'Infografis Pendidikan Bermutu 2045',
                 'description' => 'Pembelajaran mendalam sebagai solusi menuju pendidikan bermutu 2045 dengan konteks PISA 2022.',
                 'source' => 'PISA 2022',
+            ],
+            'journey' => [
+                'title' => 'Perjalanan Kurikulum di SMAN 1 Baleendah',
+                'description' => 'Perjalanan implementasi kurikulum di sekolah kami terus berkembang mengikuti arah kebijakan pendidikan nasional hingga saat ini menggunakan Kurikulum Merdeka.',
+                'items' => [
+                    [
+                        'period' => '2006-2015',
+                        'title' => 'Kurikulum KTSP',
+                        'details' => [
+                            '2006-2015',
+                            'Kurikulum KTSP Berbasis Paket',
+                        ],
+                        'badge' => 'KTSP 2006',
+                        'badgeType' => 'text',
+                    ],
+                    [
+                        'period' => '2016-2022',
+                        'title' => 'Kurikulum 2013',
+                        'details' => [
+                            '2016-2019',
+                            'Kurikulum 2013 Berbasis Paket',
+                            '2019-2022',
+                            'Kurikulum 2013 Berbasis SKS',
+                        ],
+                        'badge' => 'K13',
+                        'badgeType' => 'text',
+                    ],
+                    [
+                        'period' => '2022-Sekarang',
+                        'title' => 'Kurikulum Merdeka',
+                        'details' => [
+                            '2022-Sekarang',
+                            'Kurikulum Merdeka Berbasis SKS',
+                        ],
+                        'badge' => 'Merdeka',
+                        'badgeType' => 'text',
+                    ],
+                ],
             ],
         ];
     }

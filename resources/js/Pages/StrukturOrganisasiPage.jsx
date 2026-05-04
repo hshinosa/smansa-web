@@ -7,6 +7,7 @@ import Footer from '@/Components/Footer';
 import Modal from '@/Components/Modal';
 import SEOHead from '@/Components/SEOHead';
 import { HeroImage, ContentImage } from '@/Components/ResponsiveImage';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 import { X } from 'lucide-react';
 // Import typography constants
 import { TYPOGRAPHY } from '@/Utils/typography';
@@ -16,7 +17,6 @@ import { usePage } from '@inertiajs/react';
 export default function StrukturOrganisasiPage({ auth, organization, hero }) {
     const { siteSettings } = usePage().props;
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
-    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
     const navigationData = getNavigationData(siteSettings);
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     
@@ -78,7 +78,7 @@ export default function StrukturOrganisasiPage({ auth, organization, hero }) {
             <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <HeroImage src={heroImage} alt={`Gedung ${siteName}`} />
+                    <HeroImage src={PUBLIC_HERO_IMAGE} alt={`Gedung ${siteName}`} />
                     <div className="absolute inset-0 bg-black/60"></div>
                 </div>
 

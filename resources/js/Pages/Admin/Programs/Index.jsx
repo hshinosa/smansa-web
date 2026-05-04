@@ -44,7 +44,7 @@ export default function Index({ programs }) {
             const newPreviewUrl = URL.createObjectURL(data.image);
             setPreviewUrl(newPreviewUrl);
         } else if (data.image_url) {
-            setPreviewUrl(data.image_url);
+            setPreviewUrl(getImageUrl(data.image_url));
         } else {
             setPreviewUrl(null);
         }
@@ -58,23 +58,6 @@ export default function Index({ programs }) {
             }
         };
     }, [previewUrl]);
-
-    // Update preview URL when image changes
-    useEffect(() => {
-        if (data.image instanceof File) {
-            // Revoke old preview URL
-            if (previewUrl && previewUrl.startsWith('blob:')) {
-                URL.revokeObjectURL(previewUrl);
-            }
-            // Create new preview URL
-            const newPreviewUrl = URL.createObjectURL(data.image);
-            setPreviewUrl(newPreviewUrl);
-        } else if (data.image_url) {
-            setPreviewUrl(data.image_url);
-        } else {
-            setPreviewUrl(null);
-        }
-    }, [data.image, data.image_url]);
 
     const tabs = [{ key: 'list', label: 'Program Sekolah', description: 'Kelola program unggulan sekolah.', icon: Grid }];
 

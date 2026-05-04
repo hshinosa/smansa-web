@@ -14,6 +14,7 @@ import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import SEOHead from '@/Components/SEOHead';
 import ResponsiveImage, { HeroImage, ContentImage } from '@/Components/ResponsiveImage';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 import SanitizedContent from '@/Components/SanitizedContent';
 import Modal from '@/Components/Modal';
 // Import typography constants
@@ -24,7 +25,6 @@ import { usePage } from '@inertiajs/react';
 export default function ProfilSekolahPage({ auth, hero, history, facilities, aboutContent, programsContent, ctaContent }) {
     const { siteSettings } = usePage().props;
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
-    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
     const navigationData = getNavigationData(siteSettings);
     
     // Modal state for facilities
@@ -129,7 +129,7 @@ export default function ProfilSekolahPage({ auth, hero, history, facilities, abo
                 title={`${hero?.title || 'Profil & Sejarah'} - ${siteName}`}
                 description={`Mengenal lebih dekat sejarah, program studi, dan fasilitas ${siteName}. Sekolah unggulan dengan tradisi akademik yang kuat.`}
                 keywords="profil sekolah, sejarah SMAN 1 Baleendah, program studi, fasilitas sekolah, tentang sekolah"
-                image={heroImage}
+                image={PUBLIC_HERO_IMAGE}
             />
 
             <Navbar
@@ -145,7 +145,7 @@ export default function ProfilSekolahPage({ auth, hero, history, facilities, abo
                     {/* Background Image */}
                     <div className="absolute inset-0 z-0">
                         <HeroImage 
-                            src={formatImagePath(heroImage)} 
+                            src={PUBLIC_HERO_IMAGE} 
                             alt={`Gedung ${siteName}`} 
                         />
                         <div className="absolute inset-0 bg-black/60"></div>

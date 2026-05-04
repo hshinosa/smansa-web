@@ -63,49 +63,63 @@ export default function LandingPageContentPage() {
 
     const handleSubmit = (e) => {
         const formData = new FormData();
-        
-        // Add text data
-        formData.append('hero[title_line1]', data.hero?.title_line1 || '');
-        formData.append('hero[title_line2]', data.hero?.title_line2 || '');
-        formData.append('hero[hero_text]', data.hero?.hero_text || '');
-        
-        // Add stats
-        if (data.hero?.stats) {
-            data.hero.stats.forEach((stat, index) => {
-                formData.append(`hero[stats][${index}][label]`, stat.label || '');
-                formData.append(`hero[stats][${index}][value]`, stat.value || '');
-                formData.append(`hero[stats][${index}][icon_name]`, stat.icon_name || '');
-            });
-        }
 
-        formData.append('about_lp[title]', data.about_lp?.title || '');
-        formData.append('about_lp[description_html]', data.about_lp?.description_html || '');
-        formData.append('kepsek_welcome_lp[title]', data.kepsek_welcome_lp?.title || '');
-        formData.append('kepsek_welcome_lp[kepsek_name]', data.kepsek_welcome_lp?.kepsek_name || '');
-        formData.append('kepsek_welcome_lp[kepsek_title]', data.kepsek_welcome_lp?.kepsek_title || '');
-        formData.append('kepsek_welcome_lp[welcome_text_html]', data.kepsek_welcome_lp?.welcome_text_html || '');
-        
-        formData.append('programs_lp[title]', data.programs_lp?.title || '');
-        formData.append('programs_lp[description]', data.programs_lp?.description || '');
-        
-        formData.append('gallery_lp[title]', data.gallery_lp?.title || '');
-        formData.append('gallery_lp[description]', data.gallery_lp?.description || '');
-        
-        formData.append('cta_lp[title]', data.cta_lp?.title || '');
-        formData.append('cta_lp[description]', data.cta_lp?.description || '');
-        
-        // Add files
-        if (selectedFiles.heroBackgroundImage) {
-            formData.append('hero[background_image]', selectedFiles.heroBackgroundImage);
-        }
-        if (selectedFiles.heroStudentImage) {
-            formData.append('hero[student_image]', selectedFiles.heroStudentImage);
-        }
-        if (selectedFiles.aboutImage) {
-            formData.append('about_lp[image]', selectedFiles.aboutImage);
-        }
-        if (selectedFiles.kepsekImage) {
-            formData.append('kepsek_welcome_lp[kepsek_image]', selectedFiles.kepsekImage);
+        const tabToSection = {
+            hero: 'hero',
+            about: 'about_lp',
+            kepsek: 'kepsek_welcome_lp',
+            programs: 'programs_lp',
+            gallery: 'gallery_lp',
+            cta: 'cta_lp',
+        };
+
+        const sectionKey = tabToSection[activeTab];
+        formData.append('section', sectionKey);
+
+        if (sectionKey === 'hero') {
+            formData.append('content[title_line1]', data.hero?.title_line1 || '');
+            formData.append('content[title_line2]', data.hero?.title_line2 || '');
+            formData.append('content[hero_text]', data.hero?.hero_text || '');
+
+            if (data.hero?.stats) {
+                data.hero.stats.forEach((stat, index) => {
+                    formData.append(`content[stats][${index}][label]`, stat.label || '');
+                    formData.append(`content[stats][${index}][value]`, stat.value || '');
+                    formData.append(`content[stats][${index}][icon_name]`, stat.icon_name || '');
+                });
+            }
+
+            if (selectedFiles.heroBackgroundImage) {
+                formData.append('hero[background_image]', selectedFiles.heroBackgroundImage);
+            }
+            if (selectedFiles.heroStudentImage) {
+                formData.append('hero[student_image]', selectedFiles.heroStudentImage);
+            }
+        } else if (sectionKey === 'about_lp') {
+            formData.append('content[title]', data.about_lp?.title || '');
+            formData.append('content[description_html]', data.about_lp?.description_html || '');
+
+            if (selectedFiles.aboutImage) {
+                formData.append('about_lp[image]', selectedFiles.aboutImage);
+            }
+        } else if (sectionKey === 'kepsek_welcome_lp') {
+            formData.append('content[title]', data.kepsek_welcome_lp?.title || '');
+            formData.append('content[kepsek_name]', data.kepsek_welcome_lp?.kepsek_name || '');
+            formData.append('content[kepsek_title]', data.kepsek_welcome_lp?.kepsek_title || '');
+            formData.append('content[welcome_text_html]', data.kepsek_welcome_lp?.welcome_text_html || '');
+
+            if (selectedFiles.kepsekImage) {
+                formData.append('kepsek_welcome_lp[kepsek_image]', selectedFiles.kepsekImage);
+            }
+        } else if (sectionKey === 'programs_lp') {
+            formData.append('content[title]', data.programs_lp?.title || '');
+            formData.append('content[description]', data.programs_lp?.description || '');
+        } else if (sectionKey === 'gallery_lp') {
+            formData.append('content[title]', data.gallery_lp?.title || '');
+            formData.append('content[description]', data.gallery_lp?.description || '');
+        } else if (sectionKey === 'cta_lp') {
+            formData.append('content[title]', data.cta_lp?.title || '');
+            formData.append('content[description]', data.cta_lp?.description || '');
         }
 
         // Add explicit preserve options for Inertia
@@ -113,8 +127,6 @@ export default function LandingPageContentPage() {
             preserveScroll: true,
             preserveState: true,
             onSuccess: (page) => {
-                // Determine active tab based on what was saved or use default fallback if server doesn't return
-                // Although server should redirect with ?tab=...
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.get('tab')) {
                     setActiveTab(urlParams.get('tab'));

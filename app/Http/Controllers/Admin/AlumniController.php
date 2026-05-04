@@ -95,8 +95,19 @@ class AlumniController extends Controller
 
     public function edit(Alumni $alumni)
     {
+        $alumni->load('media');
+        $data = $alumni->toArray();
+        $data['testimonialImages'] = $this->imageService->getOrderedMediaData($alumni, 'testimonial_images');
+
+        if ($alumni->content_type === 'video' && $alumni->video_source === 'upload') {
+            $videoMedia = $alumni->getFirstMedia('videos');
+            if ($videoMedia) {
+                $data['video_url'] = $videoMedia->getUrl();
+            }
+        }
+
         return Inertia::render('Admin/Alumni/Edit', [
-            'alumni' => $alumni->toArray()
+            'alumni' => $data
         ]);
     }
 

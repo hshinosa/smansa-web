@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { logger } from '@/Utils/logger';
-import { Head, useForm, router } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
+import { route as ziggyRoute } from 'ziggy-js';
 import {
     History,
     Target,
@@ -10,7 +11,6 @@ import {
     Trash2,
     MoveUp,
     MoveDown,
-    Image as ImageIcon,
     GripVertical
 } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -83,7 +83,7 @@ const SortableMissionItem = ({ id, value, index, onUpdate, onRemove }) => {
     );
 };
 
-export default function SchoolProfileIndex({ auth, sections, activeSection: initialSection }) {
+export default function SchoolProfileIndex({ sections, activeSection: initialSection }) {
     const [activeTab, setActiveTab] = useState(initialSection || 'history');
     const [activeFacilityIndex, setActiveFacilityIndex] = useState(0);
     
@@ -162,27 +162,38 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
                          (activeTab === 'history' && data.content?.image instanceof File);
         
         if (hasFiles) {
-            // Use manual FormData for file uploads
             const formData = new FormData();
             formData.append('section', data.section);
-            
-            // Add title and description
+
             if (data.content.title) formData.append('content[title]', data.content.title);
             if (data.content.description) formData.append('content[description]', data.content.description);
-            
-            // Handle organization/history image upload
+            if (data.content.vision) formData.append('content[vision]', data.content.vision);
+
+            if (Array.isArray(data.content.mission)) {
+                data.content.mission.forEach((missionItem, index) => {
+                    formData.append(`content[mission][${index}]`, missionItem || '');
+                });
+            }
+
+            if (Array.isArray(data.content.timeline)) {
+                data.content.timeline.forEach((event, index) => {
+                    formData.append(`content[timeline][${index}][year]`, event?.year || '');
+                    formData.append(`content[timeline][${index}][title]`, event?.title || '');
+                    formData.append(`content[timeline][${index}][description]`, event?.description || '');
+                });
+            }
+
             if ((activeTab === 'organization' || activeTab === 'history') && data.content.image instanceof File) {
                 formData.append('content[image]', data.content.image);
             } else if (data.content.image_url) {
                 formData.append('content[image_url]', data.content.image_url);
             }
-            
-            // Add items with files (for facilities)
+
             if (data.content.items && Array.isArray(data.content.items)) {
                 data.content.items.forEach((item, index) => {
-                    const title = item.title || item.name || '';
+                    const name = item.name || item.title || '';
                     const imageUrl = item.image_url || item.image || '';
-                    formData.append(`content[items][${index}][title]`, title);
+                    formData.append(`content[items][${index}][name]`, name);
                     formData.append(`content[items][${index}][image_url]`, imageUrl);
                     if (item.image_file instanceof File) {
                         formData.append(`content[items][${index}][image_file]`, item.image_file);
@@ -191,7 +202,7 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
             }
             
             // Use router.post for FormData
-            router.post(route('admin.school-profile.update'), formData, {
+            router.post(ziggyRoute('admin.school-profile.update'), formData, {
                 forceFormData: true,
                 preserveScroll: true,
                 preserveState: true,
@@ -205,7 +216,7 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
             });
         } else {
             // Regular submit without files
-            post(route('admin.school-profile.update'), {
+            post(ziggyRoute('admin.school-profile.update'), {
                 preserveScroll: true,
                 preserveState: true,
                 onSuccess: () => {
@@ -308,8 +319,8 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
                         <div>
                             <MiniTextEditor
                                 label="Deskripsi / Pengantar Sejarah"
-                                initialValue={historyData.description_html || ''}
-                                onChange={(content) => updateContent('description_html', content)}
+                                initialValue={historyData.description || ''}
+                                onChange={(content) => updateContent('description', content)}
                             />
                             <p className="text-xs text-gray-500 mt-1">
                                 Tuliskan pengantar atau ringkasan umum tentang sejarah sekolah (1-2 paragraf). 
@@ -572,7 +583,7 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
         };
 
         const addFacility = () => {
-            const newFacilities = [...facilities, { title: '', image_url: '' }];
+            const newFacilities = [...facilities, { name: '', image_url: '' }];
             updateFacilities(newFacilities);
             setActiveFacilityIndex(newFacilities.length - 1);
         };
@@ -599,7 +610,7 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
                 if (i !== index) return item;
                 // Normalize the item if it has old field names
                 const normalized = {
-                    title: item.title || item.name || '',
+                    name: item.name || item.title || '',
                     image_url: item.image_url || item.image || '',
                     image_file: item.image_file,
                 };
@@ -704,7 +715,7 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
                                                                 #{index + 1}
                                                             </p>
                                                             <p className="text-sm font-semibold text-gray-900 truncate">
-                                                                {facility.title || facility.name || `Fasilitas ${index + 1}`}
+                                                                {facility.name || facility.title || `Fasilitas ${index + 1}`}
                                                             </p>
                                                         </div>
                                                         <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${
@@ -746,8 +757,8 @@ export default function SchoolProfileIndex({ auth, sections, activeSection: init
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    value={selectedFacility.title || selectedFacility.name || ''}
-                                                    onChange={(e) => updateFacility(selectedFacilityIndex, 'title', e.target.value)}
+                                                    value={selectedFacility.name || selectedFacility.title || ''}
+                                                    onChange={(e) => updateFacility(selectedFacilityIndex, 'name', e.target.value)}
                                                     className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary font-semibold"
                                                     placeholder="Contoh: Laboratorium Komputer"
                                                 />

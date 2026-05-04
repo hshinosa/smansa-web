@@ -29,6 +29,7 @@ export default function Index({ teachers, currentSettings }) {
         position: '',
         department: '',
         email: '',
+        bio: '',
         image: null,
         image_url: '',
     });
@@ -80,6 +81,7 @@ export default function Index({ teachers, currentSettings }) {
                 position: teacher.position || '',
                 department: teacher.department || '',
                 email: teacher.email || '',
+                bio: teacher.bio || '',
                 image: null,
                 image_url: teacher.image_url || '',
             });

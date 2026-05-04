@@ -15,6 +15,19 @@ export default function HeroSection({ data, setData, errors }) {
             </div>
 
             <div>
+                <InputLabel htmlFor="hero_title" value="Judul Program Studi" />
+                <TextInput
+                    id="hero_title"
+                    type="text"
+                    className="mt-1 block w-full bg-gray-50"
+                    value={data.title || ''}
+                    onChange={(e) => setData('title', e.target.value)}
+                    readOnly
+                />
+                {errors?.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+            </div>
+
+            <div>
                 <InputLabel htmlFor="hero_description" value="Deskripsi Singkat" />
                 <textarea
                     id="hero_description"

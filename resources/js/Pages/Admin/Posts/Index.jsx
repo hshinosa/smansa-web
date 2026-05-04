@@ -4,6 +4,7 @@ import { logger } from '@/Utils/logger';
 
 import React, { useState } from 'react';
 import { Head, useForm, usePage, Link, router } from '@inertiajs/react';
+import { getImageUrl } from '@/Utils/imageUtils';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
@@ -31,7 +32,7 @@ export default function Index({ posts }) {
     const totalPages = Math.ceil(posts.length / itemsPerPage);
     const paginatedPosts = posts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-    const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
+    const { data, setData, post, delete: destroy, processing, errors, reset } = useForm({
         title: '', 
         category: 'Berita', 
         content: '', 
@@ -123,69 +124,59 @@ export default function Index({ posts }) {
             }
         }
         
-        // Check if any images are File objects (for new uploads)
-        const hasFileInImages = data.images && data.images.some(img => img instanceof File);
+        const existingImages = [];
+        const newImages = [];
+
+        if (data.images && data.images.length > 0) {
+            data.images.forEach((img) => {
+                if (img instanceof File) {
+                    newImages.push(img);
+                } else if (typeof img === 'string') {
+                    existingImages.push(img);
+                }
+            });
+        }
+
+        const hasFileInImages = newImages.length > 0;
         const needsFormData = data.featured_image instanceof File || hasFileInImages;
         
         logger.log('[PostSubmit] needsFormData:', needsFormData, 'hasFileInImages:', hasFileInImages);
+        logger.log('[PostSubmit] existingImages:', existingImages.length, 'newImages:', newImages.length);
         
         if (editMode) {
-            // BUG FIX: When using FormData with files, we need to use router.post with _method spoofing
-            // because PUT with FormData doesn't always serialize correctly in Inertia
-            if (needsFormData) {
-                // Prepare data with separate existing_images and new_images
-                const existingImages = [];
-                const newImages = [];
-                
-                if (data.images && data.images.length > 0) {
-                    data.images.forEach((img) => {
-                        if (img instanceof File) {
-                            newImages.push(img);
-                        } else if (typeof img === 'string') {
-                            existingImages.push(img);
-                        }
-                    });
-                }
-                
-                logger.log('[PostSubmit] Using router.post with _method PUT for edit with files');
-                logger.log('[PostSubmit] existingImages:', existingImages.length, 'newImages:', newImages.length);
-                
-                router.post(route('admin.posts.update', currentId), {
-                    _method: 'PUT',
-                    title: data.title,
-                    category: data.category,
-                    content: data.content,
-                    excerpt: data.excerpt,
-                    status: data.status,
-                    featured_image: data.featured_image instanceof File ? data.featured_image : null,
-                    existing_images: JSON.stringify(existingImages),
-                    new_images: newImages,
-                }, {
-                    forceFormData: true,
-                    preserveState: true,
-                    onSuccess: () => {
-                        reset();
-                        setIsModalOpen(false);
-                        setEditMode(false);
-                        setCurrentId(null);
-                        toast.success('Berita berhasil diperbarui');
-                    },
-                });
-            } else {
-                // No files, use regular put()
-                put(route('admin.posts.update', currentId), {
-                    preserveState: true,
-                    onSuccess: () => {
-                        reset();
-                        setIsModalOpen(false);
-                        setEditMode(false);
-                        setCurrentId(null);
-                        toast.success('Berita berhasil diperbarui');
-                    },
-                });
-            }
+            logger.log('[PostSubmit] Using router.post with _method PUT for edit');
+
+            router.post(route('admin.posts.update', currentId), {
+                _method: 'PUT',
+                title: data.title,
+                category: data.category,
+                content: data.content,
+                excerpt: data.excerpt,
+                status: data.status,
+                featured_image: data.featured_image instanceof File ? data.featured_image : null,
+                existing_images: existingImages,
+                new_images: newImages,
+            }, {
+                forceFormData: true,
+                preserveState: true,
+                onSuccess: () => {
+                    reset();
+                    setIsModalOpen(false);
+                    setEditMode(false);
+                    setCurrentId(null);
+                    toast.success('Berita berhasil diperbarui');
+                },
+            });
         } else {
             post(route('admin.posts.store'), {
+                title: data.title,
+                category: data.category,
+                content: data.content,
+                excerpt: data.excerpt,
+                status: data.status,
+                featured_image: data.featured_image,
+                new_images: newImages,
+            }, {
                 forceFormData: needsFormData,
                 onSuccess: () => {
                     reset(); // Reset form first
@@ -236,7 +227,7 @@ export default function Index({ posts }) {
                                 <tbody className="divide-y divide-gray-100">
                                     {paginatedPosts.map((postItem) => (
                                         <tr key={postItem.id} className="hover:bg-gray-50">
-                                            <td className="px-4 py-3 whitespace-nowrap"><div className="h-12 w-16 rounded-lg overflow-hidden bg-gray-100">{(postItem.featuredImage?.original_url || postItem.featured_image) ? <img src={postItem.featuredImage?.original_url || postItem.featured_image} alt={postItem.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Newspaper className="text-gray-400 w-6 h-6" /></div>}</div></td>
+                                            <td className="px-4 py-3 whitespace-nowrap"><div className="h-12 w-16 rounded-lg overflow-hidden bg-gray-100">{(postItem.featuredImage?.original_url || postItem.featured_image) ? <img src={getImageUrl(postItem.featuredImage?.original_url || postItem.featured_image)} alt={postItem.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Newspaper className="text-gray-400 w-6 h-6" /></div>}</div></td>
                                             <td className="px-4 py-3"><p className="font-semibold text-gray-900 text-sm truncate max-w-[120px] sm:max-w-none">{postItem.title}</p><p className="text-xs text-gray-500 font-mono hidden sm:block">{postItem.slug}</p></td>
                                             <td className="px-4 py-3 hidden md:table-cell"><span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">{postItem.category}</span></td>
                                             <td className="px-4 py-3"><span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${postItem.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{postItem.status === 'published' ? 'Publis' : 'Draft'}</span></td>
@@ -402,7 +393,7 @@ export default function Index({ posts }) {
                                         {data.images.map((img, idx) => (
                                             <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200 shadow-sm">
                                                 <img
-                                                    src={typeof img === 'string' ? img : URL.createObjectURL(img)}
+                                                    src={typeof img === 'string' ? getImageUrl(img) : URL.createObjectURL(img)}
                                                     alt={`Gallery ${idx}`}
                                                     className="w-full h-full object-cover"
                                                 />

@@ -5,6 +5,7 @@ import Footer from '@/Components/Footer';
 import Modal from '@/Components/Modal';
 import ResponsiveImage, { HeroImage } from '@/Components/ResponsiveImage';
 import SEOHead from '@/Components/SEOHead';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 import { TYPOGRAPHY } from '@/Utils/typography';
 import { getNavigationData } from '@/Utils/navigationData';
 import { normalizeUrl } from '@/Utils/imageUtils';
@@ -16,7 +17,6 @@ export default function AcademicCalendarPage({
 }) {
     const { siteSettings } = usePage().props;
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
-    const heroImage = normalizeUrl(siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg');
     const navigationData = getNavigationData(siteSettings);
     
     const [selectedCalendar, setSelectedCalendar] = useState(null);
@@ -80,7 +80,7 @@ export default function AcademicCalendarPage({
             <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <HeroImage src={heroImage} alt="Background Kalender Akademik" />
+                    <HeroImage src={PUBLIC_HERO_IMAGE} alt="Background Kalender Akademik" />
                     <div className="absolute inset-0 bg-black/60"></div>
                 </div>
 
@@ -293,4 +293,3 @@ export default function AcademicCalendarPage({
         </div>
     );
 }
-

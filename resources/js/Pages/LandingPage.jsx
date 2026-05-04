@@ -23,6 +23,7 @@ import ResponsiveImage, { HeroImage, ContentImage, GalleryImage } from '@/Compon
 import SanitizedContent from '@/Components/SanitizedContent';
 import { getNavigationData } from '@/Utils/navigationData';
 import { TYPOGRAPHY } from '@/Utils/typography';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 import { usePage } from '@inertiajs/react';
 
 export default function LandingPage({ 
@@ -58,7 +59,7 @@ export default function LandingPage({
                 title={`${siteName} - Generasi Unggul & Berkarakter`}
                 description={siteDescription || "SMAN 1 Baleendah adalah sekolah menengah atas unggulan di Bandung dengan program peminatan MIPA, IPS, dan Bahasa. Dapatkan informasi PPDB, program akademik, ekstrakurikuler, dan prestasi siswa."}
                 keywords="SMAN 1 Baleendah, SMA Baleendah, sekolah Bandung, PPDB Bandung, SMA negeri Bandung, pendidikan Baleendah, peminatan IPA IPS Bahasa, sekolah unggulan"
-                image={heroContent?.background_image_url || null}
+                image={PUBLIC_HERO_IMAGE}
             />
 
             {/* Navbar */}
@@ -71,16 +72,13 @@ export default function LandingPage({
 
             {/* HERO SECTION */}
             <section className="relative pt-32 md:pt-40 overflow-hidden">
-                <link rel="preload" as="image" href={heroContent?.background_image_url || '/images/hero-bg-sman1baleendah.jpeg'} fetchpriority="high" />
+                <link rel="preload" as="image" href={PUBLIC_HERO_IMAGE} fetchpriority="high" />
                 
                 {/* Hero Background Image */}
                 <div className="absolute inset-0">
-                    <img 
-                        src={heroContent?.background_image_url || '/images/hero-bg-sman1baleendah.jpeg'} 
-                        alt="Background"
-                        className="w-full h-full object-cover"
-                        loading="eager"
-                        fetchPriority="high"
+                    <HeroImage 
+                        src={PUBLIC_HERO_IMAGE}
+                        alt={`Gedung ${siteName}`}
                     />
                 </div>
                 {/* Overlay for readability */}

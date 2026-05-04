@@ -5,6 +5,7 @@ import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import SEOHead from '@/Components/SEOHead';
 import ResponsiveImage, { HeroImage } from '@/Components/ResponsiveImage';
+import { PUBLIC_HERO_IMAGE } from '@/Hooks/useNavigation';
 import { Check, Star, Target } from 'lucide-react';
 // Import typography constants
 import { TYPOGRAPHY } from '@/Utils/typography';
@@ -14,7 +15,6 @@ import { usePage } from '@inertiajs/react';
 export default function VisiMisiPage({ auth, visionMission, hero }) {
     const { siteSettings } = usePage().props;
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
-    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
     const navigationData = getNavigationData(siteSettings);
     const { vision, mission, goals } = visionMission || {};
 
@@ -47,7 +47,7 @@ export default function VisiMisiPage({ auth, visionMission, hero }) {
                 title={`${hero?.title || 'Visi & Misi'} - ${siteName}`}
                 description="Visi dan Misi SMA Negeri 1 Baleendah. Membentuk peserta didik berakhlak mulia, berprestasi akademik tinggi, berkarakter kuat, dan berwawasan global."
                 keywords="visi misi, tujuan sekolah, nilai nilai sekolah, SMAN 1 Baleendah"
-                image={heroImage}
+                image={PUBLIC_HERO_IMAGE}
             />
 
             <Navbar
@@ -62,7 +62,7 @@ export default function VisiMisiPage({ auth, visionMission, hero }) {
             <section className="relative h-[40vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <HeroImage src={heroImage} alt="Background Visi Misi" />
+                    <HeroImage src={PUBLIC_HERO_IMAGE} alt="Background Visi Misi" />
                     <div className="absolute inset-0 bg-black/60"></div>
                 </div>
 

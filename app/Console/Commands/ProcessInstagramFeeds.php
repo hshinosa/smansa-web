@@ -92,9 +92,11 @@ class ProcessInstagramFeeds extends Command
             }
 
             if ($index < $pendingFeeds->count() - 1) {
-                $delay = 15;
-                $this->line("   ⏳ Waiting {$delay}s (rate limit)...");
-                sleep($delay);
+                $delay = 0;
+                if ($delay > 0) {
+                    $this->line("   ⏳ Waiting {$delay}s (rate limit)...");
+                    sleep($delay);
+                }
             }
         }
 

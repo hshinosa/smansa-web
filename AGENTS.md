@@ -103,8 +103,11 @@ python scraper.py --target sman1baleendah --max-posts 50
 ### Compose Files
 - `docker-compose.yml` - Base config
 - `docker-compose.dev.yml` - Dev overrides
-- `docker-compose.prod.yml` - Production
 - `docker-compose.local.yml` - Localhost overrides (fixes session issues)
+
+### Separated Storage Workflow
+- `scripts/setup-separated-storage.sh` - Creates `.env.storage` directly and prepares host storage directories
+- `scripts/migrate-storage.sh` - Migrates existing public storage data into the separated storage path
 
 ### Services
 - **app** - PHP-FPM (Laravel)
@@ -119,8 +122,8 @@ python scraper.py --target sman1baleendah --max-posts 50
 ### Localhost Fix
 If login fails on localhost:
 ```bash
-docker-compose -f docker-compose.yml -f docker-compose.local.yml up -d
-docker-compose exec app php artisan config:clear
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
+docker compose exec app php artisan config:clear
 ```
 
 ## FRONTEND CONVENTIONS

@@ -200,72 +200,26 @@ export default function Index({ galleries: initialGalleries }) {
         e.preventDefault();
         
         if (editMode) {
-            // Manually construct FormData to ensure all fields are included
-            const formData = new FormData();
-            
-            // Add all fields from data
-            Object.keys(data).forEach(key => {
-                if (key === 'file') {
-                    // Only add file if it's a File object
-                    if (data.file instanceof File) {
-                        formData.append('file', data.file);
-                    }
-                } else if (key === 'is_featured' || key === 'is_external') {
-                    // Convert booleans to strings for FormData
-                    formData.append(key, data[key] ? '1' : '0');
-                } else {
-                    formData.append(key, data[key] || '');
-                }
-            });
-            
-            // Add method spoofing
-            formData.append('_method', 'PUT');
-            
-            // Get CSRF token from meta tag
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            
-            // Use native fetch to send the request directly
-            fetch(route('admin.galleries.update', currentId), {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                },
-                body: formData,
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Success - update local state with the new data
-                    setGalleries(prevGalleries => 
-                        prevGalleries.map(gallery => 
-                            gallery.id === currentId 
-                                ? { 
-                                    ...gallery, 
-                                    title: data.title,
-                                    description: data.description,
-                                    type: data.type,
-                                    url: data.url,
-                                    category: data.category,
-                                    is_featured: data.is_featured,
-                                    is_external: data.is_external,
-                                    // If file was uploaded, we'll need to refresh to get the new media URL
-                                    ...(data.file instanceof File ? { url: data.url } : {})
-                                } 
-                                : gallery
-                        )
-                    );
+            const submitData = { ...data, _method: 'PUT' };
+            submitData.is_featured = data.is_featured ? '1' : '0';
+            submitData.is_external = data.is_external ? '1' : '0';
+            if (!(data.file instanceof File)) {
+                delete submitData.file;
+            }
+
+            router.post(route('admin.galleries.update', currentId), submitData, {
+                forceFormData: true,
+                preserveScroll: true,
+                onSuccess: (page) => {
                     closeModal();
+                    if (page.props && page.props.galleries) {
+                        setGalleries(page.props.galleries);
+                    }
                     toast.success('Item galeri berhasil diperbarui');
-                } else {
-                    return response.json().then(err => {
-                        toast.error('Gagal memperbarui item galeri');
-                        throw err;
-                    });
-                }
-            })
-            .catch(error => {
-                toast.error('Gagal memperbarui item galeri');
+                },
+                onError: () => {
+                    toast.error('Gagal memperbarui item galeri');
+                },
             });
         } else {
             post(route('admin.galleries.store'), {

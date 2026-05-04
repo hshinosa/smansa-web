@@ -3,6 +3,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown, ChevronRight, Info, Menu, X } from 'lucide-react';
 import { TYPOGRAPHY } from '@/Utils/typography';
 import { getNavigationData } from '@/Utils/navigationData';
+import AnnouncementMarquee from '@/Components/AnnouncementMarquee';
 
 export default function Navbar({
     logoSman1,
@@ -336,6 +337,7 @@ export default function Navbar({
                 </div>
             </div>
             </nav>
+            <AnnouncementMarquee />
         </>
     );
 }

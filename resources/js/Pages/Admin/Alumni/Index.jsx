@@ -236,7 +236,7 @@ export default function Index({ alumnis }) {
                                                 <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border-2 border-gray-200">
                                                     {primaryImage ? (
                                                         <img
-                                                            src={primaryImage}
+                                                            src={getImageUrl(primaryImage)}
                                                             alt={alumni.name}
                                                             className="w-full h-full object-cover"
                                                         />
@@ -397,7 +397,7 @@ export default function Index({ alumnis }) {
                                                         <div className="absolute top-0 left-0 z-10 p-1">
                                                             <GripVertical size={14} className="text-gray-400" />
                                                         </div>
-                                                        <img src={img} alt={`Existing testimonial ${idx + 1}`} className="h-24 w-full object-cover" />
+                                                        <img src={getImageUrl(img)} alt={`Existing testimonial ${idx + 1}`} className="h-24 w-full object-cover" />
                                                         <button
                                                             type="button"
                                                             onClick={() => {

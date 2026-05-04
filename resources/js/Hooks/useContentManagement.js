@@ -1,16 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { router, useForm, usePage } from '@inertiajs/react';
 import toast from 'react-hot-toast';
 
 export function useContentManagement(initialData, updateRoute, method = 'post') {
     const { success, errors: pageErrorsFromLaravel } = usePage().props;
     
-    const { data, setData, post, put, processing, errors: formErrors, reset, transform } = useForm(initialData);
+    const { data, setData, post, put, processing: formProcessing, errors: formErrors, reset, transform } = useForm(initialData);
 
     const [selectedFiles, setSelectedFiles] = useState({});
     const [previewUrls, setPreviewUrls] = useState({});
     const [localSuccess, setLocalSuccess] = useState(null);
     const [localErrors, setLocalErrors] = useState({});
+    const [routerProcessing, setRouterProcessing] = useState(false);
+
+    const processing = formProcessing || routerProcessing;
 
     useEffect(() => {
         if (success) {
@@ -88,27 +91,43 @@ export function useContentManagement(initialData, updateRoute, method = 'post') 
         }
     };
 
-    const handleSubmit = (e, additionalData = null) => {
+    const handleSubmit = useCallback((e, additionalData = null, callerOptions = {}) => {
         if (e) e.preventDefault();
         setLocalErrors({});
 
-        // If additionalData is FormData, use router.post directly
+        const mergedOptions = {
+            preserveScroll: true,
+            preserveState: false,
+            ...callerOptions,
+        };
+
         if (additionalData instanceof FormData) {
+            if (method !== 'post') {
+                additionalData.append('_method', method.toUpperCase());
+            }
+
+            setRouterProcessing(true);
             router.post(updateRoute, additionalData, {
-                preserveScroll: true,
+                ...mergedOptions,
                 onSuccess: () => {
+                    setRouterProcessing(false);
                     setSelectedFiles({});
                     toast.success('Perubahan berhasil disimpan');
+                    if (mergedOptions.onSuccess) mergedOptions.onSuccess();
                 },
                 onError: (serverErrors) => {
+                    setRouterProcessing(false);
                     setLocalErrors(serverErrors);
                     toast.error('Gagal menyimpan perubahan');
-                }
+                    if (mergedOptions.onError) mergedOptions.onError(serverErrors);
+                },
+                onFinish: () => {
+                    setRouterProcessing(false);
+                },
             });
             return;
         }
 
-        // Otherwise use useForm's post/put methods
         if (additionalData) {
             transform((data) => ({
                 ...data,
@@ -117,14 +136,16 @@ export function useContentManagement(initialData, updateRoute, method = 'post') 
         }
 
         const options = {
-            preserveScroll: true,
+            ...mergedOptions,
             onSuccess: () => {
                 setSelectedFiles({});
                 toast.success('Perubahan berhasil disimpan');
+                if (mergedOptions.onSuccess) mergedOptions.onSuccess();
             },
             onError: (serverErrors) => {
                 setLocalErrors(serverErrors);
                 toast.error('Gagal menyimpan perubahan');
+                if (mergedOptions.onError) mergedOptions.onError(serverErrors);
             }
         };
 
@@ -133,7 +154,7 @@ export function useContentManagement(initialData, updateRoute, method = 'post') 
         } else {
             put(updateRoute, options);
         }
-    };
+    }, [method, updateRoute, post, put, transform]);
 
     return {
         data,

@@ -17,7 +17,9 @@ export default function SEOHead({
     const siteUrl = props.siteSettings?.general?.site_url || "https://sman1baleendah.sch.id";
     const fullUrl = url || (typeof window !== 'undefined' ? window.location.href : siteUrl);
     const canonicalUrl = canonical || fullUrl;
-    const fullImageUrl = image.startsWith('http') ? image : `${siteUrl}${image}`;
+    const fullImageUrl = image && typeof image === 'string' 
+        ? (image.startsWith('http') ? image : `${siteUrl}${image}`)
+        : `${siteUrl}/images/hero-bg-sman1baleendah.jpeg`;
     
     // Generate schema.org structured data
     const organizationSchema = {

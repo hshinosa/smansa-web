@@ -2,6 +2,8 @@ import { useState, useMemo, useCallback } from 'react';
 import { usePage } from '@inertiajs/react';
 import { getNavigationData } from '@/Utils/navigationData';
 
+export const PUBLIC_HERO_IMAGE = '/images/hero-bg-sman1baleendah.jpeg';
+
 /**
  * useNavigation Hook
  * 
@@ -16,7 +18,7 @@ export function useNavigation() {
 
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
     const siteDescription = siteSettings?.general?.site_description || 'Website Resmi SMAN 1 Baleendah';
-    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
+    const heroImage = PUBLIC_HERO_IMAGE;
 
     return {
         siteSettings,
@@ -40,7 +42,7 @@ export function useHeroSettings(pageKey) {
     
     const heroSettings = siteSettings?.[pageKey] || {};
     const siteName = siteSettings?.general?.site_name || 'SMAN 1 Baleendah';
-    const heroImage = siteSettings?.general?.hero_image || '/images/hero-bg-sman1baleendah.jpeg';
+    const heroImage = PUBLIC_HERO_IMAGE;
 
     const renderHighlightedTitle = useCallback((title) => {
         if (!title) return null;
