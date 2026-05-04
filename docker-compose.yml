@@ -27,6 +27,7 @@ services:
       EMBEDDING_BASE_URL: http://embedding:8080
     volumes:
       - storage_data:/var/www/storage
+      - build_assets:/var/www/public/build
     depends_on:
       db:
         condition: service_healthy
@@ -56,6 +57,7 @@ services:
       - "443:443"
     volumes:
       - storage_data:/var/www/storage:ro
+      - build_assets:/var/www/public/build:ro
       - ./docker/nginx/ssl/:/etc/nginx/ssl/:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
@@ -272,6 +274,8 @@ volumes:
   storage_data:
     driver: local
   scraper_downloads:
+    driver: local
+  build_assets:
     driver: local
 
 networks:

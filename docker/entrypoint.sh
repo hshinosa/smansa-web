@@ -3,7 +3,11 @@ set -e
 
 echo "==> Starting SMAN1 Baleendah Application..."
 
-# Prepare writable directories
+echo "==> Syncing build assets to shared volume..."
+if [ -d "/opt/build-assets" ]; then
+    cp -a /opt/build-assets/. /var/www/public/build/
+fi
+
 echo "==> Preparing writable directories..."
 mkdir -p /var/www/storage/app/public
 mkdir -p /var/www/storage/framework/cache /var/www/storage/framework/sessions /var/www/storage/framework/views

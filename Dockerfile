@@ -23,6 +23,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY . .
 COPY --from=composer-builder /var/www/vendor ./vendor
 COPY --from=node-builder /app/public/build ./public/build
+COPY --from=node-builder /app/public/build /opt/build-assets
 
 RUN rm -f bootstrap/cache/*.php \
     && APP_ENV=production CACHE_STORE=array SESSION_DRIVER=file QUEUE_CONNECTION=sync php artisan package:discover --ansi \
