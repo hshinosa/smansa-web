@@ -235,7 +235,7 @@ export default function BeritaDetailPage({ post, relatedPosts = [] }) {
                             )}
 
                             {/* Article Body */}
-                            <article className="prose prose-lg prose-blue max-w-none font-serif text-gray-700 leading-relaxed mb-12">
+                            <article className="prose prose-lg prose-blue max-w-none prose-a:text-primary prose-a:font-semibold prose-a:underline hover:prose-a:text-primary-darker font-serif text-gray-700 leading-relaxed mb-12">
                                 <SanitizedContent html={post.content} />
                             </article>
 

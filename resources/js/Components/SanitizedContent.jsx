@@ -12,8 +12,8 @@ const SanitizedContent = ({ html, className = '', as: Tag = 'div', ...props }) =
     // Basic sanitization config
     // We allow basic formatting tags but strip scripts/iframes unless specifically allowed
     const sanitizedHtml = DOMPurify.sanitize(html, {
-        ADD_TAGS: ['iframe'], // Allow iframes for embeds (e.g. YouTube), but be careful
-        ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'target'],
+        ADD_TAGS: ['iframe', 'a'], 
+        ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'target', 'href', 'rel'],
     });
 
     return (

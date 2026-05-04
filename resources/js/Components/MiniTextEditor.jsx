@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Bold, Italic, Pilcrow, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Undo, Redo } from 'lucide-react';
+import { Bold, Italic, Pilcrow, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Undo, Redo, Link as LinkIcon, Unlink } from 'lucide-react';
 
 // Helper untuk membersihkan HTML dari tag yang tidak diinginkan sebelum simpan
 const sanitizeHtml = (htmlString) => {
@@ -9,9 +9,18 @@ const sanitizeHtml = (htmlString) => {
     doc.body.querySelectorAll('*').forEach(el => {
         el.removeAttribute('style');
         el.removeAttribute('class');
+        if (el.tagName === 'A') {
+            if (!el.hasAttribute('href')) {
+                const textNode = document.createTextNode(el.textContent);
+                el.parentNode.replaceChild(textNode, el);
+            } else {
+                el.setAttribute('target', '_blank');
+                el.setAttribute('rel', 'noopener noreferrer');
+            }
+        }
     });
     // Hapus tag yang tidak diinginkan, misal <script>
-    doc.body.querySelectorAll('script, style, link, meta').forEach(el => el.remove());
+    doc.body.querySelectorAll('script, style, meta').forEach(el => el.remove());
     return doc.body.innerHTML;
 };
 
@@ -45,6 +54,22 @@ const MiniTextEditor = ({ value, initialValue = "", onChange, label, error }) =>
         document.execCommand(command, false, value);
         editorRef.current.focus();
         handleContentChange();
+    };
+
+    const handleInsertLink = () => {
+        const url = prompt('Masukkan URL tautan (termasuk https://):', 'https://');
+        if (url) {
+            const selection = window.getSelection();
+            if (selection.toString().length === 0) {
+                const textNode = document.createTextNode(url);
+                const range = selection.getRangeAt(0);
+                range.insertNode(textNode);
+                range.selectNodeContents(textNode);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+            execCommand('createLink', url);
+        }
     };
 
     return (
@@ -105,6 +130,25 @@ const MiniTextEditor = ({ value, initialValue = "", onChange, label, error }) =>
                         className="p-1.5 hover:bg-slate-200 rounded text-slate-700 transition-colors"
                     >
                         <ListOrdered size={16} />
+                    </button>
+
+                    <div className="w-px h-4 bg-slate-300 mx-1" />
+
+                    <button 
+                        type="button" 
+                        onClick={handleInsertLink} 
+                        title="Insert Link" 
+                        className="p-1.5 hover:bg-slate-200 rounded text-slate-700 transition-colors"
+                    >
+                        <LinkIcon size={16} />
+                    </button>
+                    <button 
+                        type="button" 
+                        onClick={() => execCommand('unlink')} 
+                        title="Remove Link" 
+                        className="p-1.5 hover:bg-slate-200 rounded text-slate-700 transition-colors"
+                    >
+                        <Unlink size={16} />
                     </button>
                 </div>
                 <div
