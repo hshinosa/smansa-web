@@ -60,7 +60,8 @@ services:
       app:
         condition: service_started
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/health || exit 1"]
+      # /up bypasses web middleware - --max-redirect=0 catches redirect loops
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/health && wget -q --max-redirect=0 -O /dev/null http://127.0.0.1/up || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
