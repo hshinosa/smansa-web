@@ -111,6 +111,7 @@ services:
     image: smansa-web:prod
     restart: unless-stopped
     working_dir: /var/www
+    user: "www-data"
     command: /bin/sh -c "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"
     env_file:
       - .env

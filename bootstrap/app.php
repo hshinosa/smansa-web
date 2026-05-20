@@ -65,8 +65,13 @@ return Application::configure(basePath: dirname(__DIR__))
                     ], $statusCode);
                 }
 
-                // For Inertia requests
-                return redirect()->back()->with('error', 'Terjadi kesalahan. Silakan coba lagi.');
+                // For web requests - avoid redirect loops by using Inertia error page
+                // redirect()->back() with no Referer causes infinite loops
+                if ($request->hasHeader('X-Inertia')) {
+                    return redirect()->back()->with('error', 'Terjadi kesalahan. Silakan coba lagi.');
+                }
+
+                return response('Terjadi kesalahan pada server. Silakan coba lagi.', $statusCode);
             }
 
             // In development: let Laravel show detailed errors
